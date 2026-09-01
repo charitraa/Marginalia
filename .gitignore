@@ -30,3 +30,6 @@ bun.lockb
 .vscode/settings.json
 .vscode/
 /.vscode
+# Local environment
+.env
+.env.local

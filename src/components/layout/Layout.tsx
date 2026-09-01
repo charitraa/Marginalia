@@ -1,16 +1,22 @@
-import Header from "./Header";
-import Footer from "./Footer";
+import type { ReactNode } from "react";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+/** Page chrome shared by every route. */
+export default function Layout({
+  children,
+  showFooter = true,
+}: {
+  children: ReactNode;
+  showFooter?: boolean;
+}) {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
+      <main id="main" className="flex-1">
+        {children}
+      </main>
+      {showFooter && <Footer />}
     </div>
   );
 }

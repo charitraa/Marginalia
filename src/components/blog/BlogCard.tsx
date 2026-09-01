@@ -1,149 +1,141 @@
 import { Link } from "react-router-dom";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import UserAvatar from "@/components/blog/UserAvatar";
+import CategoryBadge from "@/components/blog/CategoryBadge";
+import PostMeta from "@/components/blog/PostMeta";
+import { formatDate } from "@/lib/format";
+import { authorPath, postPath } from "@/lib/routes";
+import { cn } from "@/lib/utils";
+import type { Post } from "@/types/blog";
 
 interface BlogCardProps {
-  id: string;
-  title: string;
-  excerpt: string;
-  author: {
-    name: string;
-    avatar: string;
-  };
-  category: string;
-  image?: string;
-  readTime: string;
-  publishedAt: string;
-  likes: number;
-  comments: number;
-  variant?: "horizontal" | "vertical";
+  post: Post;
+  /** "grid" for the card grid, "row" for the reading feed. */
+  variant?: "grid" | "row";
+  className?: string;
 }
 
-export default function BlogCard({
-  id,
-  title,
-  excerpt,
-  author,
-  category,
-  image,
-  readTime,
-  publishedAt,
-  likes,
-  comments,
-  variant = "vertical",
-}: BlogCardProps) {
-  if (variant === "horizontal") {
-    return (
-      <article className="flex gap-6 pb-6 border-b border-border hover:bg-secondary/20 p-4 rounded-lg transition-colors cursor-pointer group">
-        {image && (
-          <Link to={`/post/${id}`} className="flex-shrink-0 w-40 h-32 rounded-lg overflow-hidden">
-            <img
-              src={image}
-              alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          </Link>
+/**
+ * The canonical post card. Both variants share the same data so the feed and
+ * the grid never drift apart.
+ */
+export default function BlogCard({ post, variant = "grid", className }: BlogCardProps) {
+  const href = postPath(post);
+  const published = formatDate(post.publishedAt);
+
+  const cover = post.coverImage ? (
+    <img
+      src={post.coverImage}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      className="h-full w-full bg-muted object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+    />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center bg-muted" aria-hidden="true">
+      <span className="font-serif text-2xl text-muted-foreground/50">
+        {post.title.slice(0, 1).toUpperCase()}
+      </span>
+    </div>
+  );
+
+  const byline = (
+    <div className="flex items-center gap-2 text-sm">
+      <UserAvatar user={post.author} size="sm" />
+      <div className="min-w-0">
+        <Link
+          to={authorPath(post.author)}
+          className="font-medium text-foreground hover:underline"
+          onClick={(event) => event.stopPropagation()}
+        >
+          {post.author.name}
+        </Link>
+        {published && (
+          <span className="ml-2 text-xs text-muted-foreground">
+            <time dateTime={post.publishedAt ?? undefined}>{published}</time>
+          </span>
         )}
+      </div>
+    </div>
+  );
 
-        <div className="flex-1 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <img
-                src={author.avatar}
-                alt={author.name}
-                className="h-8 w-8 rounded-full object-cover"
-              />
-              <div className="text-sm">
-                <p className="font-medium">{author.name}</p>
-                <p className="text-xs text-muted-foreground">{publishedAt}</p>
-              </div>
-            </div>
-
-            <Link to={`/post/${id}`}>
-              <h3 className="text-xl font-semibold group-hover:text-primary transition-colors mb-2">
-                {title}
-              </h3>
-            </Link>
-
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {excerpt}
-            </p>
+  if (variant === "row") {
+    return (
+      <article className={cn("group flex gap-5 py-6 sm:gap-8", className)}>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            {post.category && <CategoryBadge category={post.category} />}
+            {post.status === "draft" && (
+              <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
+                Draft
+              </span>
+            )}
           </div>
 
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-3 text-muted-foreground text-xs">
-              <span className="px-3 py-1 bg-secondary rounded-full">{category}</span>
-              <span>{readTime}</span>
-            </div>
+          <h3 className="text-xl font-semibold leading-snug sm:text-2xl">
+            <Link to={href} className="transition-colors hover:text-primary">
+              {post.title}
+            </Link>
+          </h3>
 
-            <div className="flex items-center gap-4 text-muted-foreground">
-              <button className="flex items-center gap-1 hover:text-primary transition-colors">
-                <Heart className="h-4 w-4" />
-                <span className="text-xs">{likes}</span>
-              </button>
-              <button className="flex items-center gap-1 hover:text-primary transition-colors">
-                <MessageCircle className="h-4 w-4" />
-                <span className="text-xs">{comments}</span>
-              </button>
-            </div>
+          {post.excerpt && (
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+              {post.excerpt}
+            </p>
+          )}
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+            {byline}
+            <PostMeta post={post} className="ml-auto" />
           </div>
         </div>
+
+        <Link
+          to={href}
+          tabIndex={-1}
+          aria-hidden="true"
+          className="h-24 w-28 shrink-0 overflow-hidden rounded-lg border border-border sm:h-28 sm:w-44"
+        >
+          {cover}
+        </Link>
       </article>
     );
   }
 
   return (
-    <article className="bg-transparent rounded-lg hover:bg-secondary/30 transition-colors group cursor-pointer h-full flex flex-col p-4 border border-transparent hover:border-border/50">
-      {image && (
-        <Link to={`/post/${id}`} className="overflow-hidden rounded-lg mb-4">
-          <img
-            src={image}
-            alt={title}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+    <article className={cn("group flex h-full flex-col", className)}>
+      <Link
+        to={href}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="mb-4 block aspect-[16/10] overflow-hidden rounded-lg border border-border"
+      >
+        {cover}
+      </Link>
+
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        {post.category && <CategoryBadge category={post.category} />}
+        {post.status === "draft" && (
+          <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-accent-foreground">
+            Draft
+          </span>
+        )}
+      </div>
+
+      <h3 className="text-lg font-semibold leading-snug">
+        <Link to={href} className="transition-colors hover:text-primary">
+          {post.title}
         </Link>
+      </h3>
+
+      {post.excerpt && (
+        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+          {post.excerpt}
+        </p>
       )}
 
-      <div className="flex flex-col flex-1">
-        {/* Author Info at Top */}
-        <div className="flex items-center gap-2 mb-4">
-          <img
-            src={author.avatar}
-            alt={author.name}
-            className="h-8 w-8 rounded-full object-cover"
-          />
-          <div className="text-sm">
-            <p className="font-medium">{author.name}</p>
-            <p className="text-xs text-muted-foreground">{publishedAt}</p>
-          </div>
-        </div>
-
-        <Link to={`/post/${id}`}>
-          <h3 className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors mb-2 line-clamp-2">
-            {title}
-          </h3>
-        </Link>
-
-        <p className="text-sm text-muted-foreground mb-4 flex-1 line-clamp-2">
-          {excerpt}
-        </p>
-
-        <div className="flex items-center justify-between pt-4">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs">
-            <span className="px-3 py-1 bg-secondary rounded-full">{category}</span>
-            <span>{readTime}</span>
-          </div>
-
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <button className="flex items-center gap-1 hover:text-primary transition-colors p-1 hover:bg-secondary rounded">
-              <Heart className="h-4 w-4" />
-              <span className="text-xs">{likes}</span>
-            </button>
-            <button className="flex items-center gap-1 hover:text-primary transition-colors p-1 hover:bg-secondary rounded">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-xs">{comments}</span>
-            </button>
-          </div>
-        </div>
+      <div className="mt-auto space-y-3 pt-4">
+        {byline}
+        <PostMeta post={post} />
       </div>
     </article>
   );

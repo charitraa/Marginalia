@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        serif: ["Georgia", "serif"],
+        sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        serif: ["Source Serif 4", "Georgia", "Cambria", "serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
       },
       fontSize: {
         "xs": ["12px", { lineHeight: "16px" }],
@@ -25,7 +26,8 @@ export default {
         "xl": ["20px", { lineHeight: "28px" }],
         "2xl": ["24px", { lineHeight: "32px" }],
         "3xl": ["30px", { lineHeight: "36px" }],
-        "4xl": ["36px", { lineHeight: "40px" }],
+        "4xl": ["36px", { lineHeight: "42px" }],
+        "5xl": ["44px", { lineHeight: "50px" }],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -105,12 +107,23 @@ export default {
           "0%": { transform: "translateY(-10px)", opacity: "0" },
           "100%": { transform: "translateY(0)", opacity: "1" },
         },
+        "rise": {
+          "0%": { transform: "translateY(6px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "like-pop": {
+          "0%": { transform: "scale(1)" },
+          "40%": { transform: "scale(1.25)" },
+          "100%": { transform: "scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.3s ease-out",
         "slide-down": "slide-down 0.3s ease-out",
+        "rise": "rise 0.35s ease-out",
+        "like-pop": "like-pop 0.3s ease-out",
       },
     },
   },

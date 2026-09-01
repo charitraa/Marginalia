@@ -1,7 +1,11 @@
+# Mindful Blog
 
 ## About the Project
-Mindful Blog is a full-stack blog platform where users can create, edit, and share articles with rich text support, comments, and user authentication.  
-The goal of this project is to provide a scalable, modern blogging system that can be used by individuals, teams, or as a foundation for larger CMS platforms.
+Mindful Blog is the React frontend of a full-stack publishing platform. Readers browse,
+search and filter stories; writers draft, publish and manage them from a dashboard.
+
+Every screen is backed by the real API — there is no mock data in the application. The
+backend lives in [Blog_Server](https://github.com/charitraa/Blog_Server).
 
 ## 🎥 Demo / Screenshots
 
@@ -11,43 +15,65 @@ The goal of this project is to provide a scalable, modern blogging system that c
 ### 📸 Screenshots
 ![Homepage](https://github.com/charitraa/Mindful_Blog/blob/main/home.png)
 ![Editor](https://github.com/charitraa/Mindful_Blog/blob/main/following.png)
-
 ## 🛠️ Tech Stack
-- **Frontend**: React (Next.js) + TailwindCSS
-- **Backend**: Django (REST Framework)
-- **Database**: Sqllite
-- **Authentication**: Session Based / JWT
-- **Other Tools**: GitHub Actions, ESLint, Prettier
+- **Framework**: React 18 + TypeScript, built with Vite
+- **Routing**: React Router 6, with route-level code splitting
+- **Server state**: TanStack Query
+- **Styling**: Tailwind CSS + shadcn/ui (Radix primitives)
+- **HTTP**: Axios, with a single instance that handles auth and token refresh
+- **Safety**: DOMPurify on every rendered post body
+- **Theming**: next-themes, light and dark
 
 ## ⚡ Features
-- ✍️ Create, edit, and delete blog posts
-- 🔒 Secure user authentication (Login/Register)
-- 🖼️ Rich text editor with image upload
-- 💬 Commenting system with replies
-- 👤 User profiles & author pages
-- 📱 Responsive UI (mobile & desktop)
-- 📊 User can follow and saved the posts
-- 🚀 Deployed with Docker / Vercel / Render
+- 🏠 Home with a hero, featured story, latest feed, popular sidebar and categories
+- 🔍 Explore and Search with debounced querying, category and tag filters, sorting and
+  pagination — all held in the URL so a view can be shared and restored
+- 📖 Article pages with a reading-progress bar, sanitised rich content, tags, likes,
+  threaded comments, sharing and related posts
+- ✍️ A writing interface with a formatting toolbar, live preview, word count and
+  reading-time estimate, cover-image upload, drafts and publishing
+- 💾 In-progress writing mirrored to `localStorage`, so a failed request never loses work
+- 📊 A dashboard with real statistics and All / Published / Drafts tabs
+- 👤 Author profiles with follow, and a settings area for profile, avatar, email and password
+- 🔒 Protected routes that remember where you were headed and return you there after sign-in
+- ♿ Semantic markup, keyboard navigation, visible focus, labelled controls
+- 📱 Verified with no horizontal overflow from 320px to large desktop
+- ⏳ Skeletons, toasts, empty states and human-readable errors on every request
 
 ## 📂 Folder Structure
 ```bash
-Mindful Blog/
-
-├── components/   # Reusable UI components
-├── config/
-├── types/
-├── styles/
-├── pages/        # Page routes
-├── services/     # API calls
-   └── utils/        # Helper functions
-
+Mindful_Blog/
+├── src/
+│   ├── components/
+│   │   ├── blog/        # PostCard, PostEditor, LikeButton, CommentSection, …
+│   │   ├── common/      # Seo, ProtectedRoute, Pagination, EmptyState, Skeletons, …
+│   │   ├── layout/      # Header, Footer, Layout
+│   │   └── ui/          # shadcn/ui primitives
+│   ├── hooks/           # useAuth (auth context), usePosts (query hooks), useDebounce
+│   ├── lib/             # format, sanitize, errors, routes, utils
+│   ├── pages/           # One file per route
+│   ├── services/        # API layer: ApiClients + one module per resource
+│   ├── types/           # Domain types the UI renders
+│   ├── constants.tsx
+│   ├── App.tsx          # Providers and routing
+│   └── main.tsx
+├── .env.example
+├── tailwind.config.ts
+└── vite.config.ts
 ```
+
+The `services/` layer is the only place that knows about API shapes: `normalizers.ts`
+maps the API's snake_case payloads onto the camelCase domain types in `types/blog.ts`, so
+no component ever reads a raw API field name.
 
 ## 🚀 Getting Started
 
+Start the [backend](https://github.com/charitraa/Blog_Server) first; it should be running
+on http://localhost:8000.
+
 ### 1️⃣ Clone the repo
 ```bash
-git clone https://github.com/username/Mindful_Blog.git
+git clone https://github.com/charitraa/Mindful_Blog.git
 cd Mindful_Blog
 ```
 
@@ -56,15 +82,48 @@ cd Mindful_Blog
 npm install
 ```
 
+### 3️⃣ Configure the environment
+```bash
+cp .env.example .env
+```
+Leave `VITE_API_BASE_URL` **empty** for local development: Vite proxies `/api` and
+`/media` to the backend, so the browser sees a single origin, cookies stay first-party and
+CORS never enters the picture. Point `VITE_DEV_API_TARGET` elsewhere if your backend is
+not on port 8000. For deployed builds, set `VITE_API_BASE_URL` to the API's public URL and
+add that origin to the backend's `CORS_ALLOWED_ORIGINS`.
+
 ### 4️⃣ Run the app
 ```bash
 npm run dev
 ```
+The app runs at http://localhost:8080.
+
+### 5️⃣ Build for production
+```bash
+npm run build
+```
 
 ## 🧪 Running Tests
 ```bash
-npm run test
+npm run typecheck   # TypeScript, strict on the project's settings
+npm test            # Vitest unit tests
 ```
+
+## 🔐 Authentication
+The access token is held **in memory only** and sent as `Authorization: Bearer`. The
+refresh token lives in an httpOnly cookie the browser replays on its own, so no credential
+is ever readable by JavaScript and an XSS has no session to steal. `localStorage` holds
+only a boolean "this user intends to be signed in" flag, which avoids a pointless refresh
+request on every visit by a signed-out reader.
+
+A 401 triggers a single shared refresh — parallel queries refresh once between them, not
+once each — and the original request is retried. If the refresh fails, the app drops to a
+signed-out state rather than leaving stale data on screen.
+
+Post bodies are sanitised server-side with bleach and again here with DOMPurify before
+they reach the DOM. Permission checks in the UI are for affordance only; the API is
+authoritative and re-checks every write.
+
 ## 👨‍💻 Contributing
 We ❤️ contributions! Please follow these steps to ensure a smooth contribution process:
 

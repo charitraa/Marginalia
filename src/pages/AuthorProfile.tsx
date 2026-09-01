@@ -1,184 +1,220 @@
-import "../global.css";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { CalendarDays, FileText, Github, Globe, Heart, Linkedin, Twitter, Users } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import Seo from "@/components/common/Seo";
 import BlogCard from "@/components/blog/BlogCard";
+import UserAvatar from "@/components/blog/UserAvatar";
+import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
+import Pagination from "@/components/common/Pagination";
+import { PostGridSkeleton, ProfileSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
-import { Github, Linkedin, Twitter, Globe, BarChart3, Users, Heart } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useAuthor, useAuthorPosts, useToggleFollow } from "@/hooks/usePosts";
+import { formatCount, formatDate } from "@/lib/format";
+import { pageCount } from "@/services/normalizers";
+
+const SOCIALS = [
+  { key: "website", label: "Website", icon: Globe },
+  { key: "twitter", label: "Twitter", icon: Twitter },
+  { key: "github", label: "GitHub", icon: Github },
+  { key: "linkedin", label: "LinkedIn", icon: Linkedin },
+] as const;
 
 export default function AuthorProfile() {
-  const { authorId } = useParams();
+  const { username } = useParams();
+  const { user, isAuthenticated } = useAuth();
+  const [page, setPage] = useState(1);
 
-  // Sample author data
-  const author = {
-    id: authorId,
-    name: "Sarah Chen",
-    title: "Full Stack Developer & Tech Writer",
-    bio: "Passionate about building scalable web applications and sharing knowledge with the community. 10+ years of experience in software development.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
-    coverImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=300&fit=crop",
-    stats: {
-      posts: 42,
-      followers: 3500,
-      likes: 8234,
-    },
-    socialLinks: {
-      twitter: "https://twitter.com",
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      website: "https://sarahchen.dev",
-    },
-    isFollowing: false,
-  };
+  const author = useAuthor(username);
+  const posts = useAuthorPosts(username, { page, pageSize: 9 });
+  const follow = useToggleFollow(username);
 
-  const AUTHOR_POSTS = [
-    {
-      id: "1",
-      title: "The Future of Web Development: What You Need to Know in 2025",
-      excerpt: "Explore the latest trends, frameworks, and best practices that are shaping the future of web development.",
-      author: { name: author.name, avatar: author.avatar },
-      category: "Technology",
-      image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop",
-      readTime: "8 min read",
-      publishedAt: "2 days ago",
-      likes: 1247,
-      comments: 89,
-    },
-    {
-      id: "2",
-      title: "React 19: Everything You Need to Know",
-      excerpt: "Deep dive into React 19's new features, improvements, and breaking changes.",
-      author: { name: author.name, avatar: author.avatar },
-      category: "Technology",
-      image: "https://images.unsplash.com/photo-1633356713697-e73dbe26dd8f?w=800&h=400&fit=crop",
-      readTime: "10 min read",
-      publishedAt: "5 days ago",
-      likes: 1521,
-      comments: 124,
-    },
-    {
-      id: "3",
-      title: "The Art of Writing Technical Documentation",
-      excerpt: "Best practices for creating clear, concise, and helpful technical docs.",
-      author: { name: author.name, avatar: author.avatar },
-      category: "Technology",
-      image: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=800&h=400&fit=crop",
-      readTime: "7 min read",
-      publishedAt: "1 week ago",
-      likes: 456,
-      comments: 32,
-    },
-  ];
+  const isSelf = Boolean(user && author.data && user.id === author.data.id);
 
-  return (
-    <Layout>
-      {/* Cover Image */}
-      <div className="w-full h-64 md:h-80 overflow-hidden -mx-4 md:mx-0">
-        <img
-          src={author.coverImage}
-          alt="Cover"
-          className="w-full h-full object-cover"
-        />
-      </div>
+  if (author.isLoading) {
+    return (
+      <Layout>
+        <div className="container-page py-12">
+          <ProfileSkeleton />
+        </div>
+      </Layout>
+    );
+  }
 
-      <div className="container mx-auto px-4 py-12 md:py-16">
-        {/* Author Header */}
-        <div className="flex flex-col md:flex-row md:items-end gap-8 mb-12 pb-12 border-b border-border">
-          {/* Avatar */}
-          <div className="flex-shrink-0 -mt-24 md:-mt-32">
-            <img
-              src={author.avatar}
-              alt={author.name}
-              className="h-40 w-40 rounded-full object-cover border-4 border-background shadow-lg"
-            />
-          </div>
-
-          {/* Info */}
-          <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-2">{author.name}</h1>
-            <p className="text-lg text-primary font-medium mb-2">{author.title}</p>
-            <p className="text-muted-foreground mb-6 max-w-2xl leading-relaxed">
-              {author.bio}
-            </p>
-
-            {/* Social Links */}
-            <div className="flex gap-3 mb-6">
-              {author.socialLinks.twitter && (
-                <a
-                  href={author.socialLinks.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-primary"
-                >
-                  <Twitter className="h-5 w-5" />
-                </a>
-              )}
-              {author.socialLinks.github && (
-                <a
-                  href={author.socialLinks.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-primary"
-                >
-                  <Github className="h-5 w-5" />
-                </a>
-              )}
-              {author.socialLinks.linkedin && (
-                <a
-                  href={author.socialLinks.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-primary"
-                >
-                  <Linkedin className="h-5 w-5" />
-                </a>
-              )}
-              {author.socialLinks.website && (
-                <a
-                  href={author.socialLinks.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 hover:bg-secondary rounded-lg transition-colors text-muted-foreground hover:text-primary"
-                >
-                  <Globe className="h-5 w-5" />
-                </a>
-              )}
-            </div>
-
-            {/* Follow Button */}
-            <Button className={author.isFollowing ? "bg-secondary text-secondary-foreground" : "bg-primary hover:bg-primary/90"}>
-              {author.isFollowing ? "Following" : "Follow"}
+  if (author.error || !author.data) {
+    return (
+      <Layout>
+        <div className="container-page py-20">
+          <ErrorState
+            error={author.error}
+            title="We couldn't find this author."
+            fallback="This profile may have been removed."
+          />
+          <div className="mt-8 text-center">
+            <Button variant="outline" asChild>
+              <Link to="/explore">Browse all stories</Link>
             </Button>
           </div>
         </div>
+      </Layout>
+    );
+  }
 
-        {/* Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
-          {[
-            { icon: BarChart3, label: "Posts", value: author.stats.posts },
-            { icon: Users, label: "Followers", value: author.stats.followers.toLocaleString() },
-            { icon: Heart, label: "Likes", value: author.stats.likes.toLocaleString() },
-          ].map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div key={index} className="bg-card rounded-lg border border-border p-6 text-center">
-                <Icon className="h-8 w-8 text-primary mx-auto mb-3" />
-                <p className="text-3xl font-bold mb-2">{stat.value}</p>
-                <p className="text-muted-foreground">{stat.label}</p>
+  const profile = author.data;
+  const items = posts.data?.items ?? [];
+
+  return (
+    <Layout>
+      <Seo
+        title={profile.name}
+        description={profile.bio || `Stories by ${profile.name} on Mindful Blog.`}
+        image={profile.avatar}
+        canonicalPath={`/author/${profile.username}`}
+      />
+
+      <header className="border-b border-border bg-muted/25">
+        <div className="container-page py-12 sm:py-16">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+            <UserAvatar user={profile} size="xl" className="shrink-0" />
+
+            <div className="min-w-0 flex-1">
+              <h1 className="text-3xl sm:text-4xl">{profile.name}</h1>
+              <p className="mt-1 text-muted-foreground">@{profile.username}</p>
+              {profile.headline && (
+                <p className="mt-2 font-medium text-primary">{profile.headline}</p>
+              )}
+              {profile.bio && (
+                <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">{profile.bio}</p>
+              )}
+
+              <dl className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                {profile.postCount != null && (
+                  <div className="inline-flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                    <dt className="sr-only">Posts</dt>
+                    <dd>
+                      <strong className="font-semibold">{formatCount(profile.postCount)}</strong>{" "}
+                      <span className="text-muted-foreground">posts</span>
+                    </dd>
+                  </div>
+                )}
+                {profile.followerCount != null && (
+                  <div className="inline-flex items-center gap-1.5">
+                    <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                    <dt className="sr-only">Followers</dt>
+                    <dd>
+                      <strong className="font-semibold">{formatCount(profile.followerCount)}</strong>{" "}
+                      <span className="text-muted-foreground">followers</span>
+                    </dd>
+                  </div>
+                )}
+                {profile.totalLikes != null && (
+                  <div className="inline-flex items-center gap-1.5">
+                    <Heart className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                    <dt className="sr-only">Likes received</dt>
+                    <dd>
+                      <strong className="font-semibold">{formatCount(profile.totalLikes)}</strong>{" "}
+                      <span className="text-muted-foreground">likes</span>
+                    </dd>
+                  </div>
+                )}
+                {profile.joinedAt && (
+                  <div className="inline-flex items-center gap-1.5 text-muted-foreground">
+                    <CalendarDays className="h-4 w-4" aria-hidden="true" />
+                    <dt className="sr-only">Joined</dt>
+                    <dd>Joined {formatDate(profile.joinedAt)}</dd>
+                  </div>
+                )}
+              </dl>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {isSelf ? (
+                  <Button variant="outline" asChild>
+                    <Link to="/settings">Edit profile</Link>
+                  </Button>
+                ) : (
+                  <Button
+                    variant={profile.isFollowing ? "outline" : "default"}
+                    disabled={follow.isPending}
+                    onClick={() => {
+                      if (!isAuthenticated) return;
+                      follow.mutate(!profile.isFollowing);
+                    }}
+                    asChild={!isAuthenticated}
+                  >
+                    {isAuthenticated ? (
+                      <span>{profile.isFollowing ? "Following" : "Follow"}</span>
+                    ) : (
+                      <Link to="/login">Sign in to follow</Link>
+                    )}
+                  </Button>
+                )}
+
+                <ul className="flex gap-1">
+                  {SOCIALS.map(({ key, label, icon: Icon }) => {
+                    const href = profile[key];
+                    if (!href) return null;
+                    return (
+                      <li key={key}>
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${profile.name} on ${label}`}
+                          className="inline-flex rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                        >
+                          <Icon className="h-5 w-5" aria-hidden="true" />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Articles */}
-        <div>
-          <h2 className="text-3xl font-bold mb-8">Published Articles</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {AUTHOR_POSTS.map((post) => (
-              <BlogCard key={post.id} {...post} />
-            ))}
+            </div>
           </div>
         </div>
-      </div>
+      </header>
+
+      <section className="container-page py-12 sm:py-16">
+        <h2 className="mb-8 border-b border-border pb-4 text-2xl">
+          {isSelf ? "Your published stories" : "Published stories"}
+        </h2>
+
+        {posts.isLoading ? (
+          <PostGridSkeleton count={3} />
+        ) : posts.error ? (
+          <ErrorState
+            error={posts.error}
+            title="We couldn't load these stories."
+            onRetry={() => posts.refetch()}
+          />
+        ) : items.length === 0 ? (
+          <EmptyState
+            title={isSelf ? "You haven't published anything yet." : "Nothing published yet."}
+            description={
+              isSelf
+                ? "Your drafts live in your dashboard until you publish them."
+                : "This author hasn't published a story yet."
+            }
+            action={isSelf ? { label: "Write a story", to: "/write" } : undefined}
+          />
+        ) : (
+          <>
+            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {items.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+            <Pagination
+              page={page}
+              pageCount={posts.data ? pageCount(posts.data) : 1}
+              onPageChange={setPage}
+            />
+          </>
+        )}
+      </section>
     </Layout>
   );
 }

@@ -1,143 +1,226 @@
-import "../global.css";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import Seo from "@/components/common/Seo";
+import SearchBar from "@/components/common/SearchBar";
 import BlogCard from "@/components/blog/BlogCard";
-import { Input } from "@/components/ui/input";
+import EmptyState from "@/components/common/EmptyState";
+import ErrorState from "@/components/common/ErrorState";
+import Pagination from "@/components/common/Pagination";
+import { PostGridSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCategories, usePostList } from "@/hooks/usePosts";
+import { useDebounce } from "@/hooks/useDebounce";
+import { SORT_OPTIONS, POSTS_PER_PAGE } from "@/constants";
+import { pageCount } from "@/services/normalizers";
+import { cn } from "@/lib/utils";
 
-const SAMPLE_ARTICLES = [
-  {
-    id: "1",
-    title: "Zero Trust Security: The Future of Cybersecurity Architecture in 2025",
-    excerpt: "Understand the principles, implementation strategies, and best practices for adopting a Zero Trust security model.",
-    author: { name: "Sarah Chen", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop" },
-    category: "Security",
-    image: "https://images.unsplash.com/photo-1555949519-3d1755ffc4d1?w=800&h=400&fit=crop",
-    readTime: "12 min read",
-    publishedAt: "2 days ago",
-    likes: 1847,
-    comments: 127,
-  },
-  {
-    id: "2",
-    title: "Building Scalable Microservices with Kubernetes: A Complete Guide",
-    excerpt: "Learn how to architect and deploy microservices at scale using Kubernetes and DevOps best practices.",
-    author: { name: "Alex Rivera", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" },
-    category: "DevOps",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&h=400&fit=crop",
-    readTime: "15 min read",
-    publishedAt: "1 day ago",
-    likes: 1256,
-    comments: 89,
-  },
-  {
-    id: "3",
-    title: "Ethical Hacking: Mastering Penetration Testing Fundamentals",
-    excerpt: "A comprehensive guide to penetration testing methodologies and tools used by security professionals.",
-    author: { name: "Jordan Miller", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop" },
-    category: "Security",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f70504c11?w=800&h=400&fit=crop",
-    readTime: "14 min read",
-    publishedAt: "3 days ago",
-    likes: 1642,
-    comments: 104,
-  },
-  {
-    id: "4",
-    title: "TypeScript Performance Optimization: Best Practices and Patterns",
-    excerpt: "Deep dive into TypeScript optimization techniques, compilation strategies, and runtime performance improvements.",
-    author: { name: "Emma Johnson", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop" },
-    category: "Web Development",
-    image: "https://images.unsplash.com/photo-1633356713697-e73dbe26dd8f?w=800&h=400&fit=crop",
-    readTime: "11 min read",
-    publishedAt: "5 days ago",
-    likes: 1521,
-    comments: 124,
-  },
-];
-
-const CATEGORIES = ["All", "Security", "DevOps", "Web Development", "Cloud", "Backend", "Frontend", "Mobile"];
-
+/**
+ * Discovery page. Every filter lives in the URL, so a filtered view can be
+ * shared, bookmarked and restored by the back button.
+ */
 export default function Explore() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [params, setParams] = useSearchParams();
 
-  const filteredArticles = SAMPLE_ARTICLES.filter((article) => {
-    const matchesCategory = selectedCategory === "All" || article.category === selectedCategory;
-    const matchesSearch = article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const category = params.get("category") ?? "all";
+  const tag = params.get("tag") ?? "";
+  const ordering = params.get("sort") ?? "latest";
+  const page = Number(params.get("page") ?? 1) || 1;
+  const urlSearch = params.get("q") ?? "";
+
+  // Typing updates the input immediately and the query only once it settles.
+  const [searchInput, setSearchInput] = useState(urlSearch);
+  const search = useDebounce(searchInput, 350);
+
+  useEffect(() => {
+    setSearchInput(urlSearch);
+  }, [urlSearch]);
+
+  // Writing the debounced value back to the URL keeps state in one place.
+  useEffect(() => {
+    if (search === urlSearch) return;
+    const next = new URLSearchParams(params);
+    if (search) next.set("q", search);
+    else next.delete("q");
+    next.delete("page");
+    setParams(next, { replace: true });
+  }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const { data: categories } = useCategories();
+
+  const query = useMemo(
+    () => ({
+      search: search || undefined,
+      category: category !== "all" ? category : undefined,
+      tag: tag || undefined,
+      ordering,
+      page,
+      pageSize: POSTS_PER_PAGE,
+    }),
+    [search, category, tag, ordering, page],
+  );
+
+  const { data, isLoading, isFetching, error, refetch } = usePostList(query);
+
+  const update = (key: string, value: string | null) => {
+    const next = new URLSearchParams(params);
+    if (value && value !== "all") next.set(key, value);
+    else next.delete(key);
+    if (key !== "page") next.delete("page");
+    setParams(next);
+  };
+
+  const clearAll = () => {
+    setSearchInput("");
+    setParams(new URLSearchParams());
+  };
+
+  const hasFilters = Boolean(search || tag || (category && category !== "all") || ordering !== "latest");
+  const posts = data?.items ?? [];
 
   return (
     <Layout>
-      <div className="py-12 md:py-16">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="max-w-2xl mx-auto mb-12">
-            <h1 className="text-4xl font-bold mb-4">Explore Articles</h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              Discover insightful articles from our community of writers.
-            </p>
+      <Seo
+        title="Explore"
+        description="Browse every story on Mindful Blog by topic, popularity or recency."
+        canonicalPath="/explore"
+      />
 
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Search articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 bg-secondary border-none"
-              />
-            </div>
+      <div className="container-page py-12 sm:py-16">
+        <header className="max-w-2xl">
+          <h1 className="text-4xl">Explore</h1>
+          <p className="mt-3 text-lg text-muted-foreground">
+            Browse every story by topic, popularity or recency.
+          </p>
+        </header>
+
+        <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center">
+          <div className="lg:max-w-md lg:flex-1">
+            <SearchBar
+              value={searchInput}
+              onChange={setSearchInput}
+              placeholder="Search stories, authors, topics…"
+              busy={isFetching && !isLoading}
+            />
           </div>
 
-          {/* Filters */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-4">
-              <Filter className="h-5 w-5 text-muted-foreground" />
-              <span className="text-sm font-medium">Filter by category:</span>
+          <div className="flex flex-wrap items-center gap-3 lg:ml-auto">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+              <label htmlFor="sort">Sort</label>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2">
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-full font-medium whitespace-nowrap transition-all ${
-                    selectedCategory === category
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Articles Grid */}
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            {filteredArticles.length > 0 ? (
-              filteredArticles.map((article) => (
-                <BlogCard key={article.id} {...article} />
-              ))
-            ) : (
-              <div className="col-span-2 text-center py-12">
-                <p className="text-lg text-muted-foreground">
-                  No articles found matching your search.
-                </p>
-              </div>
+            <Select value={ordering} onValueChange={(value) => update("sort", value)}>
+              <SelectTrigger className="w-40" id="sort" aria-label="Sort stories">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {hasFilters && (
+              <Button variant="ghost" onClick={clearAll} className="text-sm">
+                Reset
+              </Button>
             )}
           </div>
+        </div>
 
-          {/* Load More */}
-          {filteredArticles.length > 0 && (
-            <div className="text-center">
-              <Button variant="outline" className="border-primary text-primary hover:bg-primary/5">
-                Load more articles
-              </Button>
-            </div>
+        {/* Categories */}
+        {categories && categories.length > 0 && (
+          <nav aria-label="Filter by category" className="mt-6 -mx-1 overflow-x-auto pb-2">
+            <ul className="flex min-w-max gap-2 px-1">
+              {[{ slug: "all", name: "All", id: "all", description: "", count: null }, ...categories].map(
+                (entry) => {
+                  const active = category === entry.slug || (entry.slug === "all" && category === "all");
+                  return (
+                    <li key={entry.slug}>
+                      <button
+                        type="button"
+                        onClick={() => update("category", entry.slug)}
+                        aria-pressed={active}
+                        className={cn(
+                          "whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                          active
+                            ? "border-transparent bg-primary text-primary-foreground"
+                            : "border-border bg-background text-muted-foreground hover:border-foreground/25 hover:text-foreground",
+                        )}
+                      >
+                        {entry.name}
+                        {entry.count != null && entry.slug !== "all" && (
+                          <span className="ml-1.5 text-xs opacity-70">{entry.count}</span>
+                        )}
+                      </button>
+                    </li>
+                  );
+                },
+              )}
+            </ul>
+          </nav>
+        )}
+
+        {tag && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Tagged <span className="font-medium text-foreground">#{tag}</span>
+            <Button variant="link" className="h-auto p-0 pl-2 text-sm" onClick={() => update("tag", null)}>
+              clear
+            </Button>
+          </p>
+        )}
+
+        {/* Results */}
+        <div className="mt-10">
+          {isLoading ? (
+            <PostGridSkeleton count={6} />
+          ) : error ? (
+            <ErrorState
+              error={error}
+              title="We couldn't load these stories."
+              onRetry={() => refetch()}
+            />
+          ) : posts.length === 0 ? (
+            <EmptyState
+              title="No stories found."
+              description={
+                hasFilters
+                  ? "Nothing matches these filters yet. Try a broader search."
+                  : "There is nothing published here yet."
+              }
+              action={hasFilters ? { label: "Reset filters", onClick: clearAll } : undefined}
+            />
+          ) : (
+            <>
+              <p className="mb-6 text-sm text-muted-foreground" role="status">
+                {data?.count} {data?.count === 1 ? "story" : "stories"}
+              </p>
+              <div
+                className={cn(
+                  "grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3",
+                  isFetching && "opacity-60 transition-opacity",
+                )}
+              >
+                {posts.map((post) => (
+                  <BlogCard key={post.id} post={post} />
+                ))}
+              </div>
+
+              <Pagination
+                page={page}
+                pageCount={data ? pageCount(data) : 1}
+                onPageChange={(next) => update("page", String(next))}
+              />
+            </>
           )}
         </div>
       </div>
