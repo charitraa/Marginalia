@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import {
+import { BookOpen,
   ClipboardCheck, Eye, FileText, Flag, Heart, Mail, MessageSquare, Send, Users,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
@@ -142,6 +142,34 @@ export default function AdminDashboard() {
                     </li>
                   ))}
               </ul>
+            </section>
+
+            <section aria-labelledby="developer" className="mt-10 border-t border-border pt-6">
+              <h2 id="developer" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                Developer
+              </h2>
+              <p className="mb-3 text-sm text-muted-foreground">
+                The API documents itself from the code, so these are always in step
+                with what the server actually does.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" asChild className="gap-2">
+                  <a href="/api/docs/" target="_blank" rel="noopener noreferrer">
+                    <BookOpen className="h-4 w-4" aria-hidden="true" />
+                    Swagger UI
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/api/redoc/" target="_blank" rel="noopener noreferrer">
+                    ReDoc
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/api/schema/" target="_blank" rel="noopener noreferrer">
+                    OpenAPI schema
+                  </a>
+                </Button>
+              </div>
             </section>
           </>
         )}

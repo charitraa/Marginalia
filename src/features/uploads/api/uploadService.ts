@@ -1,5 +1,7 @@
 import { axiosInstance } from "@/lib/api/client";
+import { normalizePage } from "@/lib/api/normalize";
 import { mediaUrl } from "@/lib/format";
+import type { Paginated } from "@/types/common";
 
 /**
  * Images uploaded from inside the post editor.
@@ -22,4 +24,31 @@ export async function uploadEditorImage(file: File): Promise<UploadedImage> {
     id: String(data?.id ?? ""),
     url: mediaUrl(data?.url ?? "") ?? "",
   };
+}
+
+/** One image in the author's library. */
+export interface LibraryImage {
+  id: string;
+  url: string;
+  createdAt: string | null;
+}
+
+/**
+ * Images this author has uploaded.
+ *
+ * Scoped to the uploader by the API, so one writer never browses another's
+ * media even though the files sit in the same store.
+ */
+export async function listMyImages(page = 1): Promise<Paginated<LibraryImage>> {
+  const { data } = await axiosInstance.get("/api/uploads/images/mine/", { params: { page } });
+  return normalizePage(
+    data,
+    (raw: Record<string, any>) => ({
+      id: String(raw.id ?? ""),
+      url: mediaUrl(raw.url ?? "") ?? "",
+      createdAt: raw.created_at ?? null,
+    }),
+    page,
+    24,
+  );
 }

@@ -106,3 +106,23 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     followerCount: read("follower_count"),
   };
 }
+
+/**
+ * Who follows this author, and who they follow.
+ *
+ * Both are public: a follower list that only the owner can see would make the
+ * counts on the profile unverifiable.
+ */
+export async function listFollowers(username: string, page = 1): Promise<Paginated<Author>> {
+  const { data } = await axiosInstance.get(`/api/users/${username}/followers/`, {
+    params: { page },
+  });
+  return normalizePage(data, normalizeAuthor, page, 20);
+}
+
+export async function listFollowing(username: string, page = 1): Promise<Paginated<Author>> {
+  const { data } = await axiosInstance.get(`/api/users/${username}/following/`, {
+    params: { page },
+  });
+  return normalizePage(data, normalizeAuthor, page, 20);
+}

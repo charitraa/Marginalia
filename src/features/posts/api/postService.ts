@@ -15,6 +15,7 @@ import type {
   PostQuery,
   PostRevision,
   PostRevisionDetail,
+  ReactionKind,
   ReadingHistoryEntry,
   Tag,
 } from "@/features/posts/types";
@@ -116,14 +117,32 @@ export async function deletePost(idOrSlug: string): Promise<void> {
 export interface LikeResult {
   isLiked: boolean;
   likeCount: number | null;
+  myReaction: ReactionKind | null;
+  /** Per-kind totals, so the UI need not ask twice. */
+  reactions: Record<string, number>;
 }
 
-export async function setLike(idOrSlug: string, liked: boolean): Promise<LikeResult> {
+/**
+ * React to a post, or remove your reaction.
+ *
+ * `kind` defaults to "like". Sending a different one replaces the previous
+ * reaction rather than adding a second, so the count is always the number of
+ * people who reacted.
+ */
+export async function setLike(
+  idOrSlug: string,
+  liked: boolean,
+  kind: ReactionKind = "like",
+): Promise<LikeResult> {
   const path = `/api/posts/${idOrSlug}/like/`;
-  const { data } = liked ? await axiosInstance.post(path) : await axiosInstance.delete(path);
+  const { data } = liked
+    ? await axiosInstance.post(path, { kind })
+    : await axiosInstance.delete(path);
   return {
     isLiked: data?.is_liked ?? liked,
     likeCount: typeof data?.like_count === "number" ? data.like_count : null,
+    myReaction: data?.my_reaction ?? null,
+    reactions: data?.reactions ?? {},
   };
 }
 
@@ -321,4 +340,17 @@ export async function reviewPost(
 ): Promise<Post> {
   const { data } = await axiosInstance.post(`/api/posts/${slug}/review/`, { action, note });
   return normalizePost(data);
+}
+
+/**
+ * One category, with its description and post count.
+ *
+ * Used by the category landing page. The explore filter only needs the slug,
+ * but a page about a category needs the category itself.
+ */
+export async function getCategory(slug: string): Promise<Category> {
+  const { data } = await axiosInstance.get(`/api/categories/${slug}/`);
+  const category = normalizeCategory(data);
+  if (!category) throw new Error("Unknown category");
+  return category;
 }

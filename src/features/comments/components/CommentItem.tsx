@@ -18,6 +18,38 @@ import { authorPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import type { Comment } from "@/features/comments/types";
 
+// Same shape the server parses, so what is highlighted is what was notified.
+const MENTION_RE = /(?<![\w@])@([a-zA-Z0-9_-]{3,30})\b/g;
+
+/**
+ * Turns @handles into profile links.
+ *
+ * Built as React nodes rather than injected HTML: comment bodies are untrusted
+ * text, and the one thing that must never happen is a comment becoming markup.
+ */
+function renderMentions(text: string) {
+  const parts: Array<string | JSX.Element> = [];
+  let cursor = 0;
+
+  for (const match of text.matchAll(MENTION_RE)) {
+    const start = match.index ?? 0;
+    if (start > cursor) parts.push(text.slice(cursor, start));
+    parts.push(
+      <Link
+        key={`${match[1]}-${start}`}
+        to={`/author/${match[1]}`}
+        className="font-medium text-primary hover:underline"
+      >
+        @{match[1]}
+      </Link>,
+    );
+    cursor = start + match[0].length;
+  }
+
+  if (cursor < text.length) parts.push(text.slice(cursor));
+  return parts.length ? parts : text;
+}
+
 interface CommentItemProps {
   comment: Comment;
   onUpdate: (id: string, content: string) => Promise<unknown>;
@@ -212,7 +244,7 @@ export default function CommentItem({
           ) : (
             <>
               <p className="mt-2 whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-foreground/90">
-                {comment.content}
+                {renderMentions(comment.content)}
               </p>
 
               {onLike && (

@@ -4,7 +4,7 @@ import * as postService from "../api/postService";
 import { postKeys } from "../api/queryKeys";
 import { userKeys } from "@/features/users/api/queryKeys";
 import { errorMessage } from "@/lib/errors";
-import type { Post, PostQuery } from "../types";
+import type { Post, PostQuery, ReactionKind } from "../types";
 
 /** Reading and writing posts. Comment and author hooks live in their own features. */
 
@@ -89,8 +89,9 @@ export function useToggleLike(post: Post | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (liked: boolean) => postService.setLike(post?.slug ?? post?.id ?? "", liked),
-    onMutate: async (liked) => {
+    mutationFn: ({ liked, kind = "like" }: { liked: boolean; kind?: ReactionKind }) =>
+      postService.setLike(post?.slug ?? post?.id ?? "", liked, kind),
+    onMutate: async ({ liked, kind = "like" }) => {
       if (!post) return;
       const key = postKeys.detail(post.slug || post.id);
       await queryClient.cancelQueries({ queryKey: key });
@@ -101,10 +102,15 @@ export function useToggleLike(post: Post | undefined) {
           ? {
               ...current,
               isLiked: liked,
+              myReaction: liked ? kind : null,
               likeCount:
                 current.likeCount == null
                   ? current.likeCount
-                  : Math.max(0, current.likeCount + (liked ? 1 : -1)),
+                  // Switching reaction is not a new reaction: the count only
+                  // moves when someone starts or stops reacting.
+                  : current.isLiked === liked
+                    ? current.likeCount
+                    : Math.max(0, current.likeCount + (liked ? 1 : -1)),
             }
           : current,
       );
@@ -260,4 +266,15 @@ export function useEditorialActions() {
   });
 
   return { submit, review };
+}
+
+export function useCategory(slug: string | undefined) {
+  return useQuery({
+    queryKey: ["categories", "detail", slug ?? ""],
+    queryFn: () => postService.getCategory(slug as string),
+    enabled: Boolean(slug),
+    staleTime: 5 * 60_000,
+    retry: (failureCount, error: any) =>
+      error?.response?.status !== 404 && failureCount < 2,
+  });
 }

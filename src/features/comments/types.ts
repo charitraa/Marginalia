@@ -7,6 +7,14 @@ export interface Comment {
   content: string;
   author: Author;
   parentId: string | null;
+  /**
+   * The post this belongs to, as a UUID.
+   *
+   * Only useful outside a thread — on "your comments", where the reader needs
+   * to get back to an article they may not remember the name of. The detail
+   * route accepts a UUID as well as a slug, so this links directly.
+   */
+  postId: string;
   isEdited: boolean;
   /** Server's view of whether the current user may edit. UX only — the API re-checks. */
   canEdit: boolean;

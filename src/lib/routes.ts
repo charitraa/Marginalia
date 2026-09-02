@@ -14,8 +14,12 @@ export function authorPath(author: { id: string; username?: string }): string {
   return `/author/${encodeURIComponent(author.username || author.id)}`;
 }
 
+/**
+ * A category's own page, which carries its description and a follow button.
+ * `/explore?category=` still works as a plain filtered list.
+ */
 export function categoryPath(slug: string): string {
-  return `/explore?category=${encodeURIComponent(slug)}`;
+  return `/category/${encodeURIComponent(slug)}`;
 }
 
 export function tagPath(slug: string): string {

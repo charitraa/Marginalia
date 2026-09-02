@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, Rss, History, Shield,
+import { MessageSquare, ImageIcon, BarChart3, Rss, History, Shield,
   Bookmark, LayoutDashboard, LogOut, Menu, PenLine, Search, Settings, User as UserIcon, X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -155,6 +155,18 @@ export default function Header() {
                     <Link to="/analytics" className="gap-2">
                       <BarChart3 className="h-4 w-4" aria-hidden="true" />
                       Analytics
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/media" className="gap-2">
+                      <ImageIcon className="h-4 w-4" aria-hidden="true" />
+                      Media library
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-comments" className="gap-2">
+                      <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                      Your comments
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="sm:hidden">

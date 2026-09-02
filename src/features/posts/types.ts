@@ -26,6 +26,9 @@ export interface Tag {
  * `scheduled` becomes readable on its own once the date passes, so a missed
  * cron tick delays the status catching up rather than the article itself.
  */
+/** One reaction per person: choosing a new one replaces the old. */
+export type ReactionKind = "like" | "love" | "insightful" | "funny";
+
 export type PostStatus = "draft" | "in_review" | "scheduled" | "published";
 
 /** Who may open the post. */
@@ -59,6 +62,8 @@ export interface Post {
   commentCount: number | null;
   viewCount: number | null;
   isLiked: boolean;
+  /** Which reaction this reader chose, or null. */
+  myReaction: ReactionKind | null;
   isBookmarked: boolean;
   /** Only present on the author's own post, for sharing an unpublished draft. */
   previewToken: string | null;

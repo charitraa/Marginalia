@@ -53,6 +53,7 @@ export function normalizePost(raw: Raw): Post {
     viewCount: count(raw.view_count),
     isLiked: Boolean(raw.is_liked),
     isBookmarked: Boolean(raw.is_bookmarked),
+    myReaction: (raw.my_reaction as Post["myReaction"]) ?? null,
     subtitle: text(raw.subtitle),
     visibility: (raw.visibility ?? "public") as Post["visibility"],
     scheduledFor: raw.scheduled_for ?? null,

@@ -16,6 +16,8 @@ const AuthorProfile = lazy(() => import("@/pages/AuthorProfile"));
 const NewsletterAction = lazy(() => import("@/pages/NewsletterAction"));
 
 const Feed = lazy(() => import("@/pages/Feed"));
+const CategoryPage = lazy(() => import("@/pages/CategoryPage"));
+const FollowList = lazy(() => import("@/pages/FollowList"));
 const SeriesList = lazy(() => import("@/pages/series/SeriesList"));
 const SeriesDetail = lazy(() => import("@/pages/series/SeriesDetail"));
 const ManageSeries = lazy(() => import("@/pages/series/ManageSeries"));
@@ -37,6 +39,8 @@ const UserSettings = lazy(() => import("@/pages/account/UserSettings"));
 const Bookmarks = lazy(() => import("@/pages/account/Bookmarks"));
 const Notifications = lazy(() => import("@/pages/account/Notifications"));
 const ReadingHistory = lazy(() => import("@/pages/account/ReadingHistory"));
+const MediaLibrary = lazy(() => import("@/pages/account/MediaLibrary"));
+const MyComments = lazy(() => import("@/pages/account/MyComments"));
 const Trash = lazy(() => import("@/pages/account/Trash"));
 const Analytics = lazy(() => import("@/pages/account/Analytics"));
 
@@ -74,6 +78,9 @@ export default function AppRoutes() {
         <Route path="/search" element={<Search />} />
         <Route path="/post/:slug" element={<Post />} />
         <Route path="/author/:username" element={<AuthorProfile />} />
+        <Route path="/author/:username/followers" element={<FollowList mode="followers" />} />
+        <Route path="/author/:username/following" element={<FollowList mode="following" />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/series" element={<SeriesList />} />
         <Route path="/series/:slug" element={<SeriesDetail />} />
 
@@ -99,6 +106,8 @@ export default function AppRoutes() {
         <Route path="/bookmarks" element={guarded(<Bookmarks />)} />
         <Route path="/notifications" element={guarded(<Notifications />)} />
         <Route path="/history" element={guarded(<ReadingHistory />)} />
+        <Route path="/media" element={guarded(<MediaLibrary />)} />
+        <Route path="/my-comments" element={guarded(<MyComments />)} />
         <Route path="/trash" element={guarded(<Trash />)} />
         <Route path="/feed" element={guarded(<Feed />)} />
         <Route path="/analytics" element={guarded(<Analytics />)} />

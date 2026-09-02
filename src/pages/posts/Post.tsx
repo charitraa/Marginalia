@@ -83,7 +83,7 @@ export default function Post() {
     ? [
         { name: "Home", to: "/" },
         ...(post.category
-          ? [{ name: post.category.name, to: `/explore?category=${post.category.slug}` }]
+          ? [{ name: post.category.name, to: `/category/${post.category.slug}` }]
           : [{ name: "Explore", to: "/explore" }]),
         { name: post.title },
       ]

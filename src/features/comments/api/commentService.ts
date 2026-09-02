@@ -2,6 +2,7 @@ import { axiosInstance } from "@/lib/api/client";
 import { normalizePage } from "@/lib/api/normalize";
 import { normalizeComment } from "./normalizers";
 import type { Comment, CommentSort, ReportReason } from "@/features/comments/types";
+import type { Paginated } from "@/types/common";
 
 /**
  * Comments for a post.
@@ -75,4 +76,10 @@ export async function setCommentPin(commentId: string, pinned: boolean): Promise
   const path = `/api/comments/${commentId}/pin/`;
   const { data } = pinned ? await axiosInstance.post(path) : await axiosInstance.delete(path);
   return normalizeComment(data);
+}
+
+/** Everything the signed-in reader has said, newest first. */
+export async function listMyComments(page = 1): Promise<Paginated<Comment>> {
+  const { data } = await axiosInstance.get("/api/comments/mine/", { params: { page } });
+  return normalizePage(data, normalizeComment, page, 20);
 }

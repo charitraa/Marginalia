@@ -106,8 +106,32 @@ export default function AuthorProfile() {
                     <Users className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
                     <dt className="sr-only">Followers</dt>
                     <dd>
-                      <strong className="font-semibold">{formatCount(profile.followerCount)}</strong>{" "}
-                      <span className="text-muted-foreground">followers</span>
+                      {/* A count nobody can check is a number people stop believing. */}
+                      <Link
+                        to={`/author/${profile.username}/followers`}
+                        className="hover:underline"
+                      >
+                        <strong className="font-semibold">
+                          {formatCount(profile.followerCount)}
+                        </strong>{" "}
+                        <span className="text-muted-foreground">followers</span>
+                      </Link>
+                    </dd>
+                  </div>
+                )}
+                {profile.followingCount != null && profile.followingCount > 0 && (
+                  <div className="inline-flex items-center gap-1.5">
+                    <dt className="sr-only">Following</dt>
+                    <dd>
+                      <Link
+                        to={`/author/${profile.username}/following`}
+                        className="hover:underline"
+                      >
+                        <strong className="font-semibold">
+                          {formatCount(profile.followingCount)}
+                        </strong>{" "}
+                        <span className="text-muted-foreground">following</span>
+                      </Link>
                     </dd>
                   </div>
                 )}
