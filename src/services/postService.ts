@@ -131,3 +131,30 @@ export async function listMyPosts(query: PostQuery = {}): Promise<Paginated<Post
   const { data } = await axiosInstance.get("/api/posts/mine/", { params: toParams(query) });
   return normalizePage(data, normalizePost, query.page ?? 1, query.pageSize ?? POSTS_PER_PAGE);
 }
+
+export async function setBookmark(idOrSlug: string, bookmarked: boolean): Promise<boolean> {
+  const path = `/api/posts/${idOrSlug}/bookmark/`;
+  const { data } = bookmarked ? await axiosInstance.post(path) : await axiosInstance.delete(path);
+  return typeof data?.is_bookmarked === "boolean" ? data.is_bookmarked : bookmarked;
+}
+
+/** The reader's saved posts, newest save first. */
+export async function listBookmarks(query: PostQuery = {}): Promise<Paginated<Post>> {
+  const { data } = await axiosInstance.get("/api/bookmarks/", { params: toParams(query) });
+  return normalizePage(data, normalizePost, query.page ?? 1, query.pageSize ?? POSTS_PER_PAGE);
+}
+
+/**
+ * Reads an unpublished draft with its share token instead of a session, so a
+ * reviewer can open the link without an account.
+ */
+export async function getPostPreview(slug: string, token: string): Promise<Post> {
+  const { data } = await axiosInstance.get(`/api/posts/${slug}/preview/`, { params: { token } });
+  return normalizePost(data);
+}
+
+/** Issues a new preview token, which revokes every link shared so far. */
+export async function rotatePreviewToken(slug: string): Promise<Post> {
+  const { data } = await axiosInstance.post(`/api/posts/${slug}/preview-token/`);
+  return normalizePost(data);
+}

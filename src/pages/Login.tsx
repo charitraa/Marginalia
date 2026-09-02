@@ -4,6 +4,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import SocialAuthButtons from "@/components/common/SocialAuthButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,7 +99,15 @@ export default function Login() {
             </div>
 
             <div>
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-baseline justify-between gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-muted-foreground hover:text-foreground hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 name="password"
@@ -132,6 +141,8 @@ export default function Login() {
               )}
             </Button>
           </form>
+
+          <SocialAuthButtons label="or continue with" />
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Don't have an account?{" "}

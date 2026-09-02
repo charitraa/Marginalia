@@ -1,7 +1,7 @@
 import { axiosInstance, setAccessToken } from "./ApiClients";
-import { normalizeCurrentUser } from "./normalizers";
-import { PENDING_VERIFICATION_KEY, SESSION_FLAG_KEY } from "@/constants";
-import type { CurrentUser } from "@/types/blog";
+import { normalizeCurrentUser, normalizeSocialProvider } from "./normalizers";
+import { OAUTH_STATE_KEY, PENDING_VERIFICATION_KEY, SESSION_FLAG_KEY } from "@/constants";
+import type { CurrentUser, SocialProvider } from "@/types/blog";
 
 /**
  * Authentication.
@@ -162,4 +162,101 @@ export async function logout(): Promise<{ serverCleared: boolean }> {
   } finally {
     forgetSession();
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Forgotten passwords                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Starts a reset. The API answers identically whether or not the address is
+ * registered, so the UI must not claim an email "was sent" to a real account.
+ */
+export async function requestPasswordReset(email: string): Promise<string> {
+  const { data } = await axiosInstance.post("/api/auth/password-reset/", { email });
+  return data?.message ?? "If an account exists for that address, a reset link is on its way.";
+}
+
+/** Completes a reset. A successful reset also signs the user in. */
+export async function confirmPasswordReset(
+  token: string,
+  newPassword: string,
+  newPasswordConfirm: string,
+): Promise<CurrentUser | null> {
+  const { data } = await axiosInstance.post("/api/auth/password-reset/confirm/", {
+    token,
+    new_password: newPassword,
+    new_password_confirm: newPasswordConfirm,
+  });
+  const outcome = readAuthPayload(data, "");
+  return outcome.status === "authenticated" ? outcome.user : null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Social sign-in                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Providers this deployment can actually honour. An unconfigured provider is
+ * simply absent, so the UI renders no button for it rather than one that fails.
+ */
+export async function listSocialProviders(): Promise<SocialProvider[]> {
+  const { data } = await axiosInstance.get("/api/auth/providers/");
+  const list = Array.isArray(data) ? data : [];
+  return list
+    .map(normalizeSocialProvider)
+    .filter((entry): entry is SocialProvider => Boolean(entry));
+}
+
+/** Where this app expects the provider to send the browser back to. */
+export function socialRedirectUri(provider: string): string {
+  return `${window.location.origin}/auth/callback/${provider}`;
+}
+
+/**
+ * Builds the provider's consent URL.
+ *
+ * `state` is a random value stored for this browser only and compared when the
+ * provider redirects back, which is what stops a third-party page from feeding
+ * this app somebody else's authorization code.
+ */
+export function buildAuthorizeUrl(provider: SocialProvider): string {
+  const state = crypto.randomUUID();
+  try {
+    sessionStorage.setItem(`${OAUTH_STATE_KEY}.${provider.name}`, state);
+  } catch {
+    /* private mode; the callback falls back to skipping the comparison */
+  }
+
+  const params = new URLSearchParams({
+    client_id: provider.clientId,
+    redirect_uri: socialRedirectUri(provider.name),
+    response_type: "code",
+    scope: provider.scope,
+    state,
+  });
+  return `${provider.authorizeUrl}?${params.toString()}`;
+}
+
+/** True when the callback's `state` matches what this browser stored. */
+export function consumeOauthState(provider: string, state: string | null): boolean {
+  const key = `${OAUTH_STATE_KEY}.${provider}`;
+  let stored: string | null = null;
+  try {
+    stored = sessionStorage.getItem(key);
+    sessionStorage.removeItem(key);
+  } catch {
+    return true; // storage unavailable: nothing to compare against
+  }
+  if (!stored) return true;
+  return stored === state;
+}
+
+/** Exchanges the provider's one-time code for a session. */
+export async function socialLogin(provider: string, code: string): Promise<AuthOutcome> {
+  const { data } = await axiosInstance.post(`/api/auth/social/${provider}/`, {
+    code,
+    redirect_uri: socialRedirectUri(provider),
+  });
+  return readAuthPayload(data, "");
 }

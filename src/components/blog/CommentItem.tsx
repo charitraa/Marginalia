@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Flag, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import UserAvatar from "@/components/blog/UserAvatar";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
+import ReportCommentDialog from "@/components/blog/ReportCommentDialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -39,6 +40,7 @@ export default function CommentItem({
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const isOwn =
     Boolean(user) &&
@@ -80,6 +82,27 @@ export default function CommentItem({
                 {edited && <span className="ml-1">· edited</span>}
               </p>
             </div>
+
+            {!isOwn && user && !isEditing && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0 text-muted-foreground"
+                    aria-label="Comment options"
+                  >
+                    <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onSelect={() => setReportOpen(true)} className="gap-2">
+                    <Flag className="h-4 w-4" aria-hidden="true" />
+                    Report
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             {isOwn && !isEditing && (
               <DropdownMenu>
@@ -162,6 +185,12 @@ export default function CommentItem({
           )}
         </div>
       </div>
+
+      <ReportCommentDialog
+        commentId={comment.id}
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+      />
 
       <ConfirmDialog
         open={confirmOpen}

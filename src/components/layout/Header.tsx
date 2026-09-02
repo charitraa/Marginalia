@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-  LayoutDashboard, LogOut, Menu, PenLine, Search, Settings, User as UserIcon, X,
+  Bookmark, LayoutDashboard, LogOut, Menu, PenLine, Search, Settings, User as UserIcon, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import ThemeToggle from "@/components/common/ThemeToggle";
+import NotificationBell from "@/components/common/NotificationBell";
 import UserAvatar from "@/components/blog/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,6 +95,8 @@ export default function Header() {
 
           {isAuthenticated && user ? (
             <>
+              <NotificationBell />
+
               <Button asChild className="hidden gap-2 sm:inline-flex">
                 <Link to="/write">
                   <PenLine className="h-4 w-4" aria-hidden="true" />
@@ -126,6 +129,12 @@ export default function Header() {
                     <Link to="/dashboard" className="gap-2">
                       <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
                       Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/bookmarks" className="gap-2">
+                      <Bookmark className="h-4 w-4" aria-hidden="true" />
+                      Reading list
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="sm:hidden">

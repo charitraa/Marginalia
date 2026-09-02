@@ -263,3 +263,21 @@ export function useToggleFollow(username: string | undefined) {
     onError: (error) => toast.error(errorMessage(error, "Unable to update your follow.")),
   });
 }
+
+/**
+ * Reads a post either normally or, when a preview token is present, through the
+ * draft preview endpoint. The token is what authorises the read, so a reviewer
+ * following a shared link needs no account.
+ */
+export function usePostOrPreview(idOrSlug: string | undefined, previewToken: string | null) {
+  const normal = usePost(previewToken ? undefined : idOrSlug);
+
+  const preview = useQuery({
+    queryKey: ["posts", "preview", idOrSlug ?? "", previewToken ?? ""],
+    queryFn: () => postService.getPostPreview(idOrSlug as string, previewToken as string),
+    enabled: Boolean(idOrSlug && previewToken),
+    retry: false,
+  });
+
+  return previewToken ? preview : normal;
+}

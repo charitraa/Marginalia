@@ -4,7 +4,9 @@ import {
   Code2,
   Heading2,
   Heading3,
+  ImagePlus,
   Italic,
+  Loader2,
   Link2,
   List,
   ListOrdered,
@@ -13,8 +15,11 @@ import {
   Strikethrough,
   Undo2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { uploadEditorImage } from "@/services/uploadService";
+import { errorMessage } from "@/lib/errors";
 import { cn } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/sanitize";
 
@@ -96,6 +101,25 @@ export default function RichTextEditor({
     emitChange();
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const insertImage = async (file: File) => {
+    setUploading(true);
+    try {
+      const { url } = await uploadEditorImage(file);
+      if (!url) throw new Error("no url returned");
+      // Focus first: execCommand inserts at the caret, which is lost while the
+      // file dialog is open.
+      editorRef.current?.focus();
+      exec("insertImage", url);
+    } catch (error) {
+      toast.error(errorMessage(error, "That image could not be uploaded."));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const addLink = () => {
     const url = window.prompt("Link URL");
     if (!url) return;
@@ -148,6 +172,35 @@ export default function RichTextEditor({
         >
           <Link2 className="h-4 w-4" aria-hidden="true" />
         </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          title="Insert image"
+          aria-label="Insert image"
+          disabled={uploading}
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {uploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <ImagePlus className="h-4 w-4" aria-hidden="true" />
+          )}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            // Reset first so choosing the same file twice still fires.
+            event.target.value = "";
+            if (file) void insertImage(file);
+          }}
+        />
 
         <div className="ml-auto flex items-center gap-0.5">
           {renderAction({ icon: Undo2, label: "Undo", command: "undo" })}

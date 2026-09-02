@@ -18,6 +18,8 @@ export const SESSION_FLAG_KEY = "mindful.session";
 export const PENDING_VERIFICATION_KEY = "mindful.pending-verification";
 /** next-themes storage key. */
 export const THEME_STORAGE_KEY = "mindful.theme";
+/** Per-tab OAuth state value, compared when the provider redirects back. */
+export const OAUTH_STATE_KEY = "mindful.oauth-state";
 
 export const SITE_NAME = "Mindful Blog";
 export const SITE_TAGLINE = "Read. Think. Share.";

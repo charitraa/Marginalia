@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import NewsletterForm from "@/components/common/NewsletterForm";
 import { SITE_NAME, SITE_TAGLINE } from "@/constants";
 
 const SECTIONS = [
@@ -62,7 +63,11 @@ export default function Footer() {
           ))}
         </div>
 
-        <p className="mt-12 border-t border-border pt-6 text-xs text-muted-foreground">
+        <div className="mt-12 border-t border-border pt-8">
+          <NewsletterForm className="max-w-md" />
+        </div>
+
+        <p className="mt-10 border-t border-border pt-6 text-xs text-muted-foreground">
           © {new Date().getFullYear()} {SITE_NAME}. All rights reserved.
         </p>
       </div>

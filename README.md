@@ -36,6 +36,18 @@ backend lives in [Blog_Server](https://github.com/charitraa/Blog_Server).
 - 📊 A dashboard with real statistics and All / Published / Drafts tabs
 - 👤 Author profiles with follow, and a settings area for profile, avatar, email and password
 - 🔒 Protected routes that remember where you were headed and return you there after sign-in
+- 🔖 A reading list — bookmark any story and find it again under your account menu
+- 🔔 A notification bell with an unread badge, plus a full inbox for likes,
+  comments, replies and new followers
+- 🔑 Sign in with GitHub or Google; only the providers the API actually has
+  credentials for render a button, and the OAuth `state` is verified on return
+- 🔓 Forgot-password and reset-password flows, with neutral copy that never reveals
+  whether an address has an account
+- 🖼️ Inline image upload from the editor toolbar (uploaded to the API, not embedded
+  as base64)
+- 👁️‍🗨️ A copyable share link for an unpublished draft, revocable in one click
+- 🚩 Report a comment, with copy that says *flagged for review* rather than removed
+- 📬 Newsletter sign-up in the footer, plus the confirm and unsubscribe landing pages
 - ♿ Semantic markup, keyboard navigation, visible focus, labelled controls
 - 📱 Verified with no horizontal overflow from 320px to large desktop
 - ⏳ Skeletons, toasts, empty states and human-readable errors on every request
@@ -45,14 +57,19 @@ backend lives in [Blog_Server](https://github.com/charitraa/Blog_Server).
 Mindful_Blog/
 ├── src/
 │   ├── components/
-│   │   ├── blog/        # PostCard, PostEditor, LikeButton, CommentSection, …
-│   │   ├── common/      # Seo, ProtectedRoute, Pagination, EmptyState, Skeletons, …
+│   │   ├── blog/        # PostCard, PostEditor, LikeButton, BookmarkButton,
+│   │   │                 #   CommentSection, ReportCommentDialog, DraftShareLink, …
+│   │   ├── common/      # Seo, ProtectedRoute, Pagination, NotificationBell,
+│   │   │                 #   SocialAuthButtons, NewsletterForm, Skeletons, …
 │   │   ├── layout/      # Header, Footer, Layout
 │   │   └── ui/          # shadcn/ui primitives
-│   ├── hooks/           # useAuth (auth context), usePosts (query hooks), useDebounce
+│   ├── hooks/           # useAuth (auth context), usePosts, useBookmarks,
+│   │                    #   useNotifications, useDebounce
 │   ├── lib/             # format, sanitize, errors, routes, utils
 │   ├── pages/           # One file per route
 │   ├── services/        # API layer: ApiClients + one module per resource
+│   │                    #   (post, comment, user, auth, notification,
+│   │                    #    newsletter, upload)
 │   ├── types/           # Domain types the UI renders
 │   ├── constants.tsx
 │   ├── App.tsx          # Providers and routing
@@ -123,6 +140,11 @@ signed-out state rather than leaving stale data on screen.
 Post bodies are sanitised server-side with bleach and again here with DOMPurify before
 they reach the DOM. Permission checks in the UI are for affordance only; the API is
 authoritative and re-checks every write.
+
+Social sign-in never puts a client secret in this bundle: the browser is sent to the
+provider's own consent screen, and the one-time `code` it comes back with is forwarded to
+the API, which does the exchange. A random `state` is stored per tab before leaving and
+compared on return, so a code planted by another page is refused rather than exchanged.
 
 ## 👨‍💻 Contributing
 We ❤️ contributions! Please follow these steps to ensure a smooth contribution process:

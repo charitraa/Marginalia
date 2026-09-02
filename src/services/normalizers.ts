@@ -1,11 +1,14 @@
 import type {
+  AppNotification,
   Author,
   Category,
   Comment,
   CurrentUser,
+  NotificationVerb,
   Paginated,
   Post,
   PostStatus,
+  SocialProvider,
   Tag,
 } from "@/types/blog";
 import { mediaUrl } from "@/lib/format";
@@ -111,6 +114,9 @@ export function normalizePost(raw: Raw): Post {
     commentCount: count(raw.comment_count),
     viewCount: count(raw.view_count),
     isLiked: Boolean(raw.is_liked),
+    isBookmarked: Boolean(raw.is_bookmarked),
+    // Absent unless the API decided the requester owns this post.
+    previewToken: raw.preview_token ? String(raw.preview_token) : null,
   };
 }
 
@@ -122,6 +128,7 @@ export function normalizeComment(raw: Raw): Comment {
     parentId: raw.parent ? String(raw.parent) : null,
     isEdited: Boolean(raw.is_edited),
     canEdit: Boolean(raw.can_edit),
+    isHidden: Boolean(raw.is_hidden),
     createdAt: raw.created_at ?? null,
     updatedAt: raw.updated_at ?? null,
     replies: Array.isArray(raw.replies) ? raw.replies.map(normalizeComment) : [],
@@ -138,6 +145,32 @@ export function normalizeCurrentUser(raw: Raw): CurrentUser {
     district: text(raw.district),
     isVerified: Boolean(raw.is_verified),
     isStaff: Boolean(raw.is_staff),
+  };
+}
+
+const VERBS: NotificationVerb[] = ["like", "comment", "reply", "follow"];
+
+export function normalizeNotification(raw: Raw): AppNotification {
+  return {
+    id: String(raw.id ?? ""),
+    verb: VERBS.includes(raw.verb) ? raw.verb : "like",
+    actor: normalizeAuthor(raw.actor),
+    message: text(raw.message, "You have a new notification"),
+    // Falls back to the home page rather than rendering a dead link.
+    url: text(raw.url, "/"),
+    postTitle: text(raw.post_title),
+    isRead: Boolean(raw.is_read),
+    createdAt: raw.created_at ?? null,
+  };
+}
+
+export function normalizeSocialProvider(raw: Raw): SocialProvider | null {
+  if (raw?.name !== "github" && raw?.name !== "google") return null;
+  return {
+    name: raw.name,
+    authorizeUrl: text(raw.authorize_url),
+    clientId: text(raw.client_id),
+    scope: text(raw.scope),
   };
 }
 

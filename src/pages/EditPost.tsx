@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import PostEditor, { clearStoredDraft } from "@/components/blog/PostEditor";
+import DraftShareLink from "@/components/blog/DraftShareLink";
 import ErrorState from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -82,6 +83,8 @@ export default function EditPost() {
               : "This story is live. Changes appear as soon as you save."}
           </p>
         </header>
+
+        <DraftShareLink post={post} />
 
         <PostEditor
           post={post}

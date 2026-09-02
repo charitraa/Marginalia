@@ -65,6 +65,9 @@ export interface Post {
   commentCount: number | null;
   viewCount: number | null;
   isLiked: boolean;
+  isBookmarked: boolean;
+  /** Only present on the author's own post, for sharing an unpublished draft. */
+  previewToken: string | null;
 }
 
 export interface Comment {
@@ -75,6 +78,8 @@ export interface Comment {
   isEdited: boolean;
   /** Server's view of whether the current user may edit. UX only — the API re-checks. */
   canEdit: boolean;
+  /** Moderated out of public threads. Kept so a moderator can still see it. */
+  isHidden: boolean;
   createdAt: string | null;
   updatedAt: string | null;
   replies: Comment[];
@@ -129,3 +134,28 @@ export interface PostInput {
   status: PostStatus;
   coverImage?: File | null;
 }
+
+export type NotificationVerb = "like" | "comment" | "reply" | "follow";
+
+export interface AppNotification {
+  id: string;
+  verb: NotificationVerb;
+  actor: Author;
+  /** Sentence built server-side, so the wording lives in one place. */
+  message: string;
+  /** In-app path to open when the notification is clicked. */
+  url: string;
+  postTitle: string;
+  isRead: boolean;
+  createdAt: string | null;
+}
+
+/** A provider this deployment actually has credentials for. */
+export interface SocialProvider {
+  name: "github" | "google";
+  authorizeUrl: string;
+  clientId: string;
+  scope: string;
+}
+
+export type ReportReason = "spam" | "abuse" | "off_topic" | "other";

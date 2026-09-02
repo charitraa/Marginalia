@@ -4,6 +4,7 @@ import { ArrowRight, Check, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import SocialAuthButtons from "@/components/common/SocialAuthButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -245,6 +246,8 @@ export default function Register() {
               )}
             </Button>
           </form>
+
+          <SocialAuthButtons label="or sign up with" />
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
             Already have an account?{" "}

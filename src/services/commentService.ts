@@ -1,6 +1,6 @@
 import { axiosInstance } from "./ApiClients";
 import { normalizeComment, normalizePage } from "./normalizers";
-import type { Comment } from "@/types/blog";
+import type { Comment, ReportReason } from "@/types/blog";
 
 /**
  * Comments for a post.
@@ -33,4 +33,18 @@ export async function updateComment(commentId: string, content: string): Promise
 
 export async function deleteComment(commentId: string): Promise<void> {
   await axiosInstance.delete(`/api/comments/${commentId}/`);
+}
+
+/**
+ * Flags a comment for a moderator.
+ *
+ * Reporting never hides anything on its own — a moderator decides — so the UI
+ * thanks the reporter rather than implying the comment has been removed.
+ */
+export async function reportComment(
+  commentId: string,
+  reason: ReportReason,
+  detail = "",
+): Promise<void> {
+  await axiosInstance.post(`/api/comments/${commentId}/report/`, { reason, detail });
 }

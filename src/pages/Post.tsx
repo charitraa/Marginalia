@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { MessageCircle, Pencil, Trash2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
@@ -9,6 +9,7 @@ import CategoryBadge from "@/components/blog/CategoryBadge";
 import CommentSection from "@/components/blog/CommentSection";
 import LikeButton from "@/components/blog/LikeButton";
 import ShareButton from "@/components/blog/ShareButton";
+import BookmarkButton from "@/components/blog/BookmarkButton";
 import UserAvatar from "@/components/blog/UserAvatar";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import ErrorState from "@/components/common/ErrorState";
@@ -16,7 +17,7 @@ import { ArticleSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
-import { usePost, usePostMutations, useRelatedPosts } from "@/hooks/usePosts";
+import { usePostMutations, usePostOrPreview, useRelatedPosts } from "@/hooks/usePosts";
 import { formatDate } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { authorPath, tagPath } from "@/lib/routes";
@@ -40,12 +41,16 @@ function useReadingProgress() {
 
 export default function Post() {
   const { slug } = useParams();
+  const [params] = useSearchParams();
+  // A draft share link carries its own authorisation, so it reads through the
+  // preview endpoint instead of the normal one.
+  const previewToken = params.get("preview");
   const navigate = useNavigate();
   const { user } = useAuth();
   const progress = useReadingProgress();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const { data: post, isLoading, error, refetch } = usePost(slug);
+  const { data: post, isLoading, error, refetch } = usePostOrPreview(slug, previewToken);
   const { data: related } = useRelatedPosts(post?.slug);
   const { remove } = usePostMutations();
 
@@ -156,6 +161,7 @@ export default function Post() {
                     <span className="sr-only">comments</span>
                   </a>
                 </Button>
+                <BookmarkButton post={post} />
                 <ShareButton title={post.title} />
               </div>
             </div>
@@ -218,7 +224,10 @@ export default function Post() {
 
           <div className="mt-10 flex items-center justify-between border-y border-border py-4">
             <LikeButton post={post} />
-            <ShareButton title={post.title} />
+            <div className="flex items-center gap-1">
+              <BookmarkButton post={post} showLabel />
+              <ShareButton title={post.title} />
+            </div>
           </div>
 
           <div className="mt-12">

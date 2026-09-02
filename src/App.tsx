@@ -33,6 +33,12 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Cookies = lazy(() => import("./pages/Cookies"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
+const Bookmarks = lazy(() => import("./pages/Bookmarks"));
+const Notifications = lazy(() => import("./pages/Notifications"));
+const NewsletterAction = lazy(() => import("./pages/NewsletterAction"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -72,6 +78,21 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/verify" element={<VerifyEmail />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                {/* Where GitHub and Google send the browser back to. */}
+                <Route path="/auth/callback/:provider" element={<OAuthCallback />} />
+
+                {/* Both halves of the newsletter double opt-in. The token in
+                    the URL is the whole authorisation, so no account is needed. */}
+                <Route
+                  path="/newsletter/confirm"
+                  element={<NewsletterAction action="confirm" />}
+                />
+                <Route
+                  path="/newsletter/unsubscribe"
+                  element={<NewsletterAction action="unsubscribe" />}
+                />
 
                 {/* Signed-in only. ProtectedRoute sends guests to /login and
                     returns them here afterwards. */}
@@ -104,6 +125,22 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <UserSettings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/bookmarks"
+                  element={
+                    <ProtectedRoute>
+                      <Bookmarks />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/notifications"
+                  element={
+                    <ProtectedRoute>
+                      <Notifications />
                     </ProtectedRoute>
                   }
                 />
