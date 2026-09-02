@@ -1,4 +1,3 @@
-import "../global.css";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import { Button } from "@/components/ui/button";

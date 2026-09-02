@@ -1,4 +1,4 @@
-import type { Post } from "@/types/blog";
+import type { Post } from "@/features/posts/types";
 
 /**
  * Post URLs.

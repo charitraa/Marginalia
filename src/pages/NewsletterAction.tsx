@@ -4,7 +4,7 @@ import { CheckCircle2, Loader2, XCircle } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import { Button } from "@/components/ui/button";
-import * as newsletterService from "@/services/newsletterService";
+import * as newsletterService from "@/features/newsletter/api/newsletterService";
 import { errorMessage } from "@/lib/errors";
 
 /**

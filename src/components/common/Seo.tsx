@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/constants";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/config/constants";
 
 interface SeoProps {
   title?: string;

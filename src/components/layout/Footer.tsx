@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import NewsletterForm from "@/components/common/NewsletterForm";
-import { SITE_NAME, SITE_TAGLINE } from "@/constants";
+import NewsletterForm from "@/features/newsletter/components/NewsletterForm";
+import { SITE_NAME, SITE_TAGLINE } from "@/config/constants";
 
 const SECTIONS = [
   {

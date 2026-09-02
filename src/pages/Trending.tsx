@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
-import BlogCard from "@/components/blog/BlogCard";
+import BlogCard from "@/features/posts/components/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import { PostGridSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
-import { useTrendingPosts } from "@/hooks/usePosts";
+import { useTrendingPosts } from "@/features/posts/hooks/usePosts";
 import { cn } from "@/lib/utils";
 
 /**

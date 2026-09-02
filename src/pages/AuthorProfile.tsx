@@ -3,17 +3,18 @@ import { Link, useParams } from "react-router-dom";
 import { CalendarDays, FileText, Github, Globe, Heart, Linkedin, Twitter, Users } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
-import BlogCard from "@/components/blog/BlogCard";
-import UserAvatar from "@/components/blog/UserAvatar";
+import BlogCard from "@/features/posts/components/BlogCard";
+import UserAvatar from "@/features/users/components/UserAvatar";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
 import { PostGridSkeleton, ProfileSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import { useAuthor, useAuthorPosts, useToggleFollow } from "@/hooks/usePosts";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuthor, useToggleFollow } from "@/features/users/hooks/useUsers";
+import { useAuthorPosts } from "@/features/posts/hooks/usePosts";
 import { formatCount, formatDate } from "@/lib/format";
-import { pageCount } from "@/services/normalizers";
+import { pageCount } from "@/lib/api/normalize";
 
 const SOCIALS = [
   { key: "website", label: "Website", icon: Globe },

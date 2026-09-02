@@ -4,7 +4,7 @@ import { SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import SearchBar from "@/components/common/SearchBar";
-import BlogCard from "@/components/blog/BlogCard";
+import BlogCard from "@/features/posts/components/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -17,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCategories, usePostList } from "@/hooks/usePosts";
+import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
 import { useDebounce } from "@/hooks/useDebounce";
-import { SORT_OPTIONS, POSTS_PER_PAGE } from "@/constants";
-import { pageCount } from "@/services/normalizers";
+import { SORT_OPTIONS, POSTS_PER_PAGE } from "@/config/constants";
+import { pageCount } from "@/lib/api/normalize";
 import { cn } from "@/lib/utils";
 
 /**

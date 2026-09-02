@@ -1,4 +1,4 @@
-import { BASE_URL, WORDS_PER_MINUTE } from "@/constants";
+import { BASE_URL, WORDS_PER_MINUTE } from "@/config/constants";
 
 /** Strips tags so HTML content can be measured and excerpted as plain text. */
 export function toPlainText(html: string): string {

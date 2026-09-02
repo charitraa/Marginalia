@@ -53,35 +53,74 @@ backend lives in [Blog_Server](https://github.com/charitraa/Blog_Server).
 - ⏳ Skeletons, toasts, empty states and human-readable errors on every request
 
 ## 📂 Folder Structure
+
+The app is organised by **feature**, not by file type. Everything one domain needs —
+its components, hooks, API calls and types — lives in one folder, so a change to
+bookmarks touches `features/bookmarks/` and nothing else.
+
 ```bash
 Mindful_Blog/
+├── index.html
 ├── src/
-│   ├── components/
-│   │   ├── blog/        # PostCard, PostEditor, LikeButton, BookmarkButton,
-│   │   │                 #   CommentSection, ReportCommentDialog, DraftShareLink, …
-│   │   ├── common/      # Seo, ProtectedRoute, Pagination, NotificationBell,
-│   │   │                 #   SocialAuthButtons, NewsletterForm, Skeletons, …
-│   │   ├── layout/      # Header, Footer, Layout
-│   │   └── ui/          # shadcn/ui primitives
-│   ├── hooks/           # useAuth (auth context), usePosts, useBookmarks,
-│   │                    #   useNotifications, useDebounce
-│   ├── lib/             # format, sanitize, errors, routes, utils
-│   ├── pages/           # One file per route
-│   ├── services/        # API layer: ApiClients + one module per resource
-│   │                    #   (post, comment, user, auth, notification,
-│   │                    #    newsletter, upload)
-│   ├── types/           # Domain types the UI renders
-│   ├── constants.tsx
-│   ├── App.tsx          # Providers and routing
-│   └── main.tsx
+│   ├── app/                 # Composition root
+│   │   ├── main.tsx         #   entry point (index.html points here)
+│   │   ├── App.tsx          #   Providers + ScrollToTop + AppRoutes
+│   │   ├── providers.tsx    #   query, theme, auth, tooltip, router
+│   │   └── routes.tsx       #   the route table, lazily loaded
+│   │
+│   ├── features/            # One folder per domain
+│   │   ├── auth/            #   sign in/up, verify, reset, OAuth
+│   │   ├── users/           #   authors, profiles, following, dashboard stats
+│   │   ├── posts/           #   posts, categories, tags, likes, the editor
+│   │   ├── comments/        #   threads, replies, moderation reports
+│   │   ├── bookmarks/       #   reading list
+│   │   ├── notifications/   #   inbox and unread badge
+│   │   ├── newsletter/      #   double opt-in sign-up
+│   │   └── uploads/         #   image uploads for the editor
+│   │                        # each holding, as it needs them:
+│   │                        #   api/         service + normalizers + query keys
+│   │                        #   components/  UI owned by this feature
+│   │                        #   hooks/       react-query hooks
+│   │                        #   types.ts     this feature's domain types
+│   │
+│   ├── components/          # Shared UI, owned by no single feature
+│   │   ├── ui/              #   shadcn/ui primitives (generated)
+│   │   ├── common/          #   Seo, ProtectedRoute, Pagination, EmptyState, …
+│   │   └── layout/          #   Header, Footer, Layout
+│   │
+│   ├── pages/               # Route screens, grouped by area
+│   │   ├── auth/  posts/  account/  legal/
+│   │   └── Home, Explore, Trending, Search, AuthorProfile, NotFound, …
+│   │
+│   ├── hooks/               # Cross-feature hooks (useDebounce, use-mobile, use-toast)
+│   ├── lib/                 # Framework-agnostic helpers
+│   │   ├── api/             #   axios client, queryClient, normalize primitives
+│   │   └── format, sanitize, errors, routes, utils
+│   ├── config/constants.ts  # Env-derived config and storage keys
+│   ├── types/common.ts      # Types no single feature owns (Paginated<T>)
+│   └── styles/global.css
 ├── .env.example
 ├── tailwind.config.ts
 └── vite.config.ts
 ```
 
-The `services/` layer is the only place that knows about API shapes: `normalizers.ts`
-maps the API's snake_case payloads onto the camelCase domain types in `types/blog.ts`, so
-no component ever reads a raw API field name.
+### Rules that keep it tidy
+
+- **A feature owns its data.** `features/x/api/` is the only place that knows the
+  API's shape for `x`: a service module calls the endpoint, `normalizers.ts` maps
+  the snake_case payload onto the camelCase types in `features/x/types.ts`, and
+  `queryKeys.ts` names the cache entries. No component ever reads a raw API field.
+- **Dependencies point inward.** Features may import from `lib/`, `components/`
+  and `config/`; those never import from `features/`. Pages compose features.
+- **Cross-feature imports are explicit and one-way.** `Author` is the shared
+  building block, so posts, comments and notifications import from `users/` —
+  never the reverse. Importing a sibling's `api/queryKeys` is how one feature
+  invalidates another's cache without reaching into its hooks.
+- **No barrel files.** Imports name the real module, which keeps route-level code
+  splitting effective and makes cycles impossible to introduce by accident.
+- **`components/ui/` is generated.** It is shadcn/ui output — the kebab-case
+  `hooks/use-mobile` and `hooks/use-toast` keep their names because the shadcn
+  CLI expects them there.
 
 ## 🚀 Getting Started
 

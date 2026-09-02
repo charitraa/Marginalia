@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     fs: {
-      allow: [path.resolve(__dirname, "."), path.resolve(__dirname, "src"), path.resolve(__dirname, "shared")],
+      allow: [path.resolve(__dirname, "."), path.resolve(__dirname, "src")],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
     },
     // In development the API is proxied so the browser sees one origin. That
@@ -35,7 +35,6 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@shared": path.resolve(__dirname, "./shared"),
     },
   },
 }));

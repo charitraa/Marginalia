@@ -5,8 +5,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import ThemeToggle from "@/components/common/ThemeToggle";
-import NotificationBell from "@/components/common/NotificationBell";
-import UserAvatar from "@/components/blog/UserAvatar";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
+import UserAvatar from "@/features/users/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,9 +16,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorPath } from "@/lib/routes";
-import { SITE_NAME } from "@/constants";
+import { SITE_NAME } from "@/config/constants";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [

@@ -3,15 +3,15 @@ import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import SearchBar from "@/components/common/SearchBar";
-import BlogCard from "@/components/blog/BlogCard";
+import BlogCard from "@/features/posts/components/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
 import { PostListSkeleton } from "@/components/common/Skeletons";
-import { usePostList } from "@/hooks/usePosts";
+import { usePostList } from "@/features/posts/hooks/usePosts";
 import { useDebounce } from "@/hooks/useDebounce";
-import { POSTS_PER_PAGE } from "@/constants";
-import { pageCount } from "@/services/normalizers";
+import { POSTS_PER_PAGE } from "@/config/constants";
+import { pageCount } from "@/lib/api/normalize";
 
 /**
  * Full-page search. The API matches titles, excerpts, bodies, authors,

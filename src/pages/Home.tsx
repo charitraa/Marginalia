@@ -2,18 +2,18 @@ import { Link } from "react-router-dom";
 import { ArrowRight, PenLine } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
-import BlogCard from "@/components/blog/BlogCard";
-import FeaturedPost from "@/components/blog/FeaturedPost";
-import PostMeta from "@/components/blog/PostMeta";
+import BlogCard from "@/features/posts/components/BlogCard";
+import FeaturedPost from "@/features/posts/components/FeaturedPost";
+import PostMeta from "@/features/posts/components/PostMeta";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import { PostGridSkeleton, PostListSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/hooks/useAuth";
-import { useCategories, usePostList } from "@/hooks/usePosts";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
 import { postPath } from "@/lib/routes";
-import { SITE_DESCRIPTION, SITE_TAGLINE } from "@/constants";
+import { SITE_DESCRIPTION, SITE_TAGLINE } from "@/config/constants";
 
 function SectionHeading({
   title,
