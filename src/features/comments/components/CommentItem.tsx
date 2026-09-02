@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Flag, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Flag, Heart, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
 import UserAvatar from "@/features/users/components/UserAvatar";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import ReportCommentDialog from "@/features/comments/components/ReportCommentDialog";
@@ -15,12 +15,15 @@ import {
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { formatRelative } from "@/lib/format";
 import { authorPath } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 import type { Comment } from "@/features/comments/types";
 
 interface CommentItemProps {
   comment: Comment;
   onUpdate: (id: string, content: string) => Promise<unknown>;
   onDelete: (id: string) => Promise<unknown>;
+  onLike?: (id: string, liked: boolean) => void;
+  onPin?: (id: string, pinned: boolean) => void;
   busy?: boolean;
   depth?: number;
 }
@@ -33,6 +36,8 @@ export default function CommentItem({
   comment,
   onUpdate,
   onDelete,
+  onLike,
+  onPin,
   busy = false,
   depth = 0,
 }: CommentItemProps) {
@@ -80,6 +85,11 @@ export default function CommentItem({
                   {formatRelative(comment.createdAt)}
                 </time>
                 {edited && <span className="ml-1">· edited</span>}
+                {comment.isPinned && (
+                  <span className="ml-1 inline-flex items-center gap-1 font-medium text-foreground">
+                    · <Pin className="h-3 w-3" aria-hidden="true" /> Pinned
+                  </span>
+                )}
               </p>
             </div>
 
@@ -96,6 +106,24 @@ export default function CommentItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {comment.canPin && onPin && (
+                    <DropdownMenuItem
+                      onSelect={() => onPin(comment.id, !comment.isPinned)}
+                      className="gap-2"
+                    >
+                      {comment.isPinned ? (
+                        <>
+                          <PinOff className="h-4 w-4" aria-hidden="true" />
+                          Unpin
+                        </>
+                      ) : (
+                        <>
+                          <Pin className="h-4 w-4" aria-hidden="true" />
+                          Pin to top
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onSelect={() => setReportOpen(true)} className="gap-2">
                     <Flag className="h-4 w-4" aria-hidden="true" />
                     Report
@@ -117,6 +145,24 @@ export default function CommentItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  {comment.canPin && onPin && (
+                    <DropdownMenuItem
+                      onSelect={() => onPin(comment.id, !comment.isPinned)}
+                      className="gap-2"
+                    >
+                      {comment.isPinned ? (
+                        <>
+                          <PinOff className="h-4 w-4" aria-hidden="true" />
+                          Unpin
+                        </>
+                      ) : (
+                        <>
+                          <Pin className="h-4 w-4" aria-hidden="true" />
+                          Pin to top
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onSelect={() => setIsEditing(true)} className="gap-2">
                     <Pencil className="h-4 w-4" aria-hidden="true" />
                     Edit
@@ -164,9 +210,32 @@ export default function CommentItem({
               </div>
             </div>
           ) : (
-            <p className="mt-2 whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-foreground/90">
-              {comment.content}
-            </p>
+            <>
+              <p className="mt-2 whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-foreground/90">
+                {comment.content}
+              </p>
+
+              {onLike && (
+                <button
+                  type="button"
+                  onClick={() => user && onLike(comment.id, !comment.isLiked)}
+                  disabled={!user}
+                  aria-pressed={comment.isLiked}
+                  aria-label={comment.isLiked ? "Unlike this comment" : "Like this comment"}
+                  className={cn(
+                    "mt-2 inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs transition-colors",
+                    user ? "hover:bg-accent" : "cursor-default",
+                    comment.isLiked ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
+                  <Heart
+                    className={cn("h-3.5 w-3.5", comment.isLiked && "fill-current")}
+                    aria-hidden="true"
+                  />
+                  {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
+                </button>
+              )}
+            </>
           )}
 
           {comment.replies.length > 0 && (
@@ -177,6 +246,7 @@ export default function CommentItem({
                   comment={reply}
                   onUpdate={onUpdate}
                   onDelete={onDelete}
+                  onLike={onLike}
                   busy={busy}
                   depth={depth + 1}
                 />

@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, ImagePlus, Loader2, Pencil, X } from "lucide-react";
 import RichTextEditor from "@/features/posts/components/RichTextEditor";
+import PublishOptions, {
+  fromLocalInput,
+  toLocalInput,
+} from "@/features/posts/components/PublishOptions";
 import UserAvatar from "@/features/users/components/UserAvatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +22,7 @@ import { useCategories } from "@/features/posts/hooks/usePosts";
 import { excerptFrom, readingTimeFor, wordCount } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { cn } from "@/lib/utils";
-import type { Post, PostInput, PostStatus } from "@/features/posts/types";
+import type { Post, PostInput, PostStatus, PostVisibility } from "@/features/posts/types";
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_TITLE = 120;
@@ -87,6 +91,12 @@ export default function PostEditor({ post, submitting, onSubmit, onCancel }: Pos
   const [tagText, setTagText] = useState(post?.tags.map((tag) => tag.name).join(", ") ?? "");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(post?.coverImage ?? null);
+  const [subtitle, setSubtitle] = useState(post?.subtitle ?? "");
+  const [visibility, setVisibility] = useState<PostVisibility>(post?.visibility ?? "public");
+  const [scheduledFor, setScheduledFor] = useState(toLocalInput(post?.scheduledFor));
+  const [seoTitle, setSeoTitle] = useState(post?.seoTitle ?? "");
+  const [seoDescription, setSeoDescription] = useState(post?.seoDescription ?? "");
+  const [canonicalUrl, setCanonicalUrl] = useState(post?.canonicalUrl ?? "");
   const [showPreview, setShowPreview] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -170,23 +180,46 @@ export default function PostEditor({ post, submitting, onSubmit, onCancel }: Pos
 
   const submit = (status: PostStatus) => {
     if (!validate()) return;
+
+    const when = fromLocalInput(scheduledFor);
+    if (status === "scheduled") {
+      if (!when) {
+        setErrors({ scheduledFor: "Choose when this post should go live." });
+        return;
+      }
+      if (new Date(when) <= new Date()) {
+        setErrors({ scheduledFor: "Pick a time in the future, or publish now instead." });
+        return;
+      }
+    }
+
     onSubmit({
       title: title.trim(),
+      subtitle: subtitle.trim(),
       excerpt: excerpt.trim() || excerptFrom(content),
       content,
       category,
       tags,
       status,
+      visibility,
+      // Only a scheduled post carries a date; anything else clears it.
+      scheduledFor: status === "scheduled" ? when : null,
+      seoTitle: seoTitle.trim(),
+      seoDescription: seoDescription.trim(),
+      canonicalUrl: canonicalUrl.trim(),
       coverImage: coverFile,
     });
   };
+
+  /** With a future date set, the primary button schedules instead of publishing. */
+  const isScheduling = Boolean(fromLocalInput(scheduledFor));
 
   return (
     <form
       className="space-y-8"
       onSubmit={(event) => {
         event.preventDefault();
-        submit("published");
+        submit(isScheduling ? "scheduled" : "published");
       }}
     >
       {recovered && (
@@ -254,9 +287,22 @@ export default function PostEditor({ post, submitting, onSubmit, onCancel }: Pos
         </div>
       </div>
 
-      {/* Excerpt */}
+      {/* Subtitle: a deck line shown under the title on the article itself. */}
       <div className="space-y-2">
-        <Label htmlFor="excerpt">Subtitle</Label>
+        <Label htmlFor="subtitle">Subtitle</Label>
+        <Input
+          id="subtitle"
+          value={subtitle}
+          maxLength={300}
+          onChange={(event) => setSubtitle(event.target.value)}
+          placeholder="An optional line under the title…"
+          className="h-auto border-0 border-b border-border px-0 font-serif text-lg text-muted-foreground shadow-none focus-visible:ring-0 focus-visible:border-primary rounded-none"
+        />
+      </div>
+
+      {/* Excerpt: the summary used on cards, in search results and in feeds. */}
+      <div className="space-y-2">
+        <Label htmlFor="excerpt">Excerpt</Label>
         <Textarea
           id="excerpt"
           value={excerpt}
@@ -432,6 +478,22 @@ export default function PostEditor({ post, submitting, onSubmit, onCancel }: Pos
         </div>
       </div>
 
+      <PublishOptions
+        visibility={visibility}
+        onVisibilityChange={setVisibility}
+        scheduledFor={scheduledFor}
+        onScheduledForChange={setScheduledFor}
+        seoTitle={seoTitle}
+        onSeoTitleChange={setSeoTitle}
+        seoDescription={seoDescription}
+        onSeoDescriptionChange={setSeoDescription}
+        canonicalUrl={canonicalUrl}
+        onCanonicalUrlChange={setCanonicalUrl}
+        title={title}
+        excerpt={excerpt}
+        error={errors.scheduledFor}
+      />
+
       {/* Actions */}
       <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t border-border bg-background/95 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-lg sm:border sm:px-5">
         {onCancel && (
@@ -450,7 +512,7 @@ export default function PostEditor({ post, submitting, onSubmit, onCancel }: Pos
           </Button>
           <Button type="submit" disabled={submitting} className="gap-2">
             {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-            {post ? "Update story" : "Publish"}
+            {isScheduling ? "Schedule" : post ? "Update story" : "Publish"}
           </Button>
         </div>
       </div>

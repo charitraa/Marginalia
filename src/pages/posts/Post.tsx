@@ -6,6 +6,7 @@ import Seo from "@/components/common/Seo";
 import BlogCard from "@/features/posts/components/BlogCard";
 import AuthorCard from "@/features/users/components/AuthorCard";
 import CategoryBadge from "@/features/posts/components/CategoryBadge";
+import TopicFollowButton from "@/features/users/components/TopicFollowButton";
 import CommentSection from "@/features/comments/components/CommentSection";
 import LikeButton from "@/features/posts/components/LikeButton";
 import ShareButton from "@/features/posts/components/ShareButton";
@@ -207,19 +208,36 @@ export default function Post() {
             dangerouslySetInnerHTML={{ __html: safeContent }}
           />
 
-          {post.tags.length > 0 && (
-            <ul className="mt-10 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <li key={tag.id}>
-                  <Link
-                    to={tagPath(tag.slug)}
-                    className="inline-block rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                  >
-                    #{tag.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {(post.tags.length > 0 || post.category) && (
+            <div className="mt-10 space-y-3">
+              {post.category && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm text-muted-foreground">Filed under</span>
+                  <CategoryBadge category={post.category} />
+                  <TopicFollowButton
+                    kind="category"
+                    slug={post.category.slug}
+                    name={post.category.name}
+                  />
+                </div>
+              )}
+
+              {post.tags.length > 0 && (
+                <ul className="flex flex-wrap items-center gap-2">
+                  {post.tags.map((tag) => (
+                    <li key={tag.id} className="flex items-center gap-1">
+                      <Link
+                        to={tagPath(tag.slug)}
+                        className="inline-block rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      >
+                        #{tag.name}
+                      </Link>
+                      <TopicFollowButton kind="tag" slug={tag.slug} name={tag.name} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
 
           <div className="mt-10 flex items-center justify-between border-y border-border py-4">

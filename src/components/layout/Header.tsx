@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import {
+import { BarChart3, Rss, History, Shield,
   Bookmark, LayoutDashboard, LogOut, Menu, PenLine, Search, Settings, User as UserIcon, X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ const NAV_LINKS = [
   { to: "/", label: "Home", end: true },
   { to: "/explore", label: "Explore" },
   { to: "/trending", label: "Trending" },
+  { to: "/series", label: "Series" },
 ];
 
 export default function Header() {
@@ -96,6 +97,12 @@ export default function Header() {
 
           {isAuthenticated && user ? (
             <>
+              <Button variant="ghost" size="icon" asChild aria-label="Your feed">
+                <Link to="/feed">
+                  <Rss className="h-[1.15rem] w-[1.15rem]" aria-hidden="true" />
+                </Link>
+              </Button>
+
               <NotificationBell />
 
               <Button asChild className="hidden gap-2 sm:inline-flex">
@@ -138,6 +145,18 @@ export default function Header() {
                       Reading list
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/history" className="gap-2">
+                      <History className="h-4 w-4" aria-hidden="true" />
+                      Reading history
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/analytics" className="gap-2">
+                      <BarChart3 className="h-4 w-4" aria-hidden="true" />
+                      Analytics
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild className="sm:hidden">
                     <Link to="/write" className="gap-2">
                       <PenLine className="h-4 w-4" aria-hidden="true" />
@@ -150,6 +169,21 @@ export default function Header() {
                       Settings
                     </Link>
                   </DropdownMenuItem>
+
+                  {/* Only staff see this entry at all, which keeps the admin
+                      area out of an ordinary reader's menu. */}
+                  {user.canModerate && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="gap-2">
+                          <Shield className="h-4 w-4" aria-hidden="true" />
+                          Admin
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onSelect={handleLogout} className="gap-2">
                     <LogOut className="h-4 w-4" aria-hidden="true" />

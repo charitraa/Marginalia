@@ -59,5 +59,10 @@ export function normalizeCurrentUser(raw: Raw): CurrentUser {
     district: text(raw.district),
     isVerified: Boolean(raw.is_verified),
     isStaff: Boolean(raw.is_staff),
+    role: text(raw.role, "user") as CurrentUser["role"],
+    canPublish: Boolean(raw.can_publish),
+    canEditOthers: Boolean(raw.can_edit_others),
+    canModerate: Boolean(raw.can_moderate),
+    canManageUsers: Boolean(raw.can_manage_users),
   };
 }

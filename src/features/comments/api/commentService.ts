@@ -1,7 +1,7 @@
 import { axiosInstance } from "@/lib/api/client";
 import { normalizePage } from "@/lib/api/normalize";
 import { normalizeComment } from "./normalizers";
-import type { Comment, ReportReason } from "@/features/comments/types";
+import type { Comment, CommentSort, ReportReason } from "@/features/comments/types";
 
 /**
  * Comments for a post.
@@ -9,9 +9,12 @@ import type { Comment, ReportReason } from "@/features/comments/types";
  * Only top-level comments are paginated; the API nests each thread's replies
  * inside its parent, so one request renders the whole discussion.
  */
-export async function listComments(postIdOrSlug: string): Promise<Comment[]> {
+export async function listComments(
+  postIdOrSlug: string,
+  sort: CommentSort = "newest",
+): Promise<Comment[]> {
   const { data } = await axiosInstance.get(`/api/posts/${postIdOrSlug}/comments/`, {
-    params: { page_size: 100 },
+    params: { page_size: 100, sort },
   });
   return normalizePage(data, normalizeComment).items;
 }
@@ -48,4 +51,28 @@ export async function reportComment(
   detail = "",
 ): Promise<void> {
   await axiosInstance.post(`/api/comments/${commentId}/report/`, { reason, detail });
+}
+
+export interface CommentLikeState {
+  isLiked: boolean;
+  likeCount: number;
+}
+
+export async function setCommentLike(
+  commentId: string,
+  liked: boolean,
+): Promise<CommentLikeState> {
+  const path = `/api/comments/${commentId}/like/`;
+  const { data } = liked ? await axiosInstance.post(path) : await axiosInstance.delete(path);
+  return {
+    isLiked: data?.is_liked ?? liked,
+    likeCount: typeof data?.like_count === "number" ? data.like_count : 0,
+  };
+}
+
+/** Pinning keeps one comment at the top of a thread. Only one per post. */
+export async function setCommentPin(commentId: string, pinned: boolean): Promise<Comment> {
+  const path = `/api/comments/${commentId}/pin/`;
+  const { data } = pinned ? await axiosInstance.post(path) : await axiosInstance.delete(path);
+  return normalizeComment(data);
 }

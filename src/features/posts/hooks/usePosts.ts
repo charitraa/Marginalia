@@ -188,3 +188,23 @@ export function usePostOrPreview(idOrSlug: string | undefined, previewToken: str
 
   return previewToken ? preview : normal;
 }
+
+export function useFeed(query: PostQuery = {}, enabled = true) {
+  return useQuery({
+    queryKey: ["posts", "feed", query],
+    queryFn: () => postService.listFeed(query),
+    enabled,
+    placeholderData: (previous) => previous,
+  });
+}
+
+export function useRecommendedPosts(page = 1, enabled = true) {
+  return useQuery({
+    queryKey: ["posts", "recommended", page],
+    queryFn: () => postService.listRecommended(page),
+    enabled,
+    placeholderData: (previous) => previous,
+    // Suggestions shift only as the reader engages with more posts.
+    staleTime: 5 * 60_000,
+  });
+}

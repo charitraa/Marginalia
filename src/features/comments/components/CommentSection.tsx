@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import { ArrowDownWideNarrow, MessageCircle } from "lucide-react";
 import CommentItem from "@/features/comments/components/CommentItem";
 import UserAvatar from "@/features/users/components/UserAvatar";
 import EmptyState from "@/components/common/EmptyState";
@@ -9,7 +9,20 @@ import { CommentSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useCommentMutations, useComments } from "@/features/comments/hooks/useComments";
+import {
+  useCommentLike,
+  useCommentMutations,
+  useCommentPin,
+  useComments,
+} from "@/features/comments/hooks/useComments";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { CommentSort } from "@/features/comments/types";
 import type { AxiosError } from "axios";
 
 const MAX_LENGTH = 1000;
@@ -20,8 +33,11 @@ const MAX_LENGTH = 1000;
  */
 export default function CommentSection({ postId }: { postId: string }) {
   const { isAuthenticated, user } = useAuth();
-  const { data: comments, isLoading, error, refetch } = useComments(postId);
+  const [sort, setSort] = useState<CommentSort>("newest");
+  const { data: comments, isLoading, error, refetch } = useComments(postId, sort);
   const { create, update, remove } = useCommentMutations(postId);
+  const like = useCommentLike(postId);
+  const pin = useCommentPin(postId);
   const [draft, setDraft] = useState("");
 
   const total = comments?.reduce((sum, comment) => sum + 1 + comment.replies.length, 0) ?? 0;
@@ -102,6 +118,24 @@ export default function CommentSection({ postId }: { postId: string }) {
           />
         ) : (
           <div className="space-y-8">
+            {comments.length > 1 && (
+              <div className="flex items-center justify-end gap-2">
+                <ArrowDownWideNarrow
+                  className="h-4 w-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <Select value={sort} onValueChange={(value) => setSort(value as CommentSort)}>
+                  <SelectTrigger className="h-8 w-40 text-sm" aria-label="Sort comments">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest first</SelectItem>
+                    <SelectItem value="oldest">Oldest first</SelectItem>
+                    <SelectItem value="popular">Most liked</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             {comments.map((comment) => (
               <CommentItem
                 key={comment.id}
@@ -109,6 +143,8 @@ export default function CommentSection({ postId }: { postId: string }) {
                 busy={update.isPending || remove.isPending}
                 onUpdate={(id, content) => update.mutateAsync({ id, content })}
                 onDelete={(id) => remove.mutateAsync(id)}
+                onLike={(id, liked) => like.mutate({ id, liked })}
+                onPin={(id, pinned) => pin.mutate({ id, pinned })}
               />
             ))}
           </div>

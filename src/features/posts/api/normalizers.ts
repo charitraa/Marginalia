@@ -1,7 +1,15 @@
 import { count, text, type Raw } from "@/lib/api/normalize";
 import { mediaUrl } from "@/lib/format";
 import { normalizeAuthor } from "@/features/users/api/normalizers";
-import type { Category, Post, PostStatus, Tag } from "../types";
+import type {
+  Category,
+  Post,
+  PostRevision,
+  PostRevisionDetail,
+  PostStatus,
+  ReadingHistoryEntry,
+  Tag,
+} from "../types";
 
 export function normalizeCategory(raw: Raw | null | undefined): Category | null {
   if (!raw?.name) return null;
@@ -45,7 +53,45 @@ export function normalizePost(raw: Raw): Post {
     viewCount: count(raw.view_count),
     isLiked: Boolean(raw.is_liked),
     isBookmarked: Boolean(raw.is_bookmarked),
+    subtitle: text(raw.subtitle),
+    visibility: (raw.visibility ?? "public") as Post["visibility"],
+    scheduledFor: raw.scheduled_for ?? null,
+    isFeatured: Boolean(raw.is_featured),
+    isArchived: Boolean(raw.is_archived),
+    seoTitle: text(raw.seo_title),
+    seoDescription: text(raw.seo_description),
+    canonicalUrl: text(raw.canonical_url),
     // Absent unless the API decided the requester owns this post.
     previewToken: raw.preview_token ? String(raw.preview_token) : null,
+  };
+}
+
+export function normalizePostRevision(raw: Raw): PostRevision {
+  return {
+    id: String(raw.id ?? ""),
+    title: text(raw.title, "Untitled"),
+    note: text(raw.note),
+    createdBy: raw.created_by ? normalizeAuthor(raw.created_by) : null,
+    createdAt: raw.created_at ?? null,
+    wordCount: typeof raw.word_count === "number" ? raw.word_count : 0,
+  };
+}
+
+export function normalizePostRevisionDetail(raw: Raw): PostRevisionDetail {
+  return {
+    ...normalizePostRevision(raw),
+    subtitle: text(raw.subtitle),
+    excerpt: text(raw.excerpt),
+    content: text(raw.content),
+  };
+}
+
+export function normalizeReadingHistoryEntry(raw: Raw): ReadingHistoryEntry {
+  return {
+    id: String(raw.id ?? ""),
+    post: normalizePost(raw.post ?? {}),
+    progress: typeof raw.progress === "number" ? raw.progress : 0,
+    isFinished: Boolean(raw.is_finished),
+    lastReadAt: raw.last_read_at ?? null,
   };
 }

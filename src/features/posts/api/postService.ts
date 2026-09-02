@@ -1,7 +1,23 @@
 import { axiosInstance } from "@/lib/api/client";
 import { normalizePage } from "@/lib/api/normalize";
-import { normalizeCategory, normalizePost, normalizeTag } from "./normalizers";
-import type { Category, Post, PostInput, PostQuery, Tag } from "@/features/posts/types";
+import {
+  normalizeCategory,
+  normalizePost,
+  normalizePostRevision,
+  normalizePostRevisionDetail,
+  normalizeReadingHistoryEntry,
+  normalizeTag,
+} from "./normalizers";
+import type {
+  Category,
+  Post,
+  PostInput,
+  PostQuery,
+  PostRevision,
+  PostRevisionDetail,
+  ReadingHistoryEntry,
+  Tag,
+} from "@/features/posts/types";
 import type { Paginated } from "@/types/common";
 import { POSTS_PER_PAGE } from "@/config/constants";
 
@@ -63,6 +79,13 @@ function toPayload(input: PostInput, options: { includeCover?: boolean } = {}) {
     status: input.status,
   };
   if (input.category) base.category = input.category;
+  if (input.subtitle !== undefined) base.subtitle = input.subtitle;
+  if (input.visibility) base.visibility = input.visibility;
+  // Only meaningful for a scheduled post; sending null clears a previous date.
+  if (input.scheduledFor !== undefined) base.scheduled_for = input.scheduledFor;
+  if (input.seoTitle !== undefined) base.seo_title = input.seoTitle;
+  if (input.seoDescription !== undefined) base.seo_description = input.seoDescription;
+  if (input.canonicalUrl !== undefined) base.canonical_url = input.canonicalUrl;
 
   if (input.coverImage instanceof File && options.includeCover !== false) {
     const form = new FormData();
@@ -159,4 +182,87 @@ export async function getPostPreview(slug: string, token: string): Promise<Post>
 export async function rotatePreviewToken(slug: string): Promise<Post> {
   const { data } = await axiosInstance.post(`/api/posts/${slug}/preview-token/`);
   return normalizePost(data);
+}
+
+/* ------------------------------------------------------------------ */
+/* Lifecycle                                                           */
+/* ------------------------------------------------------------------ */
+
+type LifecycleAction = "archive" | "unarchive" | "restore" | "duplicate";
+
+/** Archive, unarchive, restore from trash, or copy into a new draft. */
+export async function runLifecycleAction(
+  slug: string,
+  action: LifecycleAction,
+): Promise<Post> {
+  const { data } = await axiosInstance.post(`/api/posts/${slug}/${action}/`);
+  return normalizePost(data);
+}
+
+/** The author's soft-deleted posts. Deleting is reversible, so this is a trash can. */
+export async function listTrash(page = 1): Promise<Paginated<Post>> {
+  const { data } = await axiosInstance.get("/api/posts/trash/", { params: { page } });
+  return normalizePage(data, normalizePost, page, POSTS_PER_PAGE);
+}
+
+export async function listRevisions(slug: string, page = 1): Promise<Paginated<PostRevision>> {
+  const { data } = await axiosInstance.get(`/api/posts/${slug}/revisions/`, { params: { page } });
+  return normalizePage(data, normalizePostRevision, page, 10);
+}
+
+export async function getRevision(slug: string, id: string): Promise<PostRevisionDetail> {
+  const { data } = await axiosInstance.get(`/api/posts/${slug}/revisions/${id}/`);
+  return normalizePostRevisionDetail(data);
+}
+
+/** Puts a revision's text back. What was there is snapshotted first. */
+export async function restoreRevision(slug: string, id: string): Promise<Post> {
+  const { data } = await axiosInstance.post(`/api/posts/${slug}/revisions/${id}/`);
+  return normalizePost(data);
+}
+
+/* ------------------------------------------------------------------ */
+/* Reading history                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Records how far down the article the reader has got.
+ *
+ * Called while scrolling, so failures are swallowed: losing a scroll position
+ * is not worth an error in the reader's face.
+ */
+export async function recordProgress(slug: string, progress: number): Promise<void> {
+  try {
+    await axiosInstance.post(`/api/posts/${slug}/progress/`, { progress });
+  } catch {
+    /* best effort */
+  }
+}
+
+export async function listReadingHistory(
+  options: { unfinishedOnly?: boolean; page?: number } = {},
+): Promise<Paginated<ReadingHistoryEntry>> {
+  const params: Record<string, string | number> = { page: options.page ?? 1 };
+  if (options.unfinishedOnly) params.unfinished = "true";
+
+  const { data } = await axiosInstance.get("/api/reading-history/", { params });
+  return normalizePage(data, normalizeReadingHistoryEntry, options.page ?? 1, 10);
+}
+
+export async function clearReadingHistory(postSlug?: string): Promise<void> {
+  await axiosInstance.delete("/api/reading-history/clear/", {
+    params: postSlug ? { post: postSlug } : undefined,
+  });
+}
+
+/** Posts from the authors, categories and tags this reader follows. */
+export async function listFeed(query: PostQuery = {}): Promise<Paginated<Post>> {
+  const { data } = await axiosInstance.get("/api/posts/feed/", { params: toParams(query) });
+  return normalizePage(data, normalizePost, query.page ?? 1, POSTS_PER_PAGE);
+}
+
+/** Content-based suggestions, from what this reader has liked, saved or finished. */
+export async function listRecommended(page = 1): Promise<Paginated<Post>> {
+  const { data } = await axiosInstance.get("/api/posts/recommended/", { params: { page } });
+  return normalizePage(data, normalizePost, page, POSTS_PER_PAGE);
 }

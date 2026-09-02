@@ -1,8 +1,11 @@
+import { useState } from "react";
+import { History } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import PostEditor, { clearStoredDraft } from "@/features/posts/components/PostEditor";
 import DraftShareLink from "@/features/posts/components/DraftShareLink";
+import RevisionHistory from "@/features/posts/components/RevisionHistory";
 import ErrorState from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,6 +15,7 @@ import { postPath } from "@/lib/routes";
 import type { PostInput } from "@/features/posts/types";
 
 export default function EditPost() {
+  const [historyOpen, setHistoryOpen] = useState(false);
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -84,7 +88,21 @@ export default function EditPost() {
           </p>
         </header>
 
+        <div className="mb-6 flex justify-end">
+          <Button variant="outline" size="sm" className="gap-2"
+                  onClick={() => setHistoryOpen(true)}>
+            <History className="h-4 w-4" aria-hidden="true" />
+            Version history
+          </Button>
+        </div>
+
         <DraftShareLink post={post} />
+
+        <RevisionHistory
+          slug={post.slug}
+          open={historyOpen}
+          onOpenChange={setHistoryOpen}
+        />
 
         <PostEditor
           post={post}

@@ -26,6 +26,17 @@ export interface Author {
   linkedin: string;
 }
 
+/** The permission ladder, ordered by authority from low to high. */
+export type Role =
+  | "user"
+  | "member"
+  | "contributor"
+  | "author"
+  | "moderator"
+  | "editor"
+  | "admin"
+  | "super_admin";
+
 export interface CurrentUser extends Author {
   email: string;
   firstName: string;
@@ -34,6 +45,15 @@ export interface CurrentUser extends Author {
   district: string;
   isVerified: boolean;
   isStaff: boolean;
+  role: Role;
+  /**
+   * Capabilities resolved server-side, so the UI can hide controls the account
+   * cannot use. They never enforce anything — the API re-checks every one.
+   */
+  canPublish: boolean;
+  canEditOthers: boolean;
+  canModerate: boolean;
+  canManageUsers: boolean;
 }
 
 export interface DashboardStats {
