@@ -28,7 +28,7 @@ export default function Trending() {
     <Layout>
       <Seo
         title="Trending"
-        description="The stories readers are engaging with most on Mindful Blog."
+        description="The stories readers are engaging with most on Marginalia."
         canonicalPath="/trending"
       />
 

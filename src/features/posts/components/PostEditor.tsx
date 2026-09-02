@@ -49,7 +49,7 @@ interface StoredDraft {
 const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function draftKey(postId?: string) {
-  return `mindful.draft.${postId ?? "new"}`;
+  return `marginalia.draft.${postId ?? "new"}`;
 }
 
 function readDraft(postId?: string): StoredDraft | null {

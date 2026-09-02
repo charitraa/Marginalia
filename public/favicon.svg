@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Marginalia">
+  <!-- Paper ground, so the mark reads on both light and dark tab bars. -->
+  <rect width="32" height="32" rx="7" fill="#FBFAF8"/>
+  <!-- The note in the margin. -->
+  <circle cx="12.7" cy="12" r="3.7" fill="#255647"/>
+  <!-- The margin rule. -->
+  <rect x="20.2" y="5.5" width="2.8" height="21" rx="1.4" fill="#25201D"/>
+</svg>

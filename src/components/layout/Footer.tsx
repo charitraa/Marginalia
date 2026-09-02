@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import NewsletterForm from "@/features/newsletter/components/NewsletterForm";
+import Logo from "@/components/common/Logo";
 import { SITE_NAME, SITE_TAGLINE } from "@/config/constants";
 
 const SECTIONS = [
@@ -34,8 +35,8 @@ export default function Footer() {
       <div className="container-page py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <Link to="/" className="font-serif text-lg font-bold">
-              {SITE_NAME}
+            <Link to="/" className="text-lg" aria-label={`${SITE_NAME} home`}>
+              <Logo />
             </Link>
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
               {SITE_TAGLINE} A quiet corner of the internet for thoughtful writing.

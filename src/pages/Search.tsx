@@ -50,7 +50,7 @@ export default function Search() {
     <Layout>
       <Seo
         title={term ? `Search: ${term}` : "Search"}
-        description="Search stories across Mindful Blog."
+        description="Search stories across Marginalia."
         canonicalPath="/search"
         noIndex
       />

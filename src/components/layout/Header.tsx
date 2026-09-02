@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { authorPath } from "@/lib/routes";
+import Logo from "@/components/common/Logo";
 import { SITE_NAME } from "@/config/constants";
 import { cn } from "@/lib/utils";
 
@@ -72,8 +73,8 @@ export default function Header() {
       </a>
 
       <div className="container-page flex h-16 items-center gap-4">
-        <Link to="/" className="shrink-0 font-serif text-xl font-bold tracking-tight">
-          {SITE_NAME}
+        <Link to="/" className="shrink-0 text-xl" aria-label={`${SITE_NAME} home`}>
+          <Logo />
         </Link>
 
         <nav aria-label="Main" className="ml-4 hidden items-center gap-6 md:flex">

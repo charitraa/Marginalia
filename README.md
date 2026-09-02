@@ -1,7 +1,9 @@
-# Mindful Blog
+# Marginalia
+
+> *Notes in the margins.*
 
 ## About the Project
-Mindful Blog is the React frontend of a full-stack publishing platform. Readers browse,
+Marginalia is the React frontend of a full-stack publishing platform. Readers browse,
 search and filter stories; writers draft, publish and manage them from a dashboard.
 
 Every screen is backed by the real API — there is no mock data in the application. The
@@ -104,6 +106,22 @@ Mindful_Blog/
 └── vite.config.ts
 ```
 
+### The brand
+
+The mark is a page's margin rule with three lines of text and a single dot out in
+the margin — a reader's note beside the line it answers. It lives in
+`components/common/Logo.tsx` as `<Logo />` (mark + wordmark) and `<LogoMark />`
+(mark alone), sized in `em` so it tracks whatever type size it sits in. The dot is
+the only element carrying the evergreen accent; everything else is `currentColor`,
+so the mark inverts correctly in dark mode with no second asset.
+
+Icons in `public/`: `favicon.svg` (primary), `favicon.ico` (16/32/48 fallback) and
+`apple-touch-icon.png`. The favicon drops the text lines — at 16px only the dot and
+the rule survive legibly.
+
+Name and tagline come from `SITE_NAME` / `SITE_TAGLINE` in `config/constants.ts`;
+no component hardcodes them.
+
 ### Rules that keep it tidy
 
 - **A feature owns its data.** `features/x/api/` is the only place that knows the
@@ -190,7 +208,7 @@ We ❤️ contributions! Please follow these steps to ensure a smooth contributi
 
 ### How to Contribute
 1. **Fork the Repository**  
-   Click the "Fork" button on the Mindful Blog GitHub repository.  
+   Click the "Fork" button on the Marginalia GitHub repository.  
    Clone your forked repository to your local machine:  
    ```bash
    git clone https://github.com/your-username/Mindful_Blog.git
@@ -240,7 +258,7 @@ We ❤️ contributions! Please follow these steps to ensure a smooth contributi
    ```bash
    git push origin feature/your-feature-name
    ```  
-   Open a Pull Request (PR) on the main Mindful Blog repository.  
+   Open a Pull Request (PR) on the main Marginalia repository.  
    In the PR description, include:  
    - A summary of your changes.  
    - Any related issue numbers (e.g., `Closes #123`).  
@@ -268,7 +286,7 @@ We ❤️ contributions! Please follow these steps to ensure a smooth contributi
 ## 📜 Code of Conduct
 
 ### Our Pledge
-We, as contributors and maintainers of Mindful Blog, pledge to make participation in our project and community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We, as contributors and maintainers of Marginalia, pledge to make participation in our project and community a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 ### Our Standards
 Examples of behavior that contributes to a positive environment include:  
@@ -290,7 +308,7 @@ Project maintainers are responsible for clarifying the standards of acceptable b
 Maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, issues, and other contributions that are not aligned with this Code of Conduct, or to ban temporarily or permanently any contributor for behaviors deemed inappropriate, threatening, offensive, or harmful.
 
 ### Scope
-This Code of Conduct applies within all project spaces, including GitHub repositories, issue trackers, and any other communication channels related to Mindful Blog. It also applies when an individual is representing the project or its community in public spaces.
+This Code of Conduct applies within all project spaces, including GitHub repositories, issue trackers, and any other communication channels related to Marginalia. It also applies when an individual is representing the project or its community in public spaces.
 
 ### Enforcement
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by contacting the project team at your.email@example.com. All complaints will be reviewed and investigated promptly and fairly.  
@@ -310,14 +328,14 @@ For answers to common questions about this Code of Conduct, see the FAQ at https
 ## 🛡️ Security Policy
 
 ### Supported Versions
-The Mindful Blog project actively maintains security updates for the following versions:
+The Marginalia project actively maintains security updates for the following versions:
 
 | Version  | Supported          |
 |----------|--------------------|
 | main     | ✅                 |
 
 ### Reporting a Vulnerability
-If you discover a security vulnerability in Mindful Blog, we encourage responsible disclosure. Please follow these steps:  
+If you discover a security vulnerability in Marginalia, we encourage responsible disclosure. Please follow these steps:  
 - Do not report security issues publicly via GitHub issues or other public forums.  
 - Send a detailed report to stharabi9862187405@gmail.com. Include:  
   - A description of the vulnerability.  

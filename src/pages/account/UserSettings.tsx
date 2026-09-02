@@ -189,7 +189,7 @@ export default function UserSettings() {
           <h1 className="text-4xl">Settings</h1>
           <p className="mt-3 text-lg text-muted-foreground">
             Manage how you appear across {""}
-            <span className="whitespace-nowrap">Mindful Blog</span>.
+            <span className="whitespace-nowrap">Marginalia</span>.
           </p>
         </header>
 

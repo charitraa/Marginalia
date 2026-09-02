@@ -90,7 +90,7 @@ export default function Explore() {
     <Layout>
       <Seo
         title="Explore"
-        description="Browse every story on Mindful Blog by topic, popularity or recency."
+        description="Browse every story on Marginalia by topic, popularity or recency."
         canonicalPath="/explore"
       />
 

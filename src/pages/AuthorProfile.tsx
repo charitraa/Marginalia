@@ -70,7 +70,7 @@ export default function AuthorProfile() {
     <Layout>
       <Seo
         title={profile.name}
-        description={profile.bio || `Stories by ${profile.name} on Mindful Blog.`}
+        description={profile.bio || `Stories by ${profile.name} on Marginalia.`}
         image={profile.avatar}
         canonicalPath={`/author/${profile.username}`}
       />
