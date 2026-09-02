@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import BlogCard from "@/features/posts/components/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
@@ -94,15 +95,14 @@ export default function Explore() {
         canonicalPath="/explore"
       />
 
-      <div className="container-page py-12 sm:py-16">
-        <header className="max-w-2xl">
-          <h1 className="text-4xl">Explore</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            Browse every story by topic, popularity or recency.
-          </p>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          eyebrow="Marginalia / Archive"
+          title="Explore"
+          description="Every story published here, by topic, popularity or recency."
+        />
 
-        <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-center">
+        <div className="mt-10 flex flex-col gap-4 lg:flex-row lg:items-center">
           <div className="lg:max-w-md lg:flex-1">
             <SearchBar
               value={searchInput}
@@ -139,8 +139,8 @@ export default function Explore() {
 
         {/* Categories */}
         {categories && categories.length > 0 && (
-          <nav aria-label="Filter by category" className="mt-6 -mx-1 overflow-x-auto pb-2">
-            <ul className="flex min-w-max gap-2 px-1">
+          <nav aria-label="Filter by category" className="-mx-1 mt-8 overflow-x-auto border-b border-border">
+            <ul className="flex min-w-max gap-7 px-1">
               {[{ slug: "all", name: "All", id: "all", description: "", count: null }, ...categories].map(
                 (entry) => {
                   const active = category === entry.slug || (entry.slug === "all" && category === "all");
@@ -151,15 +151,15 @@ export default function Explore() {
                         onClick={() => update("category", entry.slug)}
                         aria-pressed={active}
                         className={cn(
-                          "whitespace-nowrap rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                          "whitespace-nowrap border-b-2 pb-2.5 pt-1 font-sans text-sm transition-colors duration-200",
                           active
-                            ? "border-transparent bg-primary text-primary-foreground"
-                            : "border-border bg-background text-muted-foreground hover:border-foreground/25 hover:text-foreground",
+                            ? "border-primary text-foreground"
+                            : "border-transparent text-muted-foreground hover:text-foreground",
                         )}
                       >
                         {entry.name}
                         {entry.count != null && entry.slug !== "all" && (
-                          <span className="ml-1.5 text-xs opacity-70">{entry.count}</span>
+                          <span className="ml-1.5 text-xs tabular-nums opacity-60">{entry.count}</span>
                         )}
                       </button>
                     </li>

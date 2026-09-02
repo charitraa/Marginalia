@@ -64,7 +64,7 @@ export default function NewsletterAction({ action }: { action: "confirm" | "unsu
           {state === "done" && (
             <>
               <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
-              <h1 className="font-serif text-2xl font-bold">
+              <h1 className="font-serif text-2xl font-semibold">
                 {action === "confirm" ? "You're subscribed" : "You're unsubscribed"}
               </h1>
               <p className="text-sm text-muted-foreground">{message}</p>
@@ -77,7 +77,7 @@ export default function NewsletterAction({ action }: { action: "confirm" | "unsu
           {state === "failed" && (
             <>
               <XCircle className="mx-auto h-12 w-12 text-destructive" aria-hidden="true" />
-              <h1 className="font-serif text-2xl font-bold">That link didn&apos;t work</h1>
+              <h1 className="font-serif text-2xl font-semibold">That link didn&apos;t work</h1>
               <p className="text-sm text-muted-foreground">{message}</p>
               <Button variant="outline" asChild>
                 <Link to="/">Back to the blog</Link>

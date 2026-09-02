@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { MessageSquare, ImageIcon, BarChart3, Rss, History, Shield,
+import { MessageSquare, ImageIcon, BarChart3, Rss, History, Shield, ChevronDown,
   Bookmark, LayoutDashboard, LogOut, Menu, PenLine, Search, Settings, User as UserIcon, X,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -17,7 +17,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { authorPath } from "@/lib/routes";
+import { useCategories } from "@/features/posts/hooks/usePosts";
+import { authorPath, categoryPath } from "@/lib/routes";
 import Logo from "@/components/common/Logo";
 import { SITE_NAME } from "@/config/constants";
 import { cn } from "@/lib/utils";
@@ -29,22 +30,81 @@ const NAV_LINKS = [
   { to: "/series", label: "Series" },
 ];
 
+/** Categories come from the API, so the menu only lists topics that exist. */
+function CategoryMenu() {
+  const [open, setOpen] = useState(false);
+  // Deferred: readers who never open this never pay for the request.
+  const { data: categories } = useCategories(open);
+
+  return (
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger
+        className={cn(
+          "group inline-flex items-center gap-1 text-sm transition-colors duration-200",
+          open ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+        )}
+      >
+        Categories
+        <ChevronDown
+          className={cn("h-3.5 w-3.5 transition-transform duration-200 ease-editorial", open && "rotate-180")}
+          aria-hidden="true"
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className="w-64 p-1.5">
+        {categories?.length ? (
+          categories.map((category) => (
+            <DropdownMenuItem asChild key={category.id}>
+              <Link to={categoryPath(category.slug)} className="flex items-baseline justify-between gap-4">
+                <span className="font-serif text-base">{category.name}</span>
+                {category.count != null && (
+                  <span className="font-sans text-xs tabular-nums text-muted-foreground">{category.count}</span>
+                )}
+              </Link>
+            </DropdownMenuItem>
+          ))
+        ) : (
+          <p className="px-2 py-3 text-sm text-muted-foreground">Loading topics…</p>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/explore" className="text-sm text-muted-foreground">
+            Browse everything
+          </Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [condensed, setCondensed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   // Navigating away should always close the mobile sheet.
   useEffect(() => setMenuOpen(false), [location.pathname, location.search]);
 
-  // A open mobile menu locks the page behind it.
+  // An open mobile menu locks the page behind it.
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [menuOpen]);
+
+  /**
+   * The header sits flush with the page until the reader moves, then draws its
+   * rule and tightens. The threshold is past the first line of most heroes, so
+   * it does not flicker on tiny scrolls.
+   */
+  useEffect(() => {
+    const onScroll = () => setCondensed(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleLogout = async () => {
     const { serverCleared } = await logout();
@@ -60,12 +120,21 @@ export default function Header() {
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "text-sm font-medium transition-colors",
-      isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+      "relative text-sm transition-colors duration-200",
+      isActive
+        ? "text-foreground after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:bg-primary"
+        : "text-muted-foreground hover:text-foreground",
     );
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+    <header
+      className={cn(
+        "sticky top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 ease-editorial",
+        condensed
+          ? "border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
+          : "border-b border-transparent bg-background",
+      )}
+    >
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
@@ -73,23 +142,38 @@ export default function Header() {
         Skip to content
       </a>
 
-      <div className="container-page flex h-16 items-center gap-4">
-        <Link to="/" className="shrink-0 text-xl" aria-label={`${SITE_NAME} home`}>
+      <div
+        className={cn(
+          "container-page grid grid-cols-[auto_1fr_auto] items-center gap-4 transition-[height] duration-300 ease-editorial",
+          condensed ? "h-header-sm" : "h-header",
+        )}
+      >
+        <Link
+          to="/"
+          className="shrink-0 text-[1.0625rem] tracking-tight"
+          aria-label={`${SITE_NAME} home`}
+        >
           <Logo />
         </Link>
 
-        <nav aria-label="Main" className="ml-4 hidden items-center gap-6 md:flex">
+        {/* Centre column: the publication's own sections. */}
+        <nav aria-label="Main" className="hidden items-center justify-center gap-7 md:flex">
           {NAV_LINKS.map((link) => (
             <NavLink key={link.to} to={link.to} end={link.end} className={navLinkClass}>
               {link.label}
             </NavLink>
           ))}
+          <CategoryMenu />
+          <NavLink to="/about" className={navLinkClass}>
+            About
+          </NavLink>
         </nav>
+        <div className="md:hidden" />
 
-        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center justify-end gap-0.5 sm:gap-1">
           <Button variant="ghost" size="icon" asChild aria-label="Search stories">
             <Link to="/search">
-              <Search className="h-[1.15rem] w-[1.15rem]" aria-hidden="true" />
+              <Search className="h-[1.05rem] w-[1.05rem]" aria-hidden="true" />
             </Link>
           </Button>
 
@@ -97,17 +181,17 @@ export default function Header() {
 
           {isAuthenticated && user ? (
             <>
-              <Button variant="ghost" size="icon" asChild aria-label="Your feed">
+              <Button variant="ghost" size="icon" asChild aria-label="Your feed" className="hidden sm:inline-flex">
                 <Link to="/feed">
-                  <Rss className="h-[1.15rem] w-[1.15rem]" aria-hidden="true" />
+                  <Rss className="h-[1.05rem] w-[1.05rem]" aria-hidden="true" />
                 </Link>
               </Button>
 
               <NotificationBell />
 
-              <Button asChild className="hidden gap-2 sm:inline-flex">
+              <Button asChild size="sm" className="ml-1.5 hidden gap-1.5 sm:inline-flex">
                 <Link to="/write">
-                  <PenLine className="h-4 w-4" aria-hidden="true" />
+                  <PenLine className="h-3.5 w-3.5" aria-hidden="true" />
                   Write
                 </Link>
               </Button>
@@ -115,7 +199,7 @@ export default function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="ml-1 rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="ml-1.5 rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     aria-label="Account menu"
                   >
                     <UserAvatar user={user} size="sm" />
@@ -205,11 +289,14 @@ export default function Header() {
               </DropdownMenu>
             </>
           ) : (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button variant="ghost" asChild>
-                <Link to="/login">Sign in</Link>
-              </Button>
-              <Button asChild>
+            <div className="ml-2 hidden items-center gap-2 md:flex">
+              <Link
+                to="/login"
+                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Sign in
+              </Link>
+              <Button asChild size="sm">
                 <Link to="/register">Get started</Link>
               </Button>
             </div>
@@ -238,16 +325,16 @@ export default function Header() {
           id="mobile-nav"
           className="animate-slide-down border-t border-border bg-background md:hidden"
         >
-          <nav aria-label="Mobile" className="container-page flex flex-col py-3">
-            {NAV_LINKS.map((link) => (
+          <nav aria-label="Mobile" className="container-page flex flex-col py-2">
+            {[...NAV_LINKS, { to: "/about", label: "About", end: false }].map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 end={link.end}
                 className={({ isActive }) =>
                   cn(
-                    "rounded-md px-3 py-3 text-base font-medium transition-colors",
-                    isActive ? "bg-accent text-foreground" : "text-muted-foreground hover:bg-accent/60",
+                    "border-b border-border/70 py-3.5 font-serif text-lg transition-colors",
+                    isActive ? "text-foreground" : "text-muted-foreground",
                   )
                 }
               >
@@ -256,13 +343,13 @@ export default function Header() {
             ))}
             <NavLink
               to="/search"
-              className="rounded-md px-3 py-3 text-base font-medium text-muted-foreground transition-colors hover:bg-accent/60"
+              className="border-b border-border/70 py-3.5 font-serif text-lg text-muted-foreground transition-colors"
             >
               Search
             </NavLink>
 
             {!isAuthenticated && (
-              <div className="mt-3 flex gap-3 border-t border-border pt-4">
+              <div className="mt-5 flex gap-3 pb-2">
                 <Button variant="outline" asChild className="flex-1">
                   <Link to="/login">Sign in</Link>
                 </Button>

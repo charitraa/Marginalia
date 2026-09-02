@@ -138,25 +138,29 @@ export default function Post() {
         <span className="sr-only">{Math.round(progress)}% read</span>
       </div>
 
-      <article className="pb-16">
+      <article className="pb-20">
         <div className="container-prose pt-10 sm:pt-14">
           <header>
-            <div className="flex flex-wrap items-center gap-3">
+            {!prefs.focusMode && <Breadcrumbs trail={trail} />}
+
+            <div className="mt-7 flex flex-wrap items-center gap-4">
               {post.category && <CategoryBadge category={post.category} />}
               {post.status === "draft" && (
-                <span className="rounded-full bg-amber-500/15 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400">
+                <span className="font-sans text-2xs font-medium uppercase tracking-[0.14em] text-destructive">
                   Draft — only you can see this
                 </span>
               )}
             </div>
 
-            <h1 className="mt-5 text-4xl leading-[1.15] sm:text-5xl">{post.title}</h1>
+            <h1 className="mt-5 font-serif text-display-sm font-semibold">{post.title}</h1>
 
             {post.excerpt && (
-              <p className="mt-5 text-xl leading-relaxed text-muted-foreground">{post.excerpt}</p>
+              <p className="mt-6 font-sans text-xl leading-relaxed text-muted-foreground">
+                {post.excerpt}
+              </p>
             )}
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-y border-border py-4">
+            <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-y border-border py-5">
               <div className="flex items-center gap-3">
                 <Link to={authorPath(post.author)} className="shrink-0">
                   <UserAvatar user={post.author} />
@@ -219,28 +223,45 @@ export default function Post() {
         </div>
 
         {post.coverImage && (
-          <div className="container-page my-10">
+          <figure className="container-page my-12 sm:my-16">
             <img
               src={post.coverImage}
               alt=""
               loading="eager"
               decoding="async"
-              className="mx-auto max-h-[32rem] w-full max-w-5xl rounded-xl object-cover"
+              className="mx-auto aspect-[16/9] w-full max-w-5xl rounded-md object-cover"
             />
-          </div>
+          </figure>
         )}
 
-        <div className="container-prose">
-          {!prefs.focusMode && <Breadcrumbs trail={trail} />}
+        {/**
+         * The reading column, with the contents list hanging in the left margin
+         * on wide screens — the publication's own idiom applied to navigation.
+         * Below xl there is no margin to hang it in, so it collapses inline.
+         */}
+        <div className="mx-auto w-full max-w-[76rem]">
+          <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,43rem)_minmax(0,1fr)] xl:gap-6">
+            <aside className="hidden xl:block xl:pl-10">
+              {headings.length >= 3 && !prefs.focusMode && (
+                <div className="sticky top-28 max-h-[calc(100vh-9rem)] overflow-y-auto pr-4">
+                  <TableOfContents headings={headings} activeId={activeId} />
+                </div>
+              )}
+            </aside>
 
-          <div className="mb-6 flex flex-wrap items-center justify-end gap-3 border-b border-border pb-4">
+            {/* Same measure and padding as the header above, so the two align. */}
+            <div className="container-prose">
+          <div className="mb-8 flex flex-wrap items-center justify-end gap-3 border-b border-border pb-4">
             <ReadingControls prefs={prefs} onChange={updatePrefs} />
           </div>
 
           {headings.length >= 3 && !prefs.focusMode && (
-            <div className="mb-8 rounded-lg border border-border p-4 lg:hidden">
-              <TableOfContents headings={headings} activeId={activeId} />
-            </div>
+            <details className="mb-10 border-y border-border py-4 xl:hidden">
+              <summary className="cursor-pointer font-sans text-sm font-medium">On this page</summary>
+              <div className="mt-4">
+                <TableOfContents headings={headings} activeId={activeId} />
+              </div>
+            </details>
           )}
 
           <div
@@ -252,10 +273,10 @@ export default function Post() {
           />
 
           {(post.tags.length > 0 || post.category) && (
-            <div className="mt-10 space-y-3">
+            <div className="mt-14 space-y-4 border-t border-border pt-6">
               {post.category && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Filed under</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="eyebrow">Filed under</span>
                   <CategoryBadge category={post.category} />
                   <TopicFollowButton
                     kind="category"
@@ -266,12 +287,12 @@ export default function Post() {
               )}
 
               {post.tags.length > 0 && (
-                <ul className="flex flex-wrap items-center gap-2">
+                <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
                   {post.tags.map((tag) => (
-                    <li key={tag.id} className="flex items-center gap-1">
+                    <li key={tag.id} className="flex items-center gap-1.5">
                       <Link
                         to={tagPath(tag.slug)}
-                        className="inline-block rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                        className="font-sans text-sm text-muted-foreground transition-colors duration-200 hover:text-primary"
                       >
                         #{tag.name}
                       </Link>
@@ -283,7 +304,7 @@ export default function Post() {
             </div>
           )}
 
-          <div className="mt-10 flex items-center justify-between border-y border-border py-4">
+          <div className="mt-12 flex items-center justify-between border-y border-border py-4">
             <LikeButton post={post} />
             <div className="flex items-center gap-1">
               <BookmarkButton post={post} showLabel />
@@ -300,13 +321,19 @@ export default function Post() {
           <div className="mt-16">
             <CommentSection postId={post.slug} />
           </div>
+            </div>
+
+            <div className="hidden xl:block" aria-hidden="true" />
+          </div>
         </div>
 
         {related && related.length > 0 && (
-          <section className="container-page mt-20">
-            <h2 className="mb-8 border-b border-border pb-4 text-2xl">Keep reading</h2>
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {related.map((item) => (
+          <section className="container-page mt-24">
+            <div className="section-head mb-10">
+              <h2 className="section-title">Continue reading</h2>
+            </div>
+            <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+              {related.slice(0, 3).map((item) => (
                 <BlogCard key={item.id} post={item} />
               ))}
             </div>

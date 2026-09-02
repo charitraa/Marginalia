@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Sparkles } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import BlogCard from "@/features/posts/components/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
@@ -58,15 +59,14 @@ export default function Search() {
         noIndex
       />
 
-      <div className="container-page py-12 sm:py-16">
-        <header className="max-w-2xl">
-          <h1 className="text-4xl">Search</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            Find stories by title, content, author or topic.
-          </p>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          eyebrow="Marginalia / Search"
+          title="Search"
+          description="Find stories by title, content, author or topic."
+        />
 
-        <div className="mt-8 max-w-xl">
+        <div className="mt-10 max-w-xl">
           <SearchBar
             value={input}
             onChange={setInput}

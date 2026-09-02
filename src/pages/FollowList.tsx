@@ -46,7 +46,7 @@ export default function FollowList({ mode }: { mode: "followers" | "following" }
               @{username}
             </Link>
           </p>
-          <h1 className="mt-1 font-serif text-3xl font-bold">{heading}</h1>
+          <h1 className="mt-1 font-serif text-3xl font-semibold">{heading}</h1>
           {data && (
             <p className="mt-2 text-muted-foreground">
               {data.count} {data.count === 1 ? "person" : "people"}

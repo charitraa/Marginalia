@@ -7,36 +7,38 @@ import FeaturedPost from "@/features/posts/components/FeaturedPost";
 import PostMeta from "@/features/posts/components/PostMeta";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
-import { PostGridSkeleton, PostListSkeleton } from "@/components/common/Skeletons";
+import { PostGridSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
-import { postPath } from "@/lib/routes";
-import { SITE_DESCRIPTION, SITE_TAGLINE } from "@/config/constants";
+import { categoryPath, postPath } from "@/lib/routes";
+import { SITE_DESCRIPTION, SITE_NAME } from "@/config/constants";
 
+/** A section opener: hairline, title, and an optional way out to the full list. */
 function SectionHeading({
   title,
-  description,
   action,
+  className,
 }: {
   title: string;
-  description?: string;
   action?: { to: string; label: string };
+  className?: string;
 }) {
   return (
-    <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-4">
-      <div>
-        <h2 className="text-2xl">{title}</h2>
-        {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
-      </div>
+    <div className={`section-head mb-10 ${className ?? ""}`}>
+      <h2 className="section-title">{title}</h2>
       {action && (
-        <Button variant="ghost" asChild className="gap-1 text-sm">
-          <Link to={action.to}>
-            {action.label}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
+        <Link
+          to={action.to}
+          className="group/link inline-flex items-center gap-1.5 font-sans text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          {action.label}
+          <ArrowRight
+            className="h-3.5 w-3.5 transition-transform duration-200 ease-editorial group-hover/link:translate-x-0.5"
+            aria-hidden="true"
+          />
+        </Link>
       )}
     </div>
   );
@@ -50,8 +52,7 @@ export default function Home() {
 
   const posts = latest.data?.items ?? [];
   const [featured, ...rest] = posts;
-  const highlights = rest.slice(0, 3);
-  const feed = rest.slice(3);
+  const grid = rest.slice(0, 6);
 
   // Only worth its own section when it differs from the newest stories.
   const trending = (popular.data?.items ?? []).filter(
@@ -62,18 +63,22 @@ export default function Home() {
     <Layout>
       <Seo title={undefined} description={SITE_DESCRIPTION} canonicalPath="/" />
 
-      {/* Hero */}
-      <section className="border-b border-border bg-muted/25">
-        <div className="container-page py-14 sm:py-20">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl leading-[1.1] sm:text-5xl">{SITE_TAGLINE}</h1>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              Discover thoughtful stories, ideas, tutorials and experiences from our community.
+      {/* Hero. The masthead label hangs in the margin; the statement carries the page. */}
+      <section className="container-page pb-16 pt-16 sm:pb-24 sm:pt-24">
+        <div className="rail">
+          <p className="rail-label">{SITE_NAME} / Journal</p>
+          <div>
+            <h1 className="max-w-[19ch] font-serif text-display font-semibold">
+              Ideas worth reading. Thoughts worth keeping.
+            </h1>
+            <p className="mt-8 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+              An independent publication about software, design and the thinking behind
+              them — written slowly, and meant to be read the same way.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap gap-3">
               <Button asChild size="lg" className="gap-2">
                 <Link to="/explore">
-                  Explore posts
+                  Explore articles
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -88,70 +93,141 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="container-page py-14">
+      <div className="container-page pb-24">
         {/* Featured */}
-        {latest.isLoading ? (
-          <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-            <Skeleton className="aspect-[16/10] w-full rounded-lg" />
-            <div className="space-y-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-3/4" />
-              <Skeleton className="h-4 w-full" />
+        <section>
+          <SectionHeading title="Featured" />
+          {latest.isLoading ? (
+            <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-14">
+              <Skeleton className="aspect-[5/4] w-full rounded-md" />
+              <div className="space-y-5">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-2/3" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-4/5" />
+              </div>
             </div>
-          </div>
-        ) : latest.error ? (
-          <ErrorState
-            error={latest.error}
-            title="Couldn't load stories"
-            onRetry={() => latest.refetch()}
-          />
-        ) : !posts.length ? (
-          <EmptyState
-            title="No stories yet"
-            description="Once the first story is published it will appear right here."
-          >
-            <Button asChild>
-              <Link to={isAuthenticated ? "/write" : "/register"}>Write the first story</Link>
-            </Button>
-          </EmptyState>
-        ) : (
-          <FeaturedPost post={featured} />
-        )}
+          ) : latest.error ? (
+            <ErrorState
+              error={latest.error}
+              title="Couldn't load stories"
+              onRetry={() => latest.refetch()}
+            />
+          ) : !posts.length ? (
+            <EmptyState
+              title="No stories yet"
+              description="Once the first story is published it will appear right here."
+            >
+              <Button asChild>
+                <Link to={isAuthenticated ? "/write" : "/register"}>Write the first story</Link>
+              </Button>
+            </EmptyState>
+          ) : (
+            <FeaturedPost post={featured} />
+          )}
+        </section>
 
-        {/* Highlights */}
-        {highlights.length > 0 && (
-          <section className="mt-20">
-            <SectionHeading title="Recent highlights" action={{ to: "/explore", label: "View all" }} />
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {highlights.map((post) => (
-                <BlogCard key={post.id} post={post} />
-              ))}
-            </div>
+        {/* Latest stories */}
+        {(latest.isLoading || grid.length > 0) && (
+          <section className="mt-28">
+            <SectionHeading title="Latest stories" action={{ to: "/explore", label: "View all" }} />
+            {latest.isLoading ? (
+              <PostGridSkeleton count={6} />
+            ) : (
+              <div className="grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+                {grid.map((post) => (
+                  <BlogCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
           </section>
         )}
 
-        {/* Categories */}
-        {(categoriesLoading || (categories?.length ?? 0) > 0) && (
-          <section className="mt-20">
-            <SectionHeading title="Browse by topic" />
-            {categoriesLoading ? (
-              <div className="flex flex-wrap gap-3">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <Skeleton key={index} className="h-10 w-28 rounded-full" />
+        {/* Popular. A ranking, so the numbers are information rather than decoration. */}
+        {(popular.isLoading || trending.length > 0) && (
+          <section className="mt-28">
+            <SectionHeading title="Popular this week" />
+            {popular.isLoading ? (
+              <div className="grid gap-x-14 gap-y-8 sm:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex gap-5 border-t border-border pt-5">
+                    <Skeleton className="h-8 w-8 shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-5 w-full" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
-              <ul className="flex flex-wrap gap-3">
+              <ol className="grid gap-x-14 gap-y-0 sm:grid-cols-2">
+                {trending.map((post, index) => (
+                  <li key={post.id} className="group border-t border-border py-6">
+                    <div className="flex gap-6">
+                      <span
+                        className="shrink-0 font-serif text-3xl font-semibold tabular-nums text-foreground/20 transition-colors duration-200 group-hover:text-primary/50"
+                        aria-hidden="true"
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-serif text-xl font-semibold">
+                          <Link
+                            to={postPath(post)}
+                            className="transition-colors duration-200 hover:text-primary"
+                          >
+                            {post.title}
+                          </Link>
+                        </h3>
+                        <p className="mt-1.5 font-sans text-xs text-muted-foreground">
+                          {post.author.name}
+                        </p>
+                        <PostMeta post={post} className="mt-2.5" />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </section>
+        )}
+
+        {/* Topics. Typography and spacing rather than a wall of chips. */}
+        {(categoriesLoading || (categories?.length ?? 0) > 0) && (
+          <section className="mt-28">
+            <SectionHeading title="Browse by topic" />
+            {categoriesLoading ? (
+              <div className="grid gap-x-14 sm:grid-cols-2">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="border-t border-border py-6">
+                    <Skeleton className="h-6 w-40" />
+                    <Skeleton className="mt-2.5 h-3 w-64" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ul className="grid gap-x-14 sm:grid-cols-2">
                 {categories!.map((category) => (
-                  <li key={category.slug}>
+                  <li key={category.slug} className="border-t border-border">
                     <Link
-                      to={`/explore?category=${encodeURIComponent(category.slug)}`}
-                      className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium transition-colors hover:border-primary/40 hover:bg-accent"
+                      to={categoryPath(category.slug)}
+                      className="group block py-6 transition-colors"
                     >
-                      {category.name}
-                      {category.count != null && (
-                        <span className="text-xs text-muted-foreground">{category.count}</span>
+                      <div className="flex items-baseline justify-between gap-4">
+                        <h3 className="font-serif text-2xl font-semibold transition-colors duration-200 group-hover:text-primary">
+                          {category.name}
+                        </h3>
+                        {category.count != null && (
+                          <span className="shrink-0 font-sans text-xs tabular-nums text-muted-foreground">
+                            {category.count}
+                          </span>
+                        )}
+                      </div>
+                      {category.description && (
+                        <p className="mt-2 line-clamp-2 max-w-measure font-sans text-sm leading-relaxed text-muted-foreground">
+                          {category.description}
+                        </p>
                       )}
                     </Link>
                   </li>
@@ -160,77 +236,6 @@ export default function Home() {
             )}
           </section>
         )}
-
-        <div className="mt-20 grid gap-14 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          {/* Latest feed */}
-          <section>
-            <SectionHeading title="Latest stories" />
-            {latest.isLoading ? (
-              <PostListSkeleton />
-            ) : feed.length ? (
-              <div className="divide-y divide-border">
-                {feed.map((post) => (
-                  <BlogCard key={post.id} post={post} variant="row" />
-                ))}
-              </div>
-            ) : posts.length ? (
-              <p className="text-sm text-muted-foreground">
-                You're all caught up. More stories are on the way.
-              </p>
-            ) : null}
-
-            {latest.data?.hasNext && (
-              <div className="mt-10">
-                <Button variant="outline" asChild>
-                  <Link to="/explore">See more stories</Link>
-                </Button>
-              </div>
-            )}
-          </section>
-
-          {/* Trending */}
-          <aside>
-            <h2 className="mb-6 border-b border-border pb-4 text-lg">Popular right now</h2>
-            {popular.isLoading ? (
-              <div className="space-y-6">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <div key={index} className="space-y-2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-3 w-2/3" />
-                  </div>
-                ))}
-              </div>
-            ) : trending.length ? (
-              <ol className="space-y-6">
-                {trending.map((post, index) => (
-                  <li key={post.id} className="flex gap-4">
-                    <span
-                      className="font-serif text-2xl font-semibold text-muted-foreground/40"
-                      aria-hidden="true"
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-semibold leading-snug">
-                        <Link to={postPath(post)} className="transition-colors hover:text-primary">
-                          {post.title}
-                        </Link>
-                      </h3>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {post.author.name}
-                      </p>
-                      <PostMeta post={post} className="mt-2" />
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Popularity is measured once stories start collecting likes and comments.
-              </p>
-            )}
-          </aside>
-        </div>
       </div>
     </Layout>
   );

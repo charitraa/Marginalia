@@ -8,11 +8,17 @@ interface CategoryBadgeProps {
   asLink?: boolean;
 }
 
-/** The one place category chips are styled. */
+/**
+ * The one place category labels are styled.
+ *
+ * Set as a small caps label in the accent rather than a filled chip: on a page
+ * built from hairlines and type, a pill would be the loudest thing on screen and
+ * would say nothing extra.
+ */
 export default function CategoryBadge({ category, className, asLink = true }: CategoryBadgeProps) {
   const classes = cn(
-    "inline-flex items-center rounded-full border border-border bg-muted/70 px-2.5 py-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground transition-colors",
-    asLink && "hover:border-primary/40 hover:text-foreground",
+    "inline-block font-sans text-2xs font-medium uppercase tracking-[0.14em] text-primary transition-opacity duration-200",
+    asLink && "hover:opacity-70",
     className,
   );
 

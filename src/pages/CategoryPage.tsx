@@ -61,23 +61,26 @@ export default function CategoryPage() {
           ]}
         />
 
-        <header className="mb-10">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">{name}</h1>
-            <TopicFollowButton kind="category" slug={slug} name={name} size="default" />
+        <header className="rail mb-14 border-b border-foreground/15 pb-10 pt-6">
+          <p className="rail-label">Marginalia / Topic</p>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-4">
+              <h1 className="font-serif text-4xl font-semibold sm:text-5xl">{name}</h1>
+              <TopicFollowButton kind="category" slug={slug} name={name} size="default" />
+            </div>
+
+            {category.data?.description && (
+              <p className="mt-5 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+                {category.data.description}
+              </p>
+            )}
+
+            {category.data?.count != null && (
+              <p className="mt-4 font-sans text-xs tabular-nums text-muted-foreground">
+                {category.data.count} {category.data.count === 1 ? "story" : "stories"}
+              </p>
+            )}
           </div>
-
-          {category.data?.description && (
-            <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-              {category.data.description}
-            </p>
-          )}
-
-          {category.data?.count != null && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {category.data.count} {category.data.count === 1 ? "story" : "stories"}
-            </p>
-          )}
         </header>
 
         {posts.isError ? (

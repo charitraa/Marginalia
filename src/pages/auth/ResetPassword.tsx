@@ -58,7 +58,7 @@ export default function ResetPassword() {
       <Layout>
         <Seo title="Reset your password" noIndex />
         <div className="container-page py-20 text-center">
-          <h1 className="font-serif text-2xl font-bold">This link is incomplete</h1>
+          <h1 className="font-serif text-2xl font-semibold">This link is incomplete</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
             Open the reset link straight from your email, or request a new one.
           </p>
@@ -77,7 +77,7 @@ export default function ResetPassword() {
       <div className="container-page flex justify-center py-16">
         <div className="w-full max-w-md">
           <div className="mb-8 space-y-2">
-            <h1 className="font-serif text-3xl font-bold">Choose a new password</h1>
+            <h1 className="font-serif text-3xl font-semibold">Choose a new password</h1>
             <p className="text-sm text-muted-foreground">
               Pick something you haven&apos;t used elsewhere.
             </p>

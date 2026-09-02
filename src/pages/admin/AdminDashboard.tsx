@@ -24,7 +24,7 @@ export default function AdminDashboard() {
       <div className="container-page py-10">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">Admin</h1>
+            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Admin</h1>
             <p className="mt-2 text-muted-foreground">How the site is doing right now.</p>
           </div>
 

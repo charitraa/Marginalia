@@ -58,7 +58,7 @@ export default function ForgotPassword() {
             <div className="space-y-6 text-center">
               <MailCheck className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
               <div className="space-y-2">
-                <h1 className="font-serif text-2xl font-bold">Check your inbox</h1>
+                <h1 className="font-serif text-2xl font-semibold">Check your inbox</h1>
                 <p className="text-sm text-muted-foreground">{message}</p>
                 <p className="text-sm text-muted-foreground">
                   The link works once and expires shortly, so open it soon.
@@ -74,7 +74,7 @@ export default function ForgotPassword() {
           ) : (
             <>
               <div className="mb-8 space-y-2">
-                <h1 className="font-serif text-3xl font-bold">Forgot your password?</h1>
+                <h1 className="font-serif text-3xl font-semibold">Forgot your password?</h1>
                 <p className="text-sm text-muted-foreground">
                   Enter your email and we&apos;ll send a link to choose a new one.
                 </p>

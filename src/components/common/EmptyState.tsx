@@ -11,7 +11,12 @@ interface EmptyStateProps {
   children?: ReactNode;
 }
 
-/** Shown when a request succeeded but there is nothing to display. */
+/**
+ * Shown when a request succeeded but there is nothing to display.
+ *
+ * An empty shelf, not an error: hairlines top and bottom, a serif line of type
+ * and a way forward. No dashed box, no illustration — nothing here is broken.
+ */
 export default function EmptyState({
   icon,
   title,
@@ -20,23 +25,29 @@ export default function EmptyState({
   children,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border px-6 py-16 text-center">
-      {icon && <div className="mb-4 text-muted-foreground" aria-hidden="true">{icon}</div>}
-      <h3 className="text-xl font-semibold">{title}</h3>
+    <div className="border-y border-border px-6 py-20 text-center">
+      {icon && (
+        <div className="mb-5 flex justify-center text-muted-foreground/60" aria-hidden="true">
+          {icon}
+        </div>
+      )}
+      <h3 className="font-serif text-2xl font-semibold">{title}</h3>
       {description && (
-        <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">{description}</p>
+        <p className="mx-auto mt-3 max-w-sm font-sans text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </p>
       )}
       {action &&
         (action.to ? (
-          <Button variant="outline" className="mt-6" asChild>
+          <Button variant="outline" className="mt-7" asChild>
             <Link to={action.to}>{action.label}</Link>
           </Button>
         ) : (
-          <Button variant="outline" className="mt-6" onClick={action.onClick}>
+          <Button variant="outline" className="mt-7" onClick={action.onClick}>
             {action.label}
           </Button>
         ))}
-      {children && <div className="mt-6">{children}</div>}
+      {children && <div className="mt-7 flex justify-center">{children}</div>}
     </div>
   );
 }

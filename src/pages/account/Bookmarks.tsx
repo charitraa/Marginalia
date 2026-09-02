@@ -28,7 +28,7 @@ export default function Bookmarks() {
 
       <div className="container-page py-10">
         <div className="mb-8">
-          <h1 className="font-serif text-3xl font-bold sm:text-4xl">Reading list</h1>
+          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Reading list</h1>
           <p className="mt-2 text-muted-foreground">
             {data?.count
               ? `${data.count} ${data.count === 1 ? "story" : "stories"} saved for later`

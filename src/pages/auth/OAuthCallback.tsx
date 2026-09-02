@@ -72,7 +72,7 @@ export default function OAuthCallback() {
       <div className="container-page flex min-h-[50vh] items-center justify-center py-16">
         {error ? (
           <div className="max-w-md space-y-4 text-center">
-            <h1 className="font-serif text-2xl font-bold">Sign-in didn&apos;t finish</h1>
+            <h1 className="font-serif text-2xl font-semibold">Sign-in didn&apos;t finish</h1>
             <p className="text-sm text-muted-foreground">{error}</p>
             <Button asChild>
               <Link to="/login">Back to sign in</Link>

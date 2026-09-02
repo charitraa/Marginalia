@@ -47,10 +47,12 @@ export function useRelatedPosts(idOrSlug: string | undefined) {
   });
 }
 
-export function useCategories() {
+/** `enabled` lets the header defer this until its Categories menu is opened. */
+export function useCategories(enabled = true) {
   return useQuery({
     queryKey: postKeys.categories,
     queryFn: postService.listCategories,
+    enabled,
     staleTime: 5 * 60_000,
   });
 }

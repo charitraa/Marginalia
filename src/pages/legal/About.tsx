@@ -10,7 +10,7 @@ export default function About() {
         <div className="container mx-auto px-4">
           {/* Hero */}
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <h1 className="text-5xl font-bold mb-6">About DevSecHub</h1>
+            <h1 className="text-5xl font-semibold mb-6">About Marginalia</h1>
             <p className="text-xl text-muted-foreground mb-8">
               The premier platform for software developers and cybersecurity professionals to share knowledge, discuss trends, and build a secure digital future.
             </p>
@@ -19,9 +19,9 @@ export default function About() {
           {/* Mission Section */}
           <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-4">Our Mission</h2>
+              <h2 className="text-3xl font-semibold mb-4">Our Mission</h2>
               <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                We believe that secure, well-built software is essential in today's digital world. DevSecHub is built on the principle that knowledge about software development and cybersecurity should be accessible to everyone—from beginners to experts.
+                We believe that secure, well-built software is essential in today's digital world. Marginalia is built on the principle that knowledge about software development and cybersecurity should be accessible to everyone—from beginners to experts.
               </p>
               <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                 Our mission is to create a space where software engineers, security professionals, and DevOps specialists can publish quality content, share experiences, and learn from one another in a vibrant, collaborative community.
@@ -34,7 +34,7 @@ export default function About() {
 
           {/* Values */}
           <div className="mb-16">
-            <h2 className="text-3xl font-bold mb-12 text-center">Our Core Values</h2>
+            <h2 className="text-3xl font-semibold mb-12 text-center">Our Core Values</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 {
@@ -67,15 +67,15 @@ export default function About() {
 
           {/* Team */}
           <div className="mb-16 py-12 border-t border-b border-border">
-            <h2 className="text-3xl font-bold mb-8 text-center">Built by Security-Minded Engineers</h2>
+            <h2 className="text-3xl font-semibold mb-8 text-center">Built by Security-Minded Engineers</h2>
             <p className="text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-12">
-              DevSecHub is developed and maintained by a passionate team of software engineers, security researchers, and DevOps specialists committed to creating the best platform for knowledge sharing in the tech community.
+              Marginalia is developed and maintained by a passionate team of software engineers, security researchers, and DevOps specialists committed to creating the best platform for knowledge sharing in the tech community.
             </p>
           </div>
 
           {/* CTA */}
           <div className="text-center">
-            <h2 className="text-3xl font-bold mb-4">Join Our Developer Community</h2>
+            <h2 className="text-3xl font-semibold mb-4">Join Our Developer Community</h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               Start sharing your expertise and learn from thousands of developers and security professionals worldwide.
             </p>

@@ -64,7 +64,7 @@ export default function AdminNewsletter() {
       <div className="container-page max-w-4xl py-10">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">Newsletter</h1>
+            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Newsletter</h1>
             <p className="mt-2 text-muted-foreground">
               Campaigns go to every confirmed subscriber. Open and click rates come
               back from Brevo.

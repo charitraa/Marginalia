@@ -18,7 +18,7 @@ const NotFound = () => {
             </p>
           </div>
 
-          <h1 className="text-4xl font-bold mb-4">Page Not Found</h1>
+          <h1 className="text-4xl font-semibold mb-4">Page Not Found</h1>
 
           <p className="text-lg text-muted-foreground mb-8">
             Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.

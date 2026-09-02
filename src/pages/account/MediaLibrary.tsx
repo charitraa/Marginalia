@@ -48,7 +48,7 @@ export default function MediaLibrary() {
 
       <div className="container-page py-10">
         <header className="mb-8">
-          <h1 className="font-serif text-3xl font-bold sm:text-4xl">Media library</h1>
+          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Media library</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
             Images you&apos;ve uploaded from the editor. Copy a URL to reuse one in
             another post instead of uploading it again.

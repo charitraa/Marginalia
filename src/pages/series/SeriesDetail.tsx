@@ -66,7 +66,7 @@ export default function SeriesDetail() {
             <Layers className="h-4 w-4" aria-hidden="true" />
             Series
           </p>
-          <h1 className="font-serif text-3xl font-bold sm:text-4xl">{series.title}</h1>
+          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">{series.title}</h1>
           {series.description && (
             <p className="mt-3 text-lg text-muted-foreground">{series.description}</p>
           )}

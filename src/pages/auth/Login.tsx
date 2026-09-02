@@ -4,6 +4,7 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import Logo from "@/components/common/Logo";
 import SocialAuthButtons from "@/features/auth/components/SocialAuthButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,9 +64,14 @@ export default function Login() {
 
       <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
         <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl sm:text-4xl">Welcome back</h1>
-            <p className="mt-2 text-muted-foreground">Sign in to your {SITE_NAME} account.</p>
+          <div className="mb-10 text-center">
+            <Link to="/" className="inline-block text-lg" aria-label={`${SITE_NAME} home`}>
+              <Logo />
+            </Link>
+            <h1 className="mt-8 font-serif text-4xl font-semibold">Welcome back</h1>
+            <p className="mt-3 font-sans text-muted-foreground">
+              Sign in to keep reading and writing.
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>

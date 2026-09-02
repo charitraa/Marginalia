@@ -34,7 +34,7 @@ export default function Analytics() {
       <div className="container-page py-10">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">Analytics</h1>
+            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Analytics</h1>
             <p className="mt-2 text-muted-foreground">
               How your writing is doing. Only you can see this.
             </p>

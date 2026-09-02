@@ -34,7 +34,7 @@ export default function Feed() {
 
       <div className="container-page py-10">
         <header className="mb-6">
-          <h1 className="font-serif text-3xl font-bold sm:text-4xl">Your feed</h1>
+          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Your feed</h1>
           <p className="mt-2 text-muted-foreground">
             Writers, categories and tags you follow — plus a few suggestions.
           </p>

@@ -4,6 +4,7 @@ import { ArrowRight, Check, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import Logo from "@/components/common/Logo";
 import Captcha, { resetCaptcha } from "@/features/captcha/components/Captcha";
 import SocialAuthButtons from "@/features/auth/components/SocialAuthButtons";
 import { Button } from "@/components/ui/button";
@@ -123,9 +124,12 @@ export default function Register() {
 
       <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
         <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl sm:text-4xl">Create account</h1>
-            <p className="mt-2 text-muted-foreground">
+          <div className="mb-10 text-center">
+            <Link to="/" className="inline-block text-lg" aria-label={`${SITE_NAME} home`}>
+              <Logo />
+            </Link>
+            <h1 className="mt-8 font-serif text-4xl font-semibold">Create account</h1>
+            <p className="mt-3 font-sans text-muted-foreground">
               Join {SITE_NAME} to start sharing your stories.
             </p>
           </div>

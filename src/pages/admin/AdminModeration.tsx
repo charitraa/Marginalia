@@ -44,7 +44,7 @@ export default function AdminModeration() {
 
       <div className="container-page max-w-4xl py-10">
         <div className="mb-6">
-          <h1 className="font-serif text-3xl font-bold">Moderation</h1>
+          <h1 className="font-serif text-3xl font-semibold">Moderation</h1>
           <p className="mt-2 text-muted-foreground">
             Reported comments. Hiding removes a comment from public threads but keeps it here.
           </p>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import BlogCard from "@/features/posts/components/BlogCard";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
@@ -32,16 +33,13 @@ export default function Trending() {
         canonicalPath="/trending"
       />
 
-      <div className="container-page py-12 sm:py-16">
-        <header className="flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl">Trending</h1>
-            <p className="mt-3 text-lg text-muted-foreground">
-              What readers are engaging with most right now.
-            </p>
-          </div>
-
-          <div className="flex gap-2" role="group" aria-label="Trending period">
+      <div className="container-page pb-20">
+        <PageHeader
+          eyebrow="Marginalia / Trending"
+          title="Trending"
+          description="What readers are engaging with most right now."
+        >
+          <div className="mt-7 flex gap-2" role="group" aria-label="Trending period">
             {WINDOWS.map((option) => (
               <Button
                 key={option.days}
@@ -54,7 +52,7 @@ export default function Trending() {
               </Button>
             ))}
           </div>
-        </header>
+        </PageHeader>
 
         <div className="mt-10">
           {isLoading ? (

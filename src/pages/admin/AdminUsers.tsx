@@ -53,7 +53,7 @@ export default function AdminUsers() {
 
       <div className="container-page py-10">
         <div className="mb-6">
-          <h1 className="font-serif text-3xl font-bold">Users</h1>
+          <h1 className="font-serif text-3xl font-semibold">Users</h1>
           <p className="mt-2 text-muted-foreground">
             {data?.count ? `${data.count} accounts` : "Manage roles and suspensions."}
           </p>

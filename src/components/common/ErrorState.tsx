@@ -1,4 +1,4 @@
-import { AlertCircle, RotateCw } from "lucide-react";
+import { RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/lib/errors";
 
@@ -9,7 +9,13 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-/** Shown when a request failed. Never renders raw server output. */
+/**
+ * Shown when a request failed. Never renders raw server output.
+ *
+ * Kept quiet on purpose: a full red panel reads as a system crash, when almost
+ * every case here is a network blip the reader can retry. The accent is a single
+ * rule down the left, in the same idiom as a pulled quote.
+ */
 export default function ErrorState({
   error,
   title = "Something went wrong",
@@ -17,18 +23,14 @@ export default function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <div
-      role="alert"
-      className="flex flex-col items-center justify-center rounded-lg border border-destructive/25 bg-destructive/5 px-6 py-14 text-center"
-    >
-      <AlertCircle className="mb-4 h-8 w-8 text-destructive" aria-hidden="true" />
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+    <div role="alert" className="border-l-2 border-destructive py-2 pl-6">
+      <h3 className="font-serif text-xl font-semibold">{title}</h3>
+      <p className="mt-2 max-w-measure font-sans text-sm leading-relaxed text-muted-foreground">
         {errorMessage(error, fallback)}
       </p>
       {onRetry && (
-        <Button variant="outline" className="mt-6 gap-2" onClick={onRetry}>
-          <RotateCw className="h-4 w-4" aria-hidden="true" />
+        <Button variant="outline" size="sm" className="mt-5 gap-2" onClick={onRetry}>
+          <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
           Try again
         </Button>
       )}

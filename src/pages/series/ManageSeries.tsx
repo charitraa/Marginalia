@@ -64,7 +64,7 @@ export default function ManageSeries() {
     return (
       <Layout>
         <div className="container-page py-16 text-center">
-          <h1 className="font-serif text-2xl font-bold">Not your series</h1>
+          <h1 className="font-serif text-2xl font-semibold">Not your series</h1>
           <Button asChild className="mt-6">
             <Link to={`/series/${series.slug}`}>View it instead</Link>
           </Button>
@@ -98,7 +98,7 @@ export default function ManageSeries() {
               <Layers className="h-4 w-4" aria-hidden="true" />
               Managing series
             </p>
-            <h1 className="font-serif text-3xl font-bold">{series.title}</h1>
+            <h1 className="font-serif text-3xl font-semibold">{series.title}</h1>
           </div>
           <Button variant="outline" asChild>
             <Link to={`/series/${series.slug}`}>View series</Link>

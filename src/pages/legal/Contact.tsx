@@ -38,7 +38,7 @@ export default function Contact() {
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h1 className="text-5xl font-bold mb-4">Connect With DevSecHub</h1>
+            <h1 className="text-5xl font-semibold mb-4">Contact</h1>
             <p className="text-xl text-muted-foreground">
               Have questions about our platform, want to contribute, or found a security issue? Get in touch with our team and we'll respond promptly.
             </p>

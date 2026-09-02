@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Inter:wght@400..700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -7,92 +7,99 @@
 
 @layer base {
   /**
-   * Mindful Blog design tokens.
+   * Marginalia design tokens.
    *
-   * A warm paper ground with ink text and a single restrained evergreen accent.
-   * Colour carries meaning here: the accent marks actions and the reader's own
-   * state, never decoration. Every token is redefined for dark so nothing has
-   * its only definition inside the dark block.
+   * The publication is set on warm paper in near-black ink, with one restrained
+   * evergreen accent. Colour is never decoration here: the accent marks actions,
+   * links and the reader's own state, and nothing else earns a hue. Hierarchy is
+   * carried by type size, weight and whitespace instead.
+   *
+   * Every token is redefined for dark so nothing has its only definition inside
+   * the dark block.
    */
   :root {
-    --background: 40 30% 98%;
-    --foreground: 24 12% 13%;
+    /* Warm ivory, a little deeper than white so long reading is comfortable. */
+    --background: 38 33% 97%;
+    --foreground: 24 14% 11%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 24 12% 13%;
+    --card: 40 40% 99%;
+    --card-foreground: 24 14% 11%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 24 12% 13%;
+    --popover: 40 40% 99%;
+    --popover-foreground: 24 14% 11%;
 
-    /* Evergreen: the one accent, used for actions and active state. */
-    --primary: 162 40% 24%;
-    --primary-foreground: 40 30% 98%;
+    /* Evergreen: actions, links, active state. The only hue in the system. */
+    --primary: 163 46% 20%;
+    --primary-foreground: 38 33% 97%;
 
-    --secondary: 36 20% 94%;
-    --secondary-foreground: 24 12% 20%;
+    --secondary: 36 22% 93%;
+    --secondary-foreground: 24 14% 18%;
 
-    --muted: 36 18% 95%;
-    --muted-foreground: 25 7% 42%;
+    --muted: 36 20% 94%;
+    --muted-foreground: 28 8% 41%;
 
-    --accent: 36 24% 91%;
-    --accent-foreground: 24 12% 18%;
+    --accent: 36 26% 90%;
+    --accent-foreground: 24 14% 16%;
 
-    --destructive: 4 66% 44%;
-    --destructive-foreground: 40 30% 98%;
+    --destructive: 4 62% 42%;
+    --destructive-foreground: 38 33% 97%;
 
-    --border: 30 14% 88%;
-    --input: 30 14% 88%;
-    --ring: 162 40% 30%;
+    /* Hairlines. The main structural device — used instead of shadows. */
+    --border: 32 17% 87%;
+    --input: 32 17% 84%;
+    --ring: 163 46% 28%;
 
-    --radius: 0.5rem;
+    /* Small, deliberate. Images and inputs only; never pill-shaped cards. */
+    --radius: 0.375rem;
 
-    --sidebar-background: 40 24% 96%;
-    --sidebar-foreground: 24 12% 13%;
-    --sidebar-primary: 162 40% 24%;
-    --sidebar-primary-foreground: 40 30% 98%;
-    --sidebar-accent: 36 20% 92%;
-    --sidebar-accent-foreground: 24 12% 18%;
-    --sidebar-border: 30 14% 88%;
-    --sidebar-ring: 162 40% 30%;
+    --sidebar-background: 38 28% 95%;
+    --sidebar-foreground: 24 14% 11%;
+    --sidebar-primary: 163 46% 20%;
+    --sidebar-primary-foreground: 38 33% 97%;
+    --sidebar-accent: 36 22% 91%;
+    --sidebar-accent-foreground: 24 14% 16%;
+    --sidebar-border: 32 17% 87%;
+    --sidebar-ring: 163 46% 28%;
   }
 
   .dark {
-    --background: 24 10% 8%;
-    --foreground: 40 18% 93%;
+    /* Warm charcoal rather than pure black: easier on the eye at length. */
+    --background: 26 12% 7%;
+    --foreground: 38 22% 92%;
 
-    --card: 24 9% 11%;
-    --card-foreground: 40 18% 93%;
+    --card: 26 11% 10%;
+    --card-foreground: 38 22% 92%;
 
-    --popover: 24 9% 11%;
-    --popover-foreground: 40 18% 93%;
+    --popover: 26 11% 10%;
+    --popover-foreground: 38 22% 92%;
 
-    --primary: 160 36% 62%;
-    --primary-foreground: 24 14% 10%;
+    --primary: 158 38% 62%;
+    --primary-foreground: 26 14% 8%;
 
-    --secondary: 24 8% 17%;
-    --secondary-foreground: 40 18% 93%;
+    --secondary: 26 9% 16%;
+    --secondary-foreground: 38 22% 92%;
 
-    --muted: 24 8% 15%;
-    --muted-foreground: 33 8% 65%;
+    --muted: 26 9% 14%;
+    --muted-foreground: 34 10% 63%;
 
-    --accent: 24 8% 19%;
-    --accent-foreground: 40 18% 93%;
+    --accent: 26 9% 18%;
+    --accent-foreground: 38 22% 92%;
 
-    --destructive: 4 62% 56%;
-    --destructive-foreground: 24 14% 10%;
+    --destructive: 4 58% 56%;
+    --destructive-foreground: 26 14% 8%;
 
-    --border: 24 8% 21%;
-    --input: 24 8% 21%;
-    --ring: 160 36% 55%;
+    --border: 28 9% 19%;
+    --input: 28 9% 24%;
+    --ring: 158 38% 55%;
 
-    --sidebar-background: 24 10% 10%;
-    --sidebar-foreground: 40 18% 93%;
-    --sidebar-primary: 160 36% 62%;
-    --sidebar-primary-foreground: 24 14% 10%;
-    --sidebar-accent: 24 8% 17%;
-    --sidebar-accent-foreground: 40 18% 93%;
-    --sidebar-border: 24 8% 21%;
-    --sidebar-ring: 160 36% 55%;
+    --sidebar-background: 26 12% 9%;
+    --sidebar-foreground: 38 22% 92%;
+    --sidebar-primary: 158 38% 62%;
+    --sidebar-primary-foreground: 26 14% 8%;
+    --sidebar-accent: 26 9% 16%;
+    --sidebar-accent-foreground: 38 22% 92%;
+    --sidebar-border: 28 9% 19%;
+    --sidebar-ring: 158 38% 55%;
   }
 }
 
@@ -104,6 +111,8 @@
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    /* The article page anchors headings; keep them clear of the sticky header. */
+    scroll-padding-top: 6rem;
   }
 
   body {
@@ -113,14 +122,25 @@
     overflow-x: hidden;
   }
 
+  /* Let Fraunces pick the right cut for its size automatically. */
+  .font-serif {
+    font-optical-sizing: auto;
+  }
+
   /* Long words and URLs wrap instead of widening their container. */
-  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+  :where(p, span, li, a, button, label, td, th) {
     overflow-wrap: anywhere;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif font-semibold tracking-tight;
+    @apply font-serif font-semibold;
+    font-optical-sizing: auto;
     text-wrap: balance;
+  }
+
+  /* Numerals line up in tables, metadata and counts. */
+  :where(time, [data-numeric]) {
+    font-variant-numeric: tabular-nums;
   }
 
   /* One visible focus treatment everywhere, including keyboard nav in menus. */
@@ -129,7 +149,7 @@
   }
 
   ::selection {
-    @apply bg-primary/15;
+    @apply bg-primary/20;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -145,48 +165,111 @@
 @layer components {
   /* Page gutter, consistent from 320px up. */
   .container-page {
-    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto w-full max-w-[76rem] px-5 sm:px-8 lg:px-10;
   }
 
-  /* Long-form reading measure: ~70 characters. */
+  /* Long-form reading measure: ~68 characters of Fraunces. */
   .container-prose {
-    @apply mx-auto w-full max-w-[46rem] px-4 sm:px-6;
-  }
-
-  .surface-card {
-    @apply rounded-lg border border-border bg-card transition-shadow duration-200;
-  }
-
-  .surface-card-interactive {
-    @apply surface-card hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_8px_24px_-12px_rgba(0,0,0,0.15)];
+    @apply mx-auto w-full max-w-prose px-5 sm:px-8;
   }
 
   /**
-   * Article body. Sized for sustained reading rather than for scanning, and
-   * every element is given a dark-mode value so nothing washes out.
+   * The margin rail.
+   *
+   * Marginalia is named for what readers write beside the text, so the margin is
+   * a real structural element rather than an ornament: a hairline rule with the
+   * section's label, number or date hanging in the gutter beside the content.
+   * Below `lg` there is no gutter to hang anything in, so it collapses to a
+   * stacked label and the rule disappears.
+   */
+  .rail {
+    @apply lg:grid lg:grid-cols-[9rem_1fr] lg:gap-x-10;
+  }
+
+  .rail-label {
+    @apply mb-4 font-sans text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground lg:mb-0 lg:border-r lg:border-border lg:pr-10 lg:pt-1.5 lg:text-right;
+  }
+
+  /* A section opener: hairline above, title below. Used across every page. */
+  .section-head {
+    @apply flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-foreground/15 pt-5;
+  }
+
+  .section-title {
+    @apply font-serif text-2xl font-semibold tracking-tight sm:text-3xl;
+  }
+
+  /* Small caps label. Used sparingly — section kickers and category eyebrows. */
+  .eyebrow {
+    @apply font-sans text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground;
+  }
+
+  /**
+   * Editorial link: the underline is the affordance, colour is the state. Uses
+   * a background gradient rather than text-decoration so the underline sits
+   * clear of descenders.
+   */
+  .link-rule {
+    @apply bg-gradient-to-r from-current to-current bg-[length:100%_1px] bg-left-bottom bg-no-repeat transition-[background-size,color] duration-200 ease-editorial hover:bg-[length:0%_1px];
+  }
+
+  /* Surfaces. Hairline borders, no shadow — the house style. */
+  .surface-card {
+    @apply rounded-md border border-border bg-card;
+  }
+
+  .surface-card-interactive {
+    @apply surface-card transition-colors duration-200 ease-editorial hover:border-foreground/25;
+  }
+
+  /* Image frame: consistent crop, quiet placeholder, subtle zoom on hover. */
+  .media-frame {
+    @apply relative overflow-hidden rounded-md bg-muted;
+  }
+
+  .media-frame img {
+    @apply h-full w-full object-cover transition-transform duration-500 ease-editorial;
+  }
+
+  .group:hover .media-frame img {
+    @apply scale-[1.03];
+  }
+
+  /**
+   * Article body.
+   *
+   * Sized for sustained reading rather than scanning: Fraunces at its text
+   * optical size, a long line-height, and space between blocks that makes the
+   * structure legible without rules. Every element has a dark-mode value so
+   * nothing washes out.
    */
   .article-content {
-    @apply font-serif text-[1.1875rem] leading-[1.75] text-foreground/90;
+    @apply font-serif text-[1.1875rem] leading-[1.72] text-foreground/90;
+    font-optical-sizing: auto;
   }
 
   .article-content > * + * {
-    @apply mt-6;
+    @apply mt-7;
   }
 
   .article-content h2 {
-    @apply mt-12 mb-0 text-3xl;
+    @apply mt-14 mb-0 text-3xl;
   }
 
   .article-content h3 {
-    @apply mt-10 mb-0 text-2xl;
+    @apply mt-11 mb-0 text-2xl;
   }
 
   .article-content h4 {
-    @apply mt-8 mb-0 text-xl;
+    @apply mt-9 mb-0 text-xl font-semibold;
+  }
+
+  .article-content :is(h2, h3, h4) + * {
+    @apply mt-4;
   }
 
   .article-content a {
-    @apply text-foreground underline decoration-primary/40 underline-offset-[3px] transition-colors hover:decoration-primary;
+    @apply text-foreground underline decoration-primary/50 underline-offset-[4px] transition-colors duration-150 hover:decoration-primary;
   }
 
   .article-content strong {
@@ -194,56 +277,63 @@
   }
 
   .article-content ul {
-    @apply list-disc space-y-2 pl-6 marker:text-muted-foreground;
+    @apply list-disc space-y-2.5 pl-6 marker:text-primary/60;
   }
 
   .article-content ol {
-    @apply list-decimal space-y-2 pl-6 marker:text-muted-foreground;
+    @apply list-decimal space-y-2.5 pl-6 marker:font-sans marker:text-sm marker:text-muted-foreground;
   }
 
+  /* A pulled-aside quote, set in the margin idiom rather than a grey box. */
   .article-content blockquote {
-    @apply border-l-2 border-primary/50 pl-5 italic text-foreground/80;
+    @apply my-10 border-l-2 border-primary pl-6 text-[1.3125rem] leading-[1.55] text-foreground;
+  }
+
+  .article-content blockquote p {
+    @apply mt-0;
   }
 
   .article-content img {
-    @apply my-8 w-full rounded-lg border border-border bg-muted;
+    @apply my-10 w-full rounded-md border border-border bg-muted;
   }
 
   .article-content figure figcaption {
-    @apply mt-3 text-center font-sans text-sm text-muted-foreground;
+    @apply mt-3 font-sans text-sm text-muted-foreground;
   }
 
   .article-content hr {
-    @apply my-12 border-border;
+    @apply mx-auto my-14 w-16 border-t border-foreground/25;
   }
 
   .article-content code {
-    @apply rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.875em] text-foreground;
+    @apply rounded-[3px] border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.8em] text-foreground;
   }
 
+  /* Code blocks read as a terminal-adjacent surface — this is a developer
+     publication, and monospace deserves its own ground. */
   .article-content pre {
-    @apply my-8 overflow-x-auto rounded-lg border border-border bg-muted p-5;
+    @apply my-10 overflow-x-auto rounded-md border border-border bg-[hsl(var(--muted))] p-5 font-mono text-[0.9375rem] leading-relaxed dark:bg-[hsl(26_12%_5%)];
   }
 
   .article-content pre code {
-    @apply border-0 bg-transparent p-0 text-sm leading-relaxed;
+    @apply border-0 bg-transparent p-0 text-[inherit] leading-[inherit];
   }
 
   /* Tables scroll inside their own box rather than widening the article. */
   .article-content table {
-    @apply my-8 w-full border-collapse font-sans text-base;
+    @apply my-10 w-full border-collapse font-sans text-base;
   }
 
   .article-content :is(th, td) {
-    @apply border border-border px-4 py-2 text-left align-top;
+    @apply border-b border-border px-3 py-2.5 text-left align-top;
   }
 
   .article-content th {
-    @apply bg-muted font-semibold;
+    @apply border-b-foreground/30 font-sans text-2xs font-medium uppercase tracking-[0.12em] text-muted-foreground;
   }
 
   .table-scroll {
-    @apply -mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0;
+    @apply -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0;
   }
 
   /* Clamp helpers used by cards. */

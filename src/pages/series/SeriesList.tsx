@@ -54,7 +54,7 @@ export default function SeriesList() {
       <div className="container-page py-10">
         <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold sm:text-4xl">Series</h1>
+            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Series</h1>
             <p className="mt-2 max-w-2xl text-muted-foreground">
               Multi-part guides meant to be read in order. Your place is remembered as you go.
             </p>

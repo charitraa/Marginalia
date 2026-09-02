@@ -49,7 +49,7 @@ export default function Trash() {
 
       <div className="container-page max-w-3xl py-10">
         <header className="mb-8">
-          <h1 className="font-serif text-3xl font-bold sm:text-4xl">Trash</h1>
+          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Trash</h1>
           <p className="mt-2 text-muted-foreground">
             Deleted posts keep their comments and likes. Restore one to put it back as a draft.
           </p>

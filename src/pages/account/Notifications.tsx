@@ -37,7 +37,7 @@ export default function Notifications() {
       <div className="container-page max-w-3xl py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-bold">Notifications</h1>
+            <h1 className="font-serif text-3xl font-semibold">Notifications</h1>
             <p className="text-sm text-muted-foreground">
               {unread > 0 ? `${unread} unread` : "You're all caught up"}
             </p>
