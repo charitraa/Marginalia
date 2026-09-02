@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import PostEditor, { clearStoredDraft } from "@/features/posts/components/PostEditor";
 import DraftShareLink from "@/features/posts/components/DraftShareLink";
+import ReviewBanner from "@/features/posts/components/ReviewBanner";
 import RevisionHistory from "@/features/posts/components/RevisionHistory";
 import ErrorState from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/button";
@@ -95,6 +96,8 @@ export default function EditPost() {
             Version history
           </Button>
         </div>
+
+        <ReviewBanner post={post} />
 
         <DraftShareLink post={post} />
 

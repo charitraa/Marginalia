@@ -208,3 +208,56 @@ export function useRecommendedPosts(page = 1, enabled = true) {
     staleTime: 5 * 60_000,
   });
 }
+
+export function useSemanticSearch(query: string, page = 1, enabled = true) {
+  return useQuery({
+    queryKey: ["posts", "search", query, page],
+    queryFn: () => postService.searchPosts(query, page),
+    enabled: enabled && query.trim().length > 0,
+    placeholderData: (previous) => previous,
+    // Embedding a query costs an API call, so results are held a little longer
+    // than an ordinary list.
+    staleTime: 2 * 60_000,
+  });
+}
+
+export function useReviewQueue(page = 1, enabled = true) {
+  return useQuery({
+    queryKey: ["posts", "review-queue", page],
+    queryFn: () => postService.listReviewQueue(page),
+    enabled,
+    placeholderData: (previous) => previous,
+  });
+}
+
+export function useEditorialActions() {
+  const queryClient = useQueryClient();
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: postKeys.all });
+    queryClient.invalidateQueries({ queryKey: ["posts", "review-queue"] });
+  };
+
+  const submit = useMutation({
+    mutationFn: (slug: string) => postService.submitForReview(slug),
+    onSuccess: () => {
+      toast.success("Sent to an editor. You'll be notified when they decide.");
+      invalidate();
+    },
+    onError: (error) => toast.error(errorMessage(error, "Could not submit that post.")),
+  });
+
+  const review = useMutation({
+    mutationFn: ({ slug, action, note }: {
+      slug: string;
+      action: "approve" | "request_changes";
+      note?: string;
+    }) => postService.reviewPost(slug, action, note),
+    onSuccess: (_post, { action }) => {
+      toast.success(action === "approve" ? "Published." : "Sent back with your notes.");
+      invalidate();
+    },
+    onError: (error) => toast.error(errorMessage(error, "Could not record that decision.")),
+  });
+
+  return { submit, review };
+}

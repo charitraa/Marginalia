@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import SearchBar from "@/components/common/SearchBar";
@@ -8,7 +9,7 @@ import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
 import { PostListSkeleton } from "@/components/common/Skeletons";
-import { usePostList } from "@/features/posts/hooks/usePosts";
+import { useSemanticSearch } from "@/features/posts/hooks/usePosts";
 import { useDebounce } from "@/hooks/useDebounce";
 import { POSTS_PER_PAGE } from "@/config/constants";
 import { pageCount } from "@/lib/api/normalize";
@@ -39,9 +40,11 @@ export default function Search() {
   }, [debounced]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const enabled = debounced.trim().length > 0;
-  const { data, isLoading, isFetching, error, refetch } = usePostList(
-    { search: debounced, page, pageSize: POSTS_PER_PAGE },
-    enabled,
+  // Semantic search ranks by meaning, so "how do I stop XSS" finds an article
+  // called "Preventing cross-site scripting". The API falls back to keywords
+  // on its own and tells us which one ran.
+  const { data, isLoading, isFetching, error, refetch } = useSemanticSearch(
+    debounced, page, enabled,
   );
 
   const posts = data?.items ?? [];
@@ -86,13 +89,24 @@ export default function Search() {
           ) : posts.length === 0 ? (
             <EmptyState
               title={`No results for "${debounced}".`}
-              description="Try a different word, or browse everything instead."
+              description="Try describing what you're looking for in your own words — search understands meaning, not just exact words."
               action={{ label: "Browse all stories", to: "/explore" }}
             />
           ) : (
             <>
-              <p className="mb-6 text-sm text-muted-foreground" role="status">
-                {data?.count} {data?.count === 1 ? "result" : "results"} for “{debounced}”
+              <p className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted-foreground" role="status">
+                <span>
+                  {data?.count} {data?.count === 1 ? "result" : "results"} for “{debounced}”
+                </span>
+                {data?.semantic && (
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs"
+                    title="Ranked by meaning, so results need not share your exact words."
+                  >
+                    <Sparkles className="h-3 w-3" aria-hidden="true" />
+                    ranked by meaning
+                  </span>
+                )}
               </p>
               <div className="divide-y divide-border">
                 {posts.map((post) => (

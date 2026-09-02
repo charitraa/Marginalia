@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Eye, ImagePlus, Loader2, Pencil, X } from "lucide-react";
 import RichTextEditor from "@/features/posts/components/RichTextEditor";
+import AIAssistant from "@/features/ai/components/AIAssistant";
 import PublishOptions, {
   fromLocalInput,
   toLocalInput,
@@ -477,6 +478,26 @@ export default function PostEditor({ post, submitting, onSubmit, onCancel }: Pos
           <span>{minutes} min read</span>
         </div>
       </div>
+
+      <AIAssistant
+        title={title}
+        content={content}
+        onApplyTitle={setTitle}
+        onApplyExcerpt={setExcerpt}
+        onApplySeo={(seo) => {
+          setSeoTitle(seo.seoTitle);
+          setSeoDescription(seo.seoDescription);
+          // Merge rather than replace: the author's own tags are not
+          // suggestions to be overwritten.
+          const existing = tagText
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean);
+          const merged = Array.from(new Set([...existing, ...seo.tags]));
+          setTagText(merged.join(", "));
+        }}
+        onApplyContent={(html) => setContent(content ? `${content}\n${html}` : html)}
+      />
 
       <PublishOptions
         visibility={visibility}

@@ -66,6 +66,9 @@ export interface Post {
   seoTitle: string;
   seoDescription: string;
   canonicalUrl: string;
+  /** An editor's feedback when a submission was sent back. Author-only. */
+  reviewNote: string;
+  reviewedAt: string | null;
 }
 
 export interface PostRevision {

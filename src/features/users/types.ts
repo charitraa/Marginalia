@@ -45,6 +45,8 @@ export interface CurrentUser extends Author {
   district: string;
   isVerified: boolean;
   isStaff: boolean;
+  /** "email", "github" or "google". A provider account has no password. */
+  authProvider: string;
   role: Role;
   /**
    * Capabilities resolved server-side, so the UI can hide controls the account

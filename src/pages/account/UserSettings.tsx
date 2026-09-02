@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
+import DeleteAccount from "@/features/auth/components/DeleteAccount";
 import Seo from "@/components/common/Seo";
 import UserAvatar from "@/features/users/components/UserAvatar";
 import { Button } from "@/components/ui/button";
@@ -496,6 +497,9 @@ export default function UserSettings() {
           )}
         </div>
       </div>
+        <div className="mt-12">
+          <DeleteAccount />
+        </div>
     </Layout>
   );
 }

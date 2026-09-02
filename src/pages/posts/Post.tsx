@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { MessageCircle, Pencil, Trash2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
@@ -7,6 +7,18 @@ import BlogCard from "@/features/posts/components/BlogCard";
 import AuthorCard from "@/features/users/components/AuthorCard";
 import CategoryBadge from "@/features/posts/components/CategoryBadge";
 import TopicFollowButton from "@/features/users/components/TopicFollowButton";
+import AskAboutPost from "@/features/ai/components/AskAboutPost";
+import TableOfContents from "@/features/reading/components/TableOfContents";
+import ReadingControls from "@/features/reading/components/ReadingControls";
+import BackToTop from "@/components/common/BackToTop";
+import Breadcrumbs from "@/components/common/Breadcrumbs";
+import StructuredData, {
+  articleSchema,
+  breadcrumbSchema,
+} from "@/components/common/StructuredData";
+import { useHeadings } from "@/features/reading/hooks/useHeadings";
+import { useReadingPrefs } from "@/features/reading/hooks/useReadingPrefs";
+import { useCopyCodeButtons } from "@/features/reading/hooks/useCopyCodeButtons";
 import CommentSection from "@/features/comments/components/CommentSection";
 import LikeButton from "@/features/posts/components/LikeButton";
 import ShareButton from "@/features/posts/components/ShareButton";
@@ -22,6 +34,7 @@ import { usePostMutations, usePostOrPreview, useRelatedPosts } from "@/features/
 import { formatDate } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { authorPath, tagPath } from "@/lib/routes";
+import { SITE_NAME } from "@/config/constants";
 
 /** Progress through the article, shown as a thin bar under the header. */
 function useReadingProgress() {
@@ -49,6 +62,8 @@ export default function Post() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const progress = useReadingProgress();
+  const articleRef = useRef<HTMLDivElement>(null);
+  const { prefs, update: updatePrefs } = useReadingPrefs();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const { data: post, isLoading, error, refetch } = usePostOrPreview(slug, previewToken);
@@ -60,6 +75,20 @@ export default function Post() {
   // The body is sanitised on write by the API and again here before it reaches
   // the DOM, so nothing renders that has not passed both checks.
   const safeContent = useMemo(() => sanitizeHtml(post?.content ?? ""), [post?.content]);
+  const { headings, activeId } = useHeadings(articleRef, safeContent);
+
+  // Absolute URLs: a search engine needs to resolve these without a base.
+  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  const trail = post
+    ? [
+        { name: "Home", to: "/" },
+        ...(post.category
+          ? [{ name: post.category.name, to: `/explore?category=${post.category.slug}` }]
+          : [{ name: "Explore", to: "/explore" }]),
+        { name: post.title },
+      ]
+    : [];
+  useCopyCodeButtons(articleRef, safeContent);
 
   if (isLoading) {
     return (
@@ -202,8 +231,22 @@ export default function Post() {
         )}
 
         <div className="container-prose">
+          {!prefs.focusMode && <Breadcrumbs trail={trail} />}
+
+          <div className="mb-6 flex flex-wrap items-center justify-end gap-3 border-b border-border pb-4">
+            <ReadingControls prefs={prefs} onChange={updatePrefs} />
+          </div>
+
+          {headings.length >= 3 && !prefs.focusMode && (
+            <div className="mb-8 rounded-lg border border-border p-4 lg:hidden">
+              <TableOfContents headings={headings} activeId={activeId} />
+            </div>
+          )}
+
           <div
             className="article-content"
+            ref={articleRef}
+            style={{ fontSize: `${prefs.fontScale}em` }}
             /* Sanitised above with DOMPurify; the API sanitises on write too. */
             dangerouslySetInnerHTML={{ __html: safeContent }}
           />
@@ -248,6 +291,8 @@ export default function Post() {
             </div>
           </div>
 
+          {!prefs.focusMode && <AskAboutPost slug={post.slug} />}
+
           <div className="mt-12">
             <AuthorCard author={post.author} />
           </div>
@@ -283,6 +328,37 @@ export default function Post() {
           navigate("/dashboard");
         }}
       />
+      <StructuredData
+        data={
+          post
+            ? articleSchema({
+                title: post.title,
+                description: post.excerpt,
+                url: `${origin}/post/${post.slug}`,
+                image: post.coverImage,
+                authorName: post.author.name,
+                authorUrl: `${origin}${authorPath(post.author)}`,
+                publishedAt: post.publishedAt,
+                updatedAt: post.updatedAt,
+                siteName: SITE_NAME,
+              })
+            : null
+        }
+      />
+      <StructuredData
+        data={
+          trail.length
+            ? breadcrumbSchema(
+                trail.map((crumb) => ({
+                  name: crumb.name,
+                  url: crumb.to ? `${origin}${crumb.to}` : `${origin}/post/${post?.slug ?? ""}`,
+                })),
+              )
+            : null
+        }
+      />
+
+      <BackToTop />
     </Layout>
   );
 }

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  Eye, FileText, Flag, Heart, Mail, MessageSquare, Users,
+  ClipboardCheck, Eye, FileText, Flag, Heart, Mail, MessageSquare, Send, Users,
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
@@ -42,13 +42,29 @@ export default function AdminDashboard() {
                 </Link>
               </Button>
             )}
-            {user?.canManageUsers && (
+            {user?.canEditOthers && (
               <Button variant="outline" asChild className="gap-2">
-                <Link to="/admin/users">
-                  <Users className="h-4 w-4" aria-hidden="true" />
-                  Users
+                <Link to="/admin/review">
+                  <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+                  Review queue
                 </Link>
               </Button>
+            )}
+            {user?.canManageUsers && (
+              <>
+                <Button variant="outline" asChild className="gap-2">
+                  <Link to="/admin/newsletter">
+                    <Send className="h-4 w-4" aria-hidden="true" />
+                    Newsletter
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild className="gap-2">
+                  <Link to="/admin/users">
+                    <Users className="h-4 w-4" aria-hidden="true" />
+                    Users
+                  </Link>
+                </Button>
+              </>
             )}
           </div>
         </div>

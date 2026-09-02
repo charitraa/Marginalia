@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
+import Captcha, { resetCaptcha } from "@/features/captcha/components/Captcha";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import * as newsletterService from "@/features/newsletter/api/newsletterService";
@@ -16,14 +17,20 @@ import { errorMessage } from "@/lib/errors";
  */
 export default function NewsletterForm({ className }: { className?: string }) {
   const [email, setEmail] = useState("");
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const subscribe = useMutation({
-    mutationFn: () => newsletterService.subscribe(email.trim()),
+    mutationFn: () => newsletterService.subscribe(email.trim(), captcha),
     onSuccess: (message) => {
       toast.success(message);
       setEmail("");
     },
-    onError: (error) => toast.error(errorMessage(error, "Could not sign you up just now.")),
+    onError: (error) => {
+      // The token is single-use, so a retry needs a fresh one.
+      resetCaptcha();
+      setCaptcha(null);
+      toast.error(errorMessage(error, "Could not sign you up just now."));
+    },
   });
 
   return (
@@ -53,6 +60,10 @@ export default function NewsletterForm({ className }: { className?: string }) {
           {subscribe.isPending ? "Sending…" : "Subscribe"}
         </Button>
       </div>
+      <div className="mt-3">
+        <Captcha onChange={setCaptcha} />
+      </div>
+
       <p className="mt-2 text-xs text-muted-foreground">
         We send a confirmation link first, and every email has a one-click unsubscribe.
       </p>

@@ -22,6 +22,8 @@ export interface RegisterInput {
   email: string;
   password: string;
   confirmPassword: string;
+  /** reCAPTCHA token. Required when the server has the guard switched on. */
+  captcha?: string | null;
 }
 
 export interface LoginInput {
@@ -105,6 +107,7 @@ export async function register(input: RegisterInput): Promise<AuthOutcome> {
     confirm_password: input.confirmPassword,
   };
   if (input.username?.trim()) body.username = input.username.trim();
+  if (input.captcha) body.captcha = input.captcha;
 
   const { data } = await axiosInstance.post("/api/auth/register/", body);
   return readAuthPayload(data, input.email);
@@ -174,8 +177,14 @@ export async function logout(): Promise<{ serverCleared: boolean }> {
  * Starts a reset. The API answers identically whether or not the address is
  * registered, so the UI must not claim an email "was sent" to a real account.
  */
-export async function requestPasswordReset(email: string): Promise<string> {
-  const { data } = await axiosInstance.post("/api/auth/password-reset/", { email });
+export async function requestPasswordReset(
+  email: string,
+  captcha?: string | null,
+): Promise<string> {
+  const { data } = await axiosInstance.post("/api/auth/password-reset/", {
+    email,
+    ...(captcha ? { captcha } : {}),
+  });
   return data?.message ?? "If an account exists for that address, a reset link is on its way.";
 }
 
@@ -261,4 +270,47 @@ export async function socialLogin(provider: string, code: string): Promise<AuthO
     redirect_uri: socialRedirectUri(provider),
   });
   return readAuthPayload(data, "");
+}
+
+/* ------------------------------------------------------------------ */
+/* Account deletion                                                     */
+/* ------------------------------------------------------------------ */
+
+export interface AccountSummary {
+  posts: number;
+  publishedPosts: number;
+  comments: number;
+  followers: number;
+  canDelete: boolean;
+  blocker: string;
+}
+
+/** What deleting the account would destroy, fetched before confirming. */
+export async function getAccountSummary(): Promise<AccountSummary> {
+  const { data } = await axiosInstance.get("/api/users/me/delete/");
+  return {
+    posts: Number(data?.posts ?? 0),
+    publishedPosts: Number(data?.published_posts ?? 0),
+    comments: Number(data?.comments ?? 0),
+    followers: Number(data?.followers ?? 0),
+    canDelete: Boolean(data?.can_delete),
+    blocker: String(data?.blocker ?? ""),
+  };
+}
+
+/**
+ * Delete the account. Irreversible, and it takes the person's posts and
+ * comments with it.
+ *
+ * `password` is omitted for accounts that sign in through a provider and were
+ * never given one.
+ */
+export async function deleteAccount(
+  confirmUsername: string,
+  password?: string,
+): Promise<void> {
+  await axiosInstance.delete("/api/users/me/delete/", {
+    data: { confirm_username: confirmUsername, ...(password ? { password } : {}) },
+  });
+  forgetSession();
 }

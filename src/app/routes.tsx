@@ -43,6 +43,8 @@ const Analytics = lazy(() => import("@/pages/account/Analytics"));
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminUsers = lazy(() => import("@/pages/admin/AdminUsers"));
 const AdminModeration = lazy(() => import("@/pages/admin/AdminModeration"));
+const AdminNewsletter = lazy(() => import("@/pages/admin/AdminNewsletter"));
+const ReviewQueue = lazy(() => import("@/pages/admin/ReviewQueue"));
 
 const About = lazy(() => import("@/pages/legal/About"));
 const Contact = lazy(() => import("@/pages/legal/Contact"));
@@ -58,7 +60,7 @@ const guarded = (element: JSX.Element) => <ProtectedRoute>{element}</ProtectedRo
  *  capability gets the 404 page, so staff areas are not advertised. */
 const staffOnly = (
   element: JSX.Element,
-  capability: "canModerate" | "canManageUsers",
+  capability: "canModerate" | "canManageUsers" | "canEditOthers",
 ) => <RoleRoute require={capability}>{element}</RoleRoute>;
 
 export default function AppRoutes() {
@@ -107,6 +109,8 @@ export default function AppRoutes() {
         <Route path="/admin" element={staffOnly(<AdminDashboard />, "canModerate")} />
         <Route path="/admin/moderation" element={staffOnly(<AdminModeration />, "canModerate")} />
         <Route path="/admin/users" element={staffOnly(<AdminUsers />, "canManageUsers")} />
+        <Route path="/admin/newsletter" element={staffOnly(<AdminNewsletter />, "canManageUsers")} />
+        <Route path="/admin/review" element={staffOnly(<ReviewQueue />, "canEditOthers")} />
 
         {/* Static */}
         <Route path="/about" element={<About />} />

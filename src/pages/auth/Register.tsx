@@ -4,6 +4,7 @@ import { ArrowRight, Check, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import Captcha, { resetCaptcha } from "@/features/captcha/components/Captcha";
 import SocialAuthButtons from "@/features/auth/components/SocialAuthButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ export default function Register() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const update = (key: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement>) =>
     setForm((current) => ({ ...current, [key]: event.target.value }));
@@ -68,6 +70,7 @@ export default function Register() {
         email: form.email.trim(),
         password: form.password,
         confirmPassword: form.confirmPassword,
+        captcha,
       });
 
       if (result.status === "verification-required") {
@@ -79,6 +82,9 @@ export default function Register() {
       toast.success("Welcome to " + SITE_NAME + ".");
       navigate("/dashboard", { replace: true });
     } catch (error) {
+      // A reCAPTCHA token is single-use, so a failed submit needs a fresh one.
+      resetCaptcha();
+      setCaptcha(null);
       setErrors(fieldErrors(error));
       setFormError(errorMessage(error, "We couldn't create your account."));
     } finally {
@@ -231,6 +237,8 @@ export default function Register() {
               </Link>
               .
             </p>
+
+            <Captcha onChange={setCaptcha} error={errors.captcha} />
 
             <Button type="submit" className="w-full gap-2" disabled={submitting}>
               {submitting ? (

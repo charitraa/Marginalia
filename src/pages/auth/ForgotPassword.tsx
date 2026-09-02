@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, Loader2, MailCheck } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import Captcha, { resetCaptcha } from "@/features/captcha/components/Captcha";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ export default function ForgotPassword() {
   const [message, setMessage] = useState("");
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -35,9 +37,11 @@ export default function ForgotPassword() {
 
     setSubmitting(true);
     try {
-      setMessage(await authService.requestPasswordReset(email.trim()));
+      setMessage(await authService.requestPasswordReset(email.trim(), captcha));
       setSent(true);
     } catch (error) {
+      resetCaptcha();
+      setCaptcha(null);
       setFormError(errorMessage(error, "Could not start a reset just now."));
     } finally {
       setSubmitting(false);
@@ -95,6 +99,8 @@ export default function ForgotPassword() {
                     placeholder="you@example.com"
                   />
                 </div>
+
+                <Captcha onChange={setCaptcha} />
 
                 <Button type="submit" className="w-full gap-2" disabled={submitting}>
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}

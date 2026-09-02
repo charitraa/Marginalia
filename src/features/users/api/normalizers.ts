@@ -59,6 +59,7 @@ export function normalizeCurrentUser(raw: Raw): CurrentUser {
     district: text(raw.district),
     isVerified: Boolean(raw.is_verified),
     isStaff: Boolean(raw.is_staff),
+    authProvider: text(raw.auth_provider, "email"),
     role: text(raw.role, "user") as CurrentUser["role"],
     canPublish: Boolean(raw.can_publish),
     canEditOthers: Boolean(raw.can_edit_others),

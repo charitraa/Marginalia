@@ -61,6 +61,8 @@ export function normalizePost(raw: Raw): Post {
     seoTitle: text(raw.seo_title),
     seoDescription: text(raw.seo_description),
     canonicalUrl: text(raw.canonical_url),
+    reviewNote: text(raw.review_note),
+    reviewedAt: raw.reviewed_at ?? null,
     // Absent unless the API decided the requester owns this post.
     previewToken: raw.preview_token ? String(raw.preview_token) : null,
   };

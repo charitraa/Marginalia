@@ -8,8 +8,11 @@ import { axiosInstance } from "@/lib/api/client";
  * every outcome rather than leaking that detail.
  */
 
-export async function subscribe(email: string): Promise<string> {
-  const { data } = await axiosInstance.post("/api/newsletter/subscribe/", { email });
+export async function subscribe(email: string, captcha?: string | null): Promise<string> {
+  const { data } = await axiosInstance.post("/api/newsletter/subscribe/", {
+    email,
+    ...(captcha ? { captcha } : {}),
+  });
   return data?.message ?? "Check your inbox to confirm your subscription.";
 }
 

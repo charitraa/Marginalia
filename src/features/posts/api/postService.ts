@@ -266,3 +266,59 @@ export async function listRecommended(page = 1): Promise<Paginated<Post>> {
   const { data } = await axiosInstance.get("/api/posts/recommended/", { params: { page } });
   return normalizePage(data, normalizePost, page, POSTS_PER_PAGE);
 }
+
+export interface SearchResult extends Paginated<Post> {
+  /** Whether meaning-based ranking actually ran, or it fell back to keywords. */
+  semantic: boolean;
+}
+
+/**
+ * Search by meaning, falling back to keywords.
+ *
+ * The `semantic` flag is passed through so the UI can be honest about which
+ * kind of search ran rather than implying a capability that did not.
+ */
+export async function searchPosts(
+  query: string,
+  page = 1,
+  semantic = true,
+): Promise<SearchResult> {
+  const { data } = await axiosInstance.get("/api/posts/search/", {
+    params: { q: query, page, ...(semantic ? {} : { semantic: "false" }) },
+  });
+  return {
+    ...normalizePage(data, normalizePost, page, POSTS_PER_PAGE),
+    semantic: Boolean(data?.semantic),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Editorial workflow                                                  */
+/* ------------------------------------------------------------------ */
+
+/** Hand a draft to an editor. The route out of the contributor dead end. */
+export async function submitForReview(slug: string): Promise<Post> {
+  const { data } = await axiosInstance.post(`/api/posts/${slug}/submit/`);
+  return normalizePost(data);
+}
+
+/** Submissions waiting on a decision. Editors and above. */
+export async function listReviewQueue(page = 1): Promise<Paginated<Post>> {
+  const { data } = await axiosInstance.get("/api/posts/review-queue/", { params: { page } });
+  return normalizePage(data, normalizePost, page, POSTS_PER_PAGE);
+}
+
+/**
+ * Approve a submission or send it back.
+ *
+ * `request_changes` requires a note — the API refuses a rejection with no
+ * reason, because that is not a review.
+ */
+export async function reviewPost(
+  slug: string,
+  action: "approve" | "request_changes",
+  note = "",
+): Promise<Post> {
+  const { data } = await axiosInstance.post(`/api/posts/${slug}/review/`, { action, note });
+  return normalizePost(data);
+}
