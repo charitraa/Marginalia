@@ -163,8 +163,7 @@ cp .env.example .env
 Leave `VITE_API_BASE_URL` **empty** for local development: Vite proxies `/api` and
 `/media` to the backend, so the browser sees a single origin, cookies stay first-party and
 CORS never enters the picture. Point `VITE_DEV_API_TARGET` elsewhere if your backend is
-not on port 8000. For deployed builds, set `VITE_API_BASE_URL` to the API's public URL and
-add that origin to the backend's `CORS_ALLOWED_ORIGINS`.
+not on port 8000. For deployed builds, see [Deploying to Vercel](#-deploying-to-vercel).
 
 ### 4️⃣ Run the app
 ```bash
@@ -176,6 +175,65 @@ The app runs at http://localhost:8080.
 ```bash
 npm run build
 ```
+
+## ▲ Deploying to Vercel
+
+`vercel.json` holds the whole configuration. Import the repo in Vercel and it
+builds with no dashboard changes beyond the one environment variable below.
+
+| Setting | Value | Why |
+|---|---|---|
+| Install command | `npm ci` | Reproducible: installs exactly the tree in `package-lock.json` |
+| Build command | `npm run build` | `vite build` |
+| Output directory | `dist/spa` | Vite's `outDir` is not the Vercel default `dist` |
+| Node | `>=20` (`engines`) | Vercel resolves this to its current LTS |
+
+**One environment variable.** In *Project → Settings → Environment Variables* set
+`VITE_API_BASE_URL` to your API's public URL (e.g. `https://api.marginalia.blog`)
+for Production, Preview and Development. Vite inlines `VITE_*` at build time, so
+a change only takes effect on the next deploy.
+
+**SPA routing.** A single catch-all rewrite sends every unmatched path to
+`index.html` so React Router can handle deep links like `/post/my-slug` on a cold
+load. Vercel checks the filesystem first, so real files — hashed bundles in
+`/assets`, the icons — are still served directly. Hashed assets get a one-year
+`immutable` cache; everything else revalidates.
+
+**The service worker.** `sw.js` is served with `max-age=0, must-revalidate`. This
+is not a micro-optimisation: if a CDN caches the worker, browsers keep running the
+old one and stop picking up deploys — the classic "users are stuck on last week's
+build" bug. `manifest.webmanifest`, `offline.html` and the PWA icons have their own
+rules; only content-hashed `/assets` are cached immutably.
+
+### The backend has to cooperate
+
+The deployed frontend calls the API **cross-origin**, and the refresh token lives
+in an httpOnly cookie. That only works if Django sends both of these:
+
+```python
+# Cookie must be usable from another site, and SameSite=None requires Secure.
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True   # also on whatever cookie carries the refresh token
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = ["https://your-production-domain.com"]
+
+# Vercel gives every preview deployment a unique hostname, so previews need a
+# pattern rather than a fixed list.
+CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://.*\.vercel\.app$"]
+
+CSRF_TRUSTED_ORIGINS = ["https://your-production-domain.com", "https://*.vercel.app"]
+```
+
+Two things to know about this arrangement:
+
+- **Safari blocks third-party cookies today and Chrome is phasing them out.** When
+  that bites, the symptom is silent: the access token expires, the refresh call
+  gets no cookie, and the user is quietly signed out. The durable fix is to serve
+  the API from the same site as the frontend — either a `rewrites` proxy in
+  `vercel.json`, or the API on a subdomain of the production domain.
+- **The regex above lets any `*.vercel.app` origin send credentialed requests.**
+  That is fine while previews are private; drop it once you no longer need them.
 
 ## 🧪 Running Tests
 ```bash

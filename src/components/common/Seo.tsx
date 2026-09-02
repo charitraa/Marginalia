@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/config/constants";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/config/constants";
 
 interface SeoProps {
   title?: string;
@@ -48,7 +48,7 @@ export default function Seo({
   noIndex = false,
 }: SeoProps) {
   useEffect(() => {
-    const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — Read. Think. Share.`;
+    const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — ${SITE_TAGLINE}`;
     document.title = fullTitle;
 
     const url = canonicalPath
