@@ -5,7 +5,7 @@
  * Django by the dev proxy in vite.config.ts. Set VITE_API_BASE_URL for deployed
  * builds (for example https://api.marginalia.blog).
  */
-export const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+export const BASE_URL = "https://blog-server-akdq.onrender.com";
 
 /** react-query cache keys, kept from the original services layer. */
 export const LOGIN_CACHE_KEY = "login";
