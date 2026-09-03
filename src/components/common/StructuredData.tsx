@@ -53,6 +53,90 @@ export function articleSchema(options: {
   };
 }
 
+/**
+ * Schema.org describing the publication itself, with the search box a result
+ * page can offer directly. Belongs on the home page only — repeating it on
+ * every route gives a search engine several competing definitions of the site.
+ */
+export function websiteSchema(options: {
+  siteName: string;
+  description: string;
+  url: string;
+  searchPath?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: options.siteName,
+    description: options.description,
+    url: options.url,
+    publisher: { "@type": "Organization", name: options.siteName, url: options.url },
+    ...(options.searchPath
+      ? {
+          potentialAction: {
+            "@type": "SearchAction",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: `${options.url}${options.searchPath}{search_term_string}`,
+            },
+            "query-input": "required name=search_term_string",
+          },
+        }
+      : {}),
+  };
+}
+
+/** Schema.org describing one writer's profile page. */
+export function profileSchema(options: {
+  name: string;
+  username: string;
+  url: string;
+  description?: string;
+  image?: string | null;
+  sameAs?: string[];
+}) {
+  const links = (options.sameAs ?? []).filter(Boolean);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: {
+      "@type": "Person",
+      name: options.name,
+      alternateName: `@${options.username}`,
+      url: options.url,
+      ...(options.description ? { description: options.description } : {}),
+      ...(options.image ? { image: options.image } : {}),
+      ...(links.length ? { sameAs: links } : {}),
+    },
+  };
+}
+
+/** Schema.org describing a list of posts — a category, a series, an archive. */
+export function collectionSchema(options: {
+  name: string;
+  description: string;
+  url: string;
+  items: Array<{ name: string; url: string }>;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: options.name,
+    description: options.description,
+    url: options.url,
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: options.items.map((item, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: item.name,
+        url: item.url,
+      })),
+    },
+  };
+}
+
 /** Schema.org describing a breadcrumb trail. */
 export function breadcrumbSchema(trail: Array<{ name: string; url: string }>) {
   return {

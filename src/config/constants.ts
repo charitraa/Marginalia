@@ -28,6 +28,25 @@ export const CONTACT_EMAIL = "stharabi9862187405@gmail.com";
 export const MAINTAINER_URL = "https://www.charitrashrestha.com.np";
 export const SOURCE_URL = "https://github.com/charitraa/Marginalia";
 export const SITE_TAGLINE = "Notes in the margins.";
+/**
+ * Public origin of the deployed site, e.g. `https://marginalia.blog`.
+ *
+ * Canonical links, Open Graph URLs and structured data have to name the real
+ * site rather than whichever host served the bundle: a preview deployment that
+ * canonicalises itself competes with production in the index. Left empty in
+ * development, where the browser's own origin is the right answer.
+ */
+export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? "").replace(/\/+$/, "");
+
+/** Social preview image for pages that have none of their own. */
+export const SITE_OG_IMAGE = "/icon-512.png";
+
+/** The origin absolute URLs are built from. */
+export function siteOrigin(): string {
+  if (SITE_URL) return SITE_URL;
+  return typeof window === "undefined" ? "" : window.location.origin;
+}
+
 export const SITE_DESCRIPTION =
   "Thoughtful stories, ideas, tutorials and experiences from the Marginalia community.";
 

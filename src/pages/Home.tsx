@@ -8,12 +8,13 @@ import NumberedStory from "@/features/posts/components/NumberedStory";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import { PostGridSkeleton } from "@/components/common/Skeletons";
+import StructuredData, { websiteSchema } from "@/components/common/StructuredData";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
 import { categoryPath } from "@/lib/routes";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/config/constants";
+import { SITE_DESCRIPTION, SITE_NAME, siteOrigin } from "@/config/constants";
 
 /** A section opener: hairline, title, and an optional way out to the full list. */
 function SectionHeading({
@@ -62,6 +63,14 @@ export default function Home() {
   return (
     <Layout>
       <Seo title={undefined} description={SITE_DESCRIPTION} canonicalPath="/" />
+      <StructuredData
+        data={websiteSchema({
+          siteName: SITE_NAME,
+          description: SITE_DESCRIPTION,
+          url: siteOrigin(),
+          searchPath: "/search?q=",
+        })}
+      />
 
       {/* Hero. The masthead label hangs in the margin; the statement carries the page. */}
       <section className="container-page pb-16 pt-16 sm:pb-24 sm:pt-24">

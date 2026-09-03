@@ -9,12 +9,14 @@ import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
 import { PostGridSkeleton, ProfileSkeleton } from "@/components/common/Skeletons";
+import StructuredData, { profileSchema } from "@/components/common/StructuredData";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useAuthor, useToggleFollow } from "@/features/users/hooks/useUsers";
 import { useAuthorPosts } from "@/features/posts/hooks/usePosts";
 import { formatCount, formatDate } from "@/lib/format";
 import { pageCount } from "@/lib/api/normalize";
+import { SITE_NAME, siteOrigin } from "@/config/constants";
 
 const SOCIALS = [
   { key: "website", label: "Website", icon: Globe },
@@ -70,9 +72,22 @@ export default function AuthorProfile() {
     <Layout>
       <Seo
         title={profile.name}
-        description={profile.bio || `Stories by ${profile.name} on Marginalia.`}
+        description={profile.bio || `Stories by ${profile.name} on ${SITE_NAME}.`}
         image={profile.avatar}
+        type="profile"
         canonicalPath={`/author/${profile.username}`}
+      />
+      <StructuredData
+        data={profileSchema({
+          name: profile.name,
+          username: profile.username,
+          url: `${siteOrigin()}/author/${profile.username}`,
+          description: profile.bio || profile.headline,
+          image: profile.avatar,
+          // The writer's own links are what tie this page to the same person
+          // elsewhere on the web.
+          sameAs: SOCIALS.map(({ key }) => profile[key]),
+        })}
       />
 
       <header className="border-b border-foreground/15">

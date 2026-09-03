@@ -9,7 +9,9 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSeries, useSeriesProgress } from "@/features/series/hooks/useSeries";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { authorPath } from "@/lib/routes";
+import StructuredData, { collectionSchema } from "@/components/common/StructuredData";
+import { authorPath, postPath } from "@/lib/routes";
+import { siteOrigin } from "@/config/constants";
 import { cn } from "@/lib/utils";
 
 /**
@@ -58,6 +60,27 @@ export default function SeriesDetail() {
         description={series.description}
         image={series.coverImage}
         canonicalPath={`/series/${series.slug}`}
+        // An unpublished series is visible to its author, not to an index.
+        noIndex={!series.isPublished}
+      />
+      <StructuredData
+        data={
+          series.entries.length
+            ? collectionSchema({
+                name: series.title,
+                description: series.description,
+                url: `${siteOrigin()}/series/${series.slug}`,
+                // Ordered by the series' own position column, which is the
+                // reading order a search result should present.
+                items: [...series.entries]
+                  .sort((a, b) => a.position - b.position)
+                  .map((entry) => ({
+                    name: entry.post.title,
+                    url: `${siteOrigin()}${postPath(entry.post)}`,
+                  })),
+              })
+            : null
+        }
       />
 
       <div className="container-page max-w-3xl pb-20 pt-12 sm:pt-16">

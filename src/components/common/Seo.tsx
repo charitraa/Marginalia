@@ -1,21 +1,53 @@
 import { useEffect } from "react";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_TAGLINE } from "@/config/constants";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_OG_IMAGE,
+  SITE_TAGLINE,
+  siteOrigin,
+} from "@/config/constants";
 
 interface SeoProps {
   title?: string;
   description?: string;
   image?: string | null;
-  type?: "website" | "article";
+  type?: "website" | "article" | "profile";
   canonicalPath?: string;
   publishedAt?: string | null;
+  modifiedAt?: string | null;
   author?: string;
   noIndex?: boolean;
 }
 
-function upsertMeta(selector: string, attribute: "name" | "property", key: string, content: string) {
-  let tag = document.head.querySelector<HTMLMetaElement>(selector);
-  if (!tag) {
-    tag = document.createElement("meta");
+/** Roughly what a result page will show before it truncates. */
+const DESCRIPTION_LIMIT = 160;
+
+function clamp(text: string): string {
+  const clean = text.replace(/\s+/g, " ").trim();
+  if (clean.length <= DESCRIPTION_LIMIT) return clean;
+  const cut = clean.slice(0, DESCRIPTION_LIMIT - 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).replace(/[,;:.\s]+$/, "")}…`;
+}
+
+/**
+ * Writes one meta tag, or removes it when there is no content.
+ *
+ * Removal matters as much as writing: the tags live on `document.head`, which
+ * outlives the route, so a value left behind from the previous page (a post's
+ * cover image, its publication date) would be attached to the next one.
+ */
+function setMeta(attribute: "name" | "property", key: string, content?: string | null) {
+  const selector = `meta[${attribute}="${key}"]`;
+  const existing = document.head.querySelector<HTMLMetaElement>(selector);
+
+  if (!content) {
+    existing?.remove();
+    return;
+  }
+
+  const tag = existing ?? document.createElement("meta");
+  if (!existing) {
     tag.setAttribute(attribute, key);
     document.head.appendChild(tag);
   }
@@ -34,8 +66,9 @@ function upsertLink(rel: string, href: string) {
 
 /**
  * Document head management for a client rendered SPA. Crawlers that execute JS
- * (and every link preview that does) read these; server rendering would be
- * needed for the rest, which this architecture does not have.
+ * (Googlebot among them) read these; server rendering would be needed for the
+ * rest, which this architecture does not have. The static defaults in
+ * `index.html` are what a scraper that does not run JS falls back to.
  */
 export default function Seo({
   title,
@@ -44,6 +77,7 @@ export default function Seo({
   type = "website",
   canonicalPath,
   publishedAt,
+  modifiedAt,
   author,
   noIndex = false,
 }: SeoProps) {
@@ -51,43 +85,37 @@ export default function Seo({
     const fullTitle = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — ${SITE_TAGLINE}`;
     document.title = fullTitle;
 
-    const url = canonicalPath
-      ? new URL(canonicalPath, window.location.origin).toString()
-      : window.location.href.split("?")[0];
+    const origin = siteOrigin() || window.location.origin;
+    // Query strings are filters and campaign tags, not different documents, so
+    // the canonical URL is always the bare path.
+    const url = new URL(canonicalPath ?? window.location.pathname, origin).toString();
+    const summary = clamp(description || SITE_DESCRIPTION);
+    const social = new URL(image || SITE_OG_IMAGE, origin).toString();
 
-    upsertMeta('meta[name="description"]', "name", "description", description);
-    upsertMeta('meta[name="robots"]', "name", "robots", noIndex ? "noindex,nofollow" : "index,follow");
+    setMeta("name", "description", summary);
+    setMeta("name", "robots", noIndex ? "noindex,nofollow" : "index,follow");
 
-    upsertMeta('meta[property="og:title"]', "property", "og:title", fullTitle);
-    upsertMeta('meta[property="og:description"]', "property", "og:description", description);
-    upsertMeta('meta[property="og:type"]', "property", "og:type", type);
-    upsertMeta('meta[property="og:url"]', "property", "og:url", url);
-    upsertMeta('meta[property="og:site_name"]', "property", "og:site_name", SITE_NAME);
+    setMeta("property", "og:title", fullTitle);
+    setMeta("property", "og:description", summary);
+    setMeta("property", "og:type", type);
+    setMeta("property", "og:url", url);
+    setMeta("property", "og:site_name", SITE_NAME);
+    setMeta("property", "og:locale", "en_US");
+    setMeta("property", "og:image", social);
+    setMeta("property", "og:image:alt", title ? `${title} — ${SITE_NAME}` : SITE_NAME);
 
-    upsertMeta('meta[name="twitter:card"]', "name", "twitter:card", image ? "summary_large_image" : "summary");
-    upsertMeta('meta[name="twitter:title"]', "name", "twitter:title", fullTitle);
-    upsertMeta('meta[name="twitter:description"]', "name", "twitter:description", description);
+    setMeta("name", "twitter:card", image ? "summary_large_image" : "summary");
+    setMeta("name", "twitter:title", fullTitle);
+    setMeta("name", "twitter:description", summary);
+    setMeta("name", "twitter:image", social);
 
-    if (image) {
-      const absolute = new URL(image, window.location.origin).toString();
-      upsertMeta('meta[property="og:image"]', "property", "og:image", absolute);
-      upsertMeta('meta[name="twitter:image"]', "name", "twitter:image", absolute);
-    }
-
-    if (publishedAt) {
-      upsertMeta(
-        'meta[property="article:published_time"]',
-        "property",
-        "article:published_time",
-        publishedAt,
-      );
-    }
-    if (author) {
-      upsertMeta('meta[property="article:author"]', "property", "article:author", author);
-    }
+    // Article-only tags: cleared on every other page rather than inherited.
+    setMeta("property", "article:published_time", type === "article" ? publishedAt : null);
+    setMeta("property", "article:modified_time", type === "article" ? modifiedAt : null);
+    setMeta("property", "article:author", type === "article" ? author : null);
 
     upsertLink("canonical", url);
-  }, [title, description, image, type, canonicalPath, publishedAt, author, noIndex]);
+  }, [title, description, image, type, canonicalPath, publishedAt, modifiedAt, author, noIndex]);
 
   return null;
 }

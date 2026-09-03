@@ -12,9 +12,14 @@ import FeaturedPost from "@/features/posts/components/FeaturedPost";
 import NumberedStory from "@/features/posts/components/NumberedStory";
 import TopicFollowButton from "@/features/users/components/TopicFollowButton";
 import { PostGridSkeleton } from "@/components/common/Skeletons";
+import StructuredData, {
+  breadcrumbSchema,
+  collectionSchema,
+} from "@/components/common/StructuredData";
 import { useCategory, usePostList } from "@/features/posts/hooks/usePosts";
 import { pageCount } from "@/lib/api/normalize";
-import { POSTS_PER_PAGE } from "@/config/constants";
+import { POSTS_PER_PAGE, siteOrigin } from "@/config/constants";
+import { postPath } from "@/lib/routes";
 
 /**
  * A category's own page.
@@ -63,6 +68,28 @@ export default function CategoryPage() {
         title={name}
         description={category.data?.description || `Stories filed under ${name}.`}
         canonicalPath={`/category/${slug}`}
+      />
+      <StructuredData
+        data={
+          items.length
+            ? collectionSchema({
+                name,
+                description: category.data?.description || `Stories filed under ${name}.`,
+                url: `${siteOrigin()}/category/${slug}`,
+                items: items.map((post) => ({
+                  name: post.title,
+                  url: `${siteOrigin()}${postPath(post)}`,
+                })),
+              })
+            : null
+        }
+      />
+      <StructuredData
+        data={breadcrumbSchema([
+          { name: "Home", url: `${siteOrigin()}/` },
+          { name: "Explore", url: `${siteOrigin()}/explore` },
+          { name, url: `${siteOrigin()}/category/${slug}` },
+        ])}
       />
 
       <div className="container-page py-10">

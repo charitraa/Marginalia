@@ -1,14 +1,48 @@
-User-agent: Googlebot
-Allow: /
+# Marginalia
+#
+# Everything a reader can reach without signing in is crawlable. The private
+# areas below are behind auth and already carry a noindex meta tag; keeping them
+# out of the crawl saves the budget for stories.
 
-User-agent: Bingbot
+User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /analytics
+Disallow: /bookmarks
+Disallow: /dashboard
+Disallow: /feed
+Disallow: /history
+Disallow: /media
+Disallow: /my-comments
+Disallow: /notifications
+Disallow: /settings
+Disallow: /trash
+Disallow: /write
+Disallow: /login
+Disallow: /register
+Disallow: /verify
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /auth/
+Disallow: /newsletter/
+Disallow: /search
+Disallow: /post/*/edit
+Disallow: /series/*/manage
+Disallow: /*?preview=
 
+# Link previews. These fetch one URL a person pasted rather than crawling, so
+# they are not held to the rules above.
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
+User-agent: LinkedInBot
 Allow: /
+
+User-agent: Slackbot-LinkExpanding
+Allow: /
+
+# The sitemap line is appended at build time by scripts/seo-postbuild.mjs,
+# which needs VITE_SITE_URL to know the site's own hostname.

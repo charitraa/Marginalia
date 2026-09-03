@@ -34,7 +34,7 @@ import { usePostMutations, usePostOrPreview, useRelatedPosts } from "@/features/
 import { formatDate } from "@/lib/format";
 import { sanitizeHtml } from "@/lib/sanitize";
 import { authorPath, tagPath } from "@/lib/routes";
-import { SITE_NAME } from "@/config/constants";
+import { SITE_NAME, siteOrigin } from "@/config/constants";
 
 /** Progress through the article, shown as a thin bar under the header. */
 function useReadingProgress() {
@@ -78,7 +78,7 @@ export default function Post() {
   const { headings, activeId } = useHeadings(articleRef, safeContent);
 
   // Absolute URLs: a search engine needs to resolve these without a base.
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
+  const origin = siteOrigin();
   const trail = post
     ? [
         { name: "Home", to: "/" },
@@ -124,13 +124,21 @@ export default function Post() {
   return (
     <Layout>
       <Seo
-        title={post.title}
-        description={post.excerpt}
+        // What the writer set in the editor's SEO panel wins over the headline
+        // and the deck; both fall back when they were left empty.
+        title={post.seoTitle || post.title}
+        description={post.seoDescription || post.excerpt}
         image={post.coverImage}
         type="article"
-        canonicalPath={`/post/${post.slug}`}
+        // A post first published elsewhere points its canonical at the original
+        // rather than competing with it.
+        canonicalPath={post.canonicalUrl || `/post/${post.slug}`}
         publishedAt={post.publishedAt}
+        modifiedAt={post.updatedAt}
         author={post.author.name}
+        // A draft, a scheduled post and a preview link are all reachable by
+        // someone holding the URL, and none of them belong in an index.
+        noIndex={post.status !== "published" || Boolean(previewToken)}
       />
 
       <div className="fixed inset-x-0 top-0 z-40 h-1">
@@ -370,11 +378,12 @@ export default function Post() {
       />
       <StructuredData
         data={
-          post
+          // Only for a post a search engine may actually index.
+          post && post.status === "published" && !previewToken
             ? articleSchema({
-                title: post.title,
-                description: post.excerpt,
-                url: `${origin}/post/${post.slug}`,
+                title: post.seoTitle || post.title,
+                description: post.seoDescription || post.excerpt,
+                url: post.canonicalUrl || `${origin}/post/${post.slug}`,
                 image: post.coverImage,
                 authorName: post.author.name,
                 authorUrl: `${origin}${authorPath(post.author)}`,

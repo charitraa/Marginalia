@@ -91,9 +91,12 @@ export default function Explore() {
   return (
     <Layout>
       <Seo
-        title="Explore"
+        title={page > 1 ? `Explore — page ${page}` : "Explore"}
         description="Browse every story on Marginalia by topic, popularity or recency."
-        canonicalPath="/explore"
+        // Filters fold back into the bare archive so a search engine is not
+        // offered a page per combination, but a numbered page is its own set of
+        // stories and stays self-canonical.
+        canonicalPath={page > 1 ? `/explore?page=${page}` : "/explore"}
       />
 
       <div className="container-page pb-20">

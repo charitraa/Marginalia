@@ -163,7 +163,8 @@ cp .env.example .env
 Leave `VITE_API_BASE_URL` **empty** for local development: Vite proxies `/api` and
 `/media` to the backend, so the browser sees a single origin, cookies stay first-party and
 CORS never enters the picture. Point `VITE_DEV_API_TARGET` elsewhere if your backend is
-not on port 8000. For deployed builds, see [Deploying to Vercel](#-deploying-to-vercel).
+not on port 8000. Leave `VITE_SITE_URL` empty too — locally the browser's own origin is
+the right canonical host. For deployed builds, see [Deploying to Vercel](#-deploying-to-vercel).
 
 ### 4️⃣ Run the app
 ```bash
@@ -188,10 +189,12 @@ builds with no dashboard changes beyond the one environment variable below.
 | Output directory | `dist/spa` | Vite's `outDir` is not the Vercel default `dist` |
 | Node | `>=20` (`engines`) | Vercel resolves this to its current LTS |
 
-**One environment variable.** In *Project → Settings → Environment Variables* set
+**Two environment variables.** In *Project → Settings → Environment Variables* set
 `VITE_API_BASE_URL` to your API's public URL (e.g. `https://api.marginalia.blog`)
-for Production, Preview and Development. Vite inlines `VITE_*` at build time, so
-a change only takes effect on the next deploy.
+for Production, Preview and Development, and `VITE_SITE_URL` to the site's own
+public origin (e.g. `https://marginalia.blog`) — see [SEO](#-seo) for what depends
+on it. Vite inlines `VITE_*` at build time, so a change only takes effect on the
+next deploy.
 
 **SPA routing.** A single catch-all rewrite sends every unmatched path to
 `index.html` so React Router can handle deep links like `/post/my-slug` on a cold
@@ -234,6 +237,37 @@ Two things to know about this arrangement:
   `vercel.json`, or the API on a subdomain of the production domain.
 - **The regex above lets any `*.vercel.app` origin send credentialed requests.**
   That is fine while previews are private; drop it once you no longer need them.
+
+## 🔎 SEO
+
+A client rendered SPA has no server to write a document head, so the head is
+managed at runtime and the parts crawlers need before JS runs are written at
+build time.
+
+**Per page.** `<Seo>` sets the title, description, canonical link, robots
+directive, Open Graph and Twitter card tags on every route, and *removes* the
+ones the new page does not set — the head outlives the route, so a cover image
+left behind from the last post would otherwise be attached to the next page. On a
+post it also honours the SEO title, description and canonical URL the writer set
+in the editor, so a piece published elsewhere first points back to the original.
+Everything private (the dashboard, settings, drafts, preview links, search) is
+`noindex`.
+
+**Structured data.** `<StructuredData>` injects JSON-LD and removes it on
+unmount: `BlogPosting` and a breadcrumb trail on a post, `WebSite` on the home
+page, `ProfilePage` on an author, `CollectionPage` on a category and a series.
+
+**Canonical host.** `VITE_SITE_URL` is the site's public origin. Canonical links,
+Open Graph URLs and JSON-LD use it so a preview deployment does not canonicalise
+itself and compete with production. Unset, the browser's own origin is used.
+
+**At build time.** `scripts/seo-postbuild.mjs` runs after `vite build` and, when
+`VITE_SITE_URL` is set, writes `dist/spa/sitemap.xml` (the static routes, plus
+published posts, authors and categories read from the API), appends the `Sitemap:`
+line to `robots.txt`, and rewrites the static Open Graph URLs in `index.html` to
+absolute ones — Slack, Facebook and LinkedIn never run the JS that would set the
+per-page tags, so the shipped HTML is what they see. It never fails the build: an
+unreachable API costs the dynamic URLs, not the deploy.
 
 ## 🧪 Running Tests
 ```bash

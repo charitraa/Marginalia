@@ -9,6 +9,25 @@
   <title>Marginalia — Notes in the margins.</title>
   <meta name="description"
     content="Thoughtful stories, ideas, tutorials and experiences from the Marginalia community." />
+
+  <!-- Static social defaults. Most link scrapers (Slack, Facebook, LinkedIn)
+       never run the JS that would set the per-page tags, so these are what they
+       see; `scripts/seo-postbuild.mjs` rewrites the URLs below to absolute ones
+       at build time when VITE_SITE_URL is set. -->
+  <meta property="og:site_name" content="Marginalia" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="Marginalia — Notes in the margins." />
+  <meta property="og:description"
+    content="Thoughtful stories, ideas, tutorials and experiences from the Marginalia community." />
+  <meta property="og:image" content="/icon-512.png" />
+  <meta property="og:image:alt" content="Marginalia" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Marginalia — Notes in the margins." />
+  <meta name="twitter:description"
+    content="Thoughtful stories, ideas, tutorials and experiences from the Marginalia community." />
+  <meta name="twitter:image" content="/icon-512.png" />
+
   <link rel="icon" href="/favicon.ico" sizes="32x32" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
