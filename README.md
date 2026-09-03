@@ -286,6 +286,12 @@ A 401 triggers a single shared refresh — parallel queries refresh once between
 once each — and the original request is retried. If the refresh fails, the app drops to a
 signed-out state rather than leaving stale data on screen.
 
+Where a sign-in lands depends on the account. If a guard sent the visitor to `/login`, they
+are returned to the page they were after; otherwise a moderator opens the admin dashboard
+and everyone else opens their own writing dashboard (`landingPath` in `src/lib/routes.ts`).
+It reads the same `canModerate` capability that guards `/admin`, so nobody is routed to a
+page they would be bounced off.
+
 Post bodies are sanitised server-side with bleach and again here with DOMPurify before
 they reach the DOM. Permission checks in the UI are for affordance only; the API is
 authoritative and re-checks every write.

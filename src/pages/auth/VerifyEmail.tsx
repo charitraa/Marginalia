@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { getPendingVerification, resendCode } from "@/features/auth/api/authService";
 import { errorMessage } from "@/lib/errors";
+import { landingPath } from "@/lib/routes";
 
 const RESEND_SECONDS = 30;
 
@@ -47,9 +48,9 @@ export default function VerifyEmail() {
 
     setSubmitting(true);
     try {
-      await verifyEmail(email.trim(), code.trim());
+      const verified = await verifyEmail(email.trim(), code.trim());
       toast.success("Email verified.");
-      navigate("/dashboard", { replace: true });
+      navigate(landingPath(verified), { replace: true });
     } catch (error) {
       setFormError(errorMessage(error, "That code isn't valid or has expired."));
     } finally {

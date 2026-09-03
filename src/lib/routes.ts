@@ -1,4 +1,5 @@
 import type { Post } from "@/features/posts/types";
+import type { CurrentUser } from "@/features/users/types";
 
 /**
  * Post URLs.
@@ -24,4 +25,16 @@ export function categoryPath(slug: string): string {
 
 export function tagPath(slug: string): string {
   return `/explore?tag=${encodeURIComponent(slug)}`;
+}
+
+/**
+ * Where a sign-in lands when the visitor was not already headed somewhere.
+ *
+ * Someone who moderates the publication is here to run it, so they open the
+ * admin dashboard; their own writing dashboard is still one click away in the
+ * header. `canModerate` is the same capability that guards `/admin`, so this
+ * can never send anyone to a page they would be bounced off.
+ */
+export function landingPath(user: CurrentUser | null | undefined): string {
+  return user?.canModerate ? "/admin" : "/dashboard";
 }

@@ -45,7 +45,8 @@ interface AuthContextValue {
   register: (input: authService.RegisterInput) => Promise<authService.AuthOutcome>;
   verifyEmail: (email: string, code: string) => Promise<CurrentUser | null>;
   logout: () => Promise<{ serverCleared: boolean }>;
-  refresh: () => Promise<void>;
+  /** Re-reads the current user, and hands it back so a caller can route on it. */
+  refresh: () => Promise<CurrentUser | null>;
   /** Re-attempt a restore that failed because the API was unreachable. */
   retrySession: () => void;
   setUser: (user: CurrentUser | null) => void;
@@ -124,21 +125,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /** Public refresh of the current user. Offline leaves the session alone. */
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (): Promise<CurrentUser | null> => {
     try {
       const current = await authService.getCurrentUser();
-      if (!mounted.current) return;
+      if (!mounted.current) return current;
       setUser(current);
       setSessionStatus("authenticated");
+      return current;
     } catch (error) {
-      if (!mounted.current) return;
+      if (!mounted.current) return null;
       if (isTransportFailure(error)) {
         setSessionStatus(authService.hasSessionFlag() ? "unreachable" : "signed-out");
-        return;
+        return null;
       }
       setUser(null);
       authService.forgetSession();
       setSessionStatus("signed-out");
+      return null;
     }
   }, []);
 
@@ -202,9 +205,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (result.user) {
           setUser(result.user);
           setSessionStatus("authenticated");
-        } else {
-          await refresh();
+          return result;
         }
+        // The token response did not carry the account, so it is fetched and
+        // handed back: a caller deciding where to land needs it now, not on the
+        // next render.
+        return { ...result, user: await refresh() };
       }
       return result;
     },
@@ -218,9 +224,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (result.user) {
           setUser(result.user);
           setSessionStatus("authenticated");
-        } else {
-          await refresh();
+          return result;
         }
+        return { ...result, user: await refresh() };
       }
       return result;
     },
@@ -233,10 +239,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (verified) {
         setUser(verified);
         setSessionStatus("authenticated");
-      } else {
-        await refresh();
+        return verified;
       }
-      return verified;
+      return refresh();
     },
     [refresh],
   );

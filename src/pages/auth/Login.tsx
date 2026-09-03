@@ -10,11 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { errorMessage, fieldErrors } from "@/lib/errors";
+import { landingPath } from "@/lib/routes";
 
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +24,8 @@ export default function Login() {
   const [submitting, setSubmitting] = useState(false);
 
   // ProtectedRoute records where the guest was headed so we can return them.
-  const redirectTo = (location.state as { from?: string } | null)?.from ?? "/dashboard";
+  // Nothing recorded means the account itself decides the landing page.
+  const requestedFrom = (location.state as { from?: string } | null)?.from ?? null;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -47,7 +49,7 @@ export default function Login() {
         return;
       }
       toast.success("Welcome back.");
-      navigate(redirectTo, { replace: true });
+      navigate(requestedFrom ?? landingPath(result.user), { replace: true });
     } catch (error) {
       setErrors(fieldErrors(error));
       setFormError(errorMessage(error, "Invalid email or password."));
@@ -58,7 +60,7 @@ export default function Login() {
 
   // A session that restored while this page was open (after a reconnection,
   // say) means there is nothing to sign in to.
-  if (isAuthenticated) return <Navigate to={redirectTo} replace />;
+  if (isAuthenticated) return <Navigate to={requestedFrom ?? landingPath(user)} replace />;
 
   return (
     <>

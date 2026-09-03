@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import * as authService from "@/features/auth/api/authService";
 import { errorMessage } from "@/lib/errors";
+import { landingPath } from "@/lib/routes";
 
 /**
  * Where GitHub and Google send the browser back to.
@@ -56,9 +57,9 @@ export default function OAuthCallback() {
           navigate("/verify", { replace: true, state: { email: outcome.email } });
           return;
         }
-        await refresh();
+        const current = await refresh();
         toast.success("Signed in.");
-        navigate("/dashboard", { replace: true });
+        navigate(landingPath(current), { replace: true });
       } catch (err) {
         setError(errorMessage(err, "Could not complete that sign-in."));
       }

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import * as authService from "@/features/auth/api/authService";
 import { errorMessage, fieldErrors } from "@/lib/errors";
+import { landingPath } from "@/lib/routes";
 
 /**
  * Finishes a password reset using the token from the emailed link.
@@ -43,9 +44,9 @@ export default function ResetPassword() {
     setSubmitting(true);
     try {
       await authService.confirmPasswordReset(token, password, confirm);
-      await refresh();
+      const current = await refresh();
       toast.success("Password updated. You're signed in.");
-      navigate("/dashboard", { replace: true });
+      navigate(landingPath(current), { replace: true });
     } catch (error) {
       setErrors(fieldErrors(error));
       setFormError(errorMessage(error, "That reset link is invalid or has expired."));
