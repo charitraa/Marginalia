@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
+import { useCategories, usePostList, useTags } from "@/features/posts/hooks/usePosts";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SORT_OPTIONS, POSTS_PER_PAGE } from "@/config/constants";
 import { pageCount } from "@/lib/api/normalize";
@@ -56,6 +56,7 @@ export default function Explore() {
   }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data: categories } = useCategories();
+  const { data: tags } = useTags();
 
   const query = useMemo(
     () => ({
@@ -170,13 +171,52 @@ export default function Explore() {
           </nav>
         )}
 
-        {tag && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Tagged <span className="font-medium text-foreground">#{tag}</span>
-            <Button variant="link" className="h-auto p-0 pl-2 text-sm" onClick={() => update("tag", null)}>
-              clear
-            </Button>
-          </p>
+        {/* Tags. The API's own list, ordered as it returns them; the selected
+            one is always shown even if it falls outside the visible head. */}
+        {(tags?.length ?? 0) > 0 && (
+          <div className="mt-6 flex flex-wrap items-baseline gap-x-1.5 gap-y-2">
+            <span className="eyebrow mr-2 py-1">Tags</span>
+            {(() => {
+              const head = (tags ?? []).slice(0, 14);
+              const selected = (tags ?? []).find((entry) => entry.slug === tag);
+              const shown =
+                selected && !head.some((entry) => entry.slug === selected.slug)
+                  ? [selected, ...head]
+                  : head;
+              return shown.map((entry) => {
+                const active = tag === entry.slug;
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => update("tag", active ? null : entry.slug)}
+                    className={cn(
+                      "rounded-[3px] border px-2 py-1 font-sans text-xs transition-colors duration-200",
+                      active
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+                    )}
+                  >
+                    #{entry.name}
+                    {entry.count != null && (
+                      <span className="ml-1.5 tabular-nums opacity-60">{entry.count}</span>
+                    )}
+                  </button>
+                );
+              });
+            })()}
+            {tag && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => update("tag", null)}
+              >
+                Clear tag
+              </Button>
+            )}
+          </div>
         )}
 
         {/* Results */}
@@ -206,7 +246,7 @@ export default function Explore() {
               </p>
               <div
                 className={cn(
-                  "grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3",
+                  "grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3",
                   isFetching && "opacity-60 transition-opacity",
                 )}
               >

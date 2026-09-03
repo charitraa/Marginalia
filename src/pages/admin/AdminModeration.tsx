@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { CheckCircle2, EyeOff, Flag, Undo2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -42,13 +44,13 @@ export default function AdminModeration() {
     <Layout>
       <Seo title="Moderation · Admin" noIndex />
 
-      <div className="container-page max-w-4xl py-10">
-        <div className="mb-6">
-          <h1 className="font-serif text-3xl font-semibold">Moderation</h1>
-          <p className="mt-2 text-muted-foreground">
-            Reported comments. Hiding removes a comment from public threads but keeps it here.
-          </p>
-        </div>
+      <div className="container-page max-w-4xl pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Admin"
+          title="Moderation"
+          description="Reported comments. Hiding removes a comment from public threads but keeps it here."
+        />
 
         <Tabs
           value={status}
@@ -58,7 +60,7 @@ export default function AdminModeration() {
           }}
           className="mb-6"
         >
-          <TabsList>
+          <TabsList className="w-full justify-start">
             <TabsTrigger value="open">Open</TabsTrigger>
             <TabsTrigger value="reviewed">Actioned</TabsTrigger>
             <TabsTrigger value="dismissed">Dismissed</TabsTrigger>
@@ -71,7 +73,7 @@ export default function AdminModeration() {
         ) : isLoading ? (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="h-32 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-32 w-full" />
             ))}
           </div>
         ) : reports.length === 0 ? (
@@ -87,7 +89,7 @@ export default function AdminModeration() {
         ) : (
           <ul className="space-y-4">
             {reports.map((report) => (
-              <li key={report.id} className="rounded-lg border border-border p-4">
+              <li key={report.id} className="rounded-md border border-border p-4">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <Badge variant="outline">{REASON_LABELS[report.reason] ?? report.reason}</Badge>
                   {report.commentIsHidden && (

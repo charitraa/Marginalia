@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Users } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -39,20 +41,17 @@ export default function FollowList({ mode }: { mode: "followers" | "following" }
     <Layout>
       <Seo title={`${heading} · @${username}`} noIndex />
 
-      <div className="container-page max-w-2xl py-10">
-        <header className="mb-8">
-          <p className="text-sm text-muted-foreground">
-            <Link to={`/author/${username}`} className="hover:underline">
+      <div className="container-page max-w-2xl pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow={
+            <Link to={`/author/${username}`} className="transition-colors hover:text-foreground">
               @{username}
             </Link>
-          </p>
-          <h1 className="mt-1 font-serif text-3xl font-semibold">{heading}</h1>
-          {data && (
-            <p className="mt-2 text-muted-foreground">
-              {data.count} {data.count === 1 ? "person" : "people"}
-            </p>
-          )}
-        </header>
+          }
+          title={heading}
+          description={data ? `${data.count} ${data.count === 1 ? "person" : "people"}.` : undefined}
+        />
 
         {isError ? (
           <ErrorState error={error} title={`We couldn't load ${heading.toLowerCase()}.`}
@@ -60,7 +59,7 @@ export default function FollowList({ mode }: { mode: "followers" | "following" }
         ) : isLoading ? (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-16 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-16 w-full" />
             ))}
           </div>
         ) : people.length === 0 ? (
@@ -75,7 +74,7 @@ export default function FollowList({ mode }: { mode: "followers" | "following" }
           />
         ) : (
           <>
-            <ul className="divide-y divide-border rounded-lg border border-border">
+            <ul className="divide-y divide-border rounded-md border border-border">
               {people.map((person) => (
                 <li key={person.id} className="flex items-center gap-3 p-4">
                   <UserAvatar user={person} size="sm" />

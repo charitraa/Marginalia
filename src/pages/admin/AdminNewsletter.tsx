@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Mail, Pencil, RefreshCw, Send, Trash2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -61,20 +63,19 @@ export default function AdminNewsletter() {
     <Layout>
       <Seo title="Newsletter · Admin" noIndex />
 
-      <div className="container-page max-w-4xl py-10">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Newsletter</h1>
-            <p className="mt-2 text-muted-foreground">
-              Campaigns go to every confirmed subscriber. Open and click rates come
-              back from Brevo.
-            </p>
-          </div>
-          <Button className="gap-2" onClick={() => openCompose()}>
-            <Mail className="h-4 w-4" aria-hidden="true" />
-            New campaign
-          </Button>
-        </header>
+      <div className="container-page max-w-4xl pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Admin"
+          title="Newsletter"
+          description="Campaigns go to every confirmed subscriber. Open and click rates come back from Brevo."
+          actions={
+            <Button className="gap-2" onClick={() => openCompose()}>
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              New campaign
+            </Button>
+          }
+        />
 
         {isError ? (
           <ErrorState error={error} title="We couldn't load your campaigns."
@@ -82,7 +83,7 @@ export default function AdminNewsletter() {
         ) : isLoading ? (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="h-32 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-32 w-full" />
             ))}
           </div>
         ) : campaigns.length === 0 ? (
@@ -97,7 +98,7 @@ export default function AdminNewsletter() {
             {campaigns.map((campaign) => {
               const sent = campaign.status === "sent";
               return (
-                <li key={campaign.id} className="rounded-lg border border-border p-5">
+                <li key={campaign.id} className="rounded-md border border-border p-5">
                   <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">

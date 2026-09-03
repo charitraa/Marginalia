@@ -154,6 +154,14 @@ export default function Post() {
 
             <h1 className="mt-5 font-serif text-display-sm font-semibold">{post.title}</h1>
 
+            {/* The deck line the writer set in the editor. Serif, one step down
+                from the title — it belongs to the headline, not to the body. */}
+            {post.subtitle && (
+              <p className="mt-5 font-serif text-2xl leading-snug text-foreground/80">
+                {post.subtitle}
+              </p>
+            )}
+
             {post.excerpt && (
               <p className="mt-6 font-sans text-xl leading-relaxed text-muted-foreground">
                 {post.excerpt}
@@ -289,14 +297,19 @@ export default function Post() {
               {post.tags.length > 0 && (
                 <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
                   {post.tags.map((tag) => (
-                    <li key={tag.id} className="flex items-center gap-1.5">
+                    <li key={tag.id} className="flex items-center gap-1">
                       <Link
                         to={tagPath(tag.slug)}
                         className="font-sans text-sm text-muted-foreground transition-colors duration-200 hover:text-primary"
                       >
                         #{tag.name}
                       </Link>
-                      <TopicFollowButton kind="tag" slug={tag.slug} name={tag.name} />
+                      <TopicFollowButton
+                        kind="tag"
+                        slug={tag.slug}
+                        name={tag.name}
+                        variant="icon"
+                      />
                     </li>
                   ))}
                 </ul>

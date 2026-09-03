@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import Layout from "@/components/layout/Layout";
 import DeleteAccount from "@/features/auth/components/DeleteAccount";
 import Seo from "@/components/common/Seo";
@@ -22,6 +23,13 @@ const TABS = [
   { id: "profile", label: "Profile" },
   { id: "account", label: "Account" },
   { id: "security", label: "Security" },
+  { id: "appearance", label: "Appearance" },
+];
+
+const THEMES = [
+  { id: "light", label: "Light", hint: "Warm paper, ink type." },
+  { id: "dark", label: "Dark", hint: "Charcoal, for reading at night." },
+  { id: "system", label: "System", hint: "Follows your device." },
 ];
 
 function Section({
@@ -34,10 +42,16 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="surface-card p-6">
-      <h2 className="text-xl">{title}</h2>
-      {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
-      <div className="mt-6 space-y-5">{children}</div>
+    /* The tab strip already draws a rule, so the first section in a tab does
+       not draw a second one under it. */
+    <section className="border-t border-border pt-8 first:border-t-0 first:pt-0">
+      <h2 className="font-serif text-2xl font-semibold">{title}</h2>
+      {description && (
+        <p className="mt-2 max-w-measure font-sans text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      )}
+      <div className="mt-7 space-y-5">{children}</div>
     </section>
   );
 }
@@ -49,6 +63,7 @@ function FieldError({ message }: { message?: string }) {
 
 export default function UserSettings() {
   const { user, setUser, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -187,15 +202,15 @@ export default function UserSettings() {
 
       <div className="container-page max-w-3xl py-12 sm:py-16">
         <header>
-          <h1 className="text-4xl">Settings</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            Manage how you appear across {""}
-            <span className="whitespace-nowrap">Marginalia</span>.
+          <p className="eyebrow">Marginalia / Account</p>
+          <h1 className="mt-4 font-serif text-4xl font-semibold sm:text-5xl">Settings</h1>
+          <p className="mt-4 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+            Manage how you appear across Marginalia.
           </p>
         </header>
 
-        <div className="mt-8 border-b border-border">
-          <div className="flex gap-6" role="tablist">
+        <div className="mt-10 border-b border-border">
+          <div className="flex gap-7" role="tablist">
             {TABS.map((entry) => (
               <button
                 key={entry.id}
@@ -203,7 +218,7 @@ export default function UserSettings() {
                 aria-selected={tab === entry.id}
                 onClick={() => setTab(entry.id)}
                 className={cn(
-                  "-mb-px border-b-2 pb-3 text-sm font-medium transition-colors",
+                  "-mb-px border-b-2 pb-3 font-sans text-sm transition-colors duration-200",
                   tab === entry.id
                     ? "border-primary text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground",
@@ -215,7 +230,7 @@ export default function UserSettings() {
           </div>
         </div>
 
-        <div className="mt-8 space-y-8">
+        <div className="mt-10 space-y-10">
           {tab === "profile" && (
             <>
               <Section
@@ -394,7 +409,9 @@ export default function UserSettings() {
                     className="mt-2"
                   />
                   {user && !user.isVerified && (
-                    <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+                    /* One accent in the system, so an unverified address is
+                       marked by a rule rather than by a second warning hue. */
+                    <p className="mt-2.5 border-l-2 border-primary pl-3 text-sm text-muted-foreground">
                       This address is not verified yet.
                     </p>
                   )}
@@ -493,13 +510,71 @@ export default function UserSettings() {
                   </Button>
                 </div>
               </Section>
+
+              {/* The one irreversible control on the page, kept at the very
+                  bottom of Security and marked in the destructive hue. */}
+              <div className="pt-2">
+                <DeleteAccount />
+              </div>
             </>
+          )}
+
+          {tab === "appearance" && (
+            <Section
+              title="Theme"
+              description="Marginalia is designed twice — once on paper, once in charcoal. Pick whichever you read more comfortably."
+            >
+              <fieldset>
+                <legend className="sr-only">Colour theme</legend>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {THEMES.map((option) => {
+                    const active = (theme ?? "system") === option.id;
+                    return (
+                      <label
+                        key={option.id}
+                        className={cn(
+                          "cursor-pointer rounded-md border p-4 transition-colors duration-200",
+                          active
+                            ? "border-primary bg-accent/40"
+                            : "border-border hover:border-foreground/25",
+                        )}
+                      >
+                        <input
+                          type="radio"
+                          name="theme"
+                          value={option.id}
+                          checked={active}
+                          onChange={() => setTheme(option.id)}
+                          className="sr-only"
+                        />
+                        {/* A miniature of the real thing, drawn from the tokens. */}
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "mb-4 flex h-16 w-full items-center gap-1.5 rounded-sm border border-border px-3",
+                            option.id === "dark"
+                              ? "bg-[hsl(26_12%_7%)]"
+                              : option.id === "light"
+                                ? "bg-[hsl(38_33%_97%)]"
+                                : "bg-gradient-to-r from-[hsl(38_33%_97%)] from-50% to-[hsl(26_12%_7%)] to-50%",
+                          )}
+                        >
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                          <span className="h-px flex-1 bg-foreground/30" />
+                        </span>
+                        <span className="font-sans text-sm font-medium">{option.label}</span>
+                        <span className="mt-0.5 block font-sans text-xs text-muted-foreground">
+                          {option.hint}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            </Section>
           )}
         </div>
       </div>
-        <div className="mt-12">
-          <DeleteAccount />
-        </div>
     </Layout>
   );
 }

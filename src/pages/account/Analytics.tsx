@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Bookmark, Eye, Heart, MessageSquare, Users } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import { StatsSkeleton } from "@/components/common/Skeletons";
+import PageHeader from "@/components/common/PageHeader";
 import ErrorState from "@/components/common/ErrorState";
 import EmptyState from "@/components/common/EmptyState";
 import StatCard from "@/features/admin/components/StatCard";
@@ -31,37 +33,32 @@ export default function Analytics() {
     <Layout>
       <Seo title="Analytics" noIndex />
 
-      <div className="container-page py-10">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Analytics</h1>
-            <p className="mt-2 text-muted-foreground">
-              How your writing is doing. Only you can see this.
-            </p>
-          </div>
-
-          <Tabs value={String(period)} onValueChange={(value) => setPeriod(Number(value))}>
-            <TabsList>
-              {PERIODS.map((entry) => (
-                <TabsTrigger key={entry.value} value={String(entry.value)}>
-                  {entry.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Studio"
+          title="Analytics"
+          description="How your writing is doing. Only you can see this."
+          actions={
+            <Tabs value={String(period)} onValueChange={(value) => setPeriod(Number(value))}>
+              <TabsList>
+                {PERIODS.map((entry) => (
+                  <TabsTrigger key={entry.value} value={String(entry.value)}>
+                    {entry.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          }
+        />
 
         {isError ? (
           <ErrorState error={error} title="We couldn't load your analytics." onRetry={() => refetch()} />
         ) : isLoading || !data ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true">
-            {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="h-24 animate-pulse rounded-lg bg-muted" />
-            ))}
-          </div>
+          <StatsSkeleton count={8} />
         ) : (
           <>
-            <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mb-10 grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4">
               <StatCard
                 label="Total views" value={data.totalViews}
                 icon={<Eye className="h-4 w-4" />}
@@ -89,15 +86,15 @@ export default function Analytics() {
               <StatCard label="All posts" value={data.totalPosts} />
             </div>
 
-            <section aria-labelledby="views-over-time" className="mb-10 rounded-lg border border-border p-5">
-              <h2 id="views-over-time" className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <section aria-labelledby="views-over-time" className="mb-10 rounded-md border border-border p-5">
+              <h2 id="views-over-time" className="eyebrow mb-4">
                 Views over the last {period} days
               </h2>
               <ViewsChart data={data.dailyViews} />
             </section>
 
             <section aria-labelledby="top-posts">
-              <h2 id="top-posts" className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <h2 id="top-posts" className="eyebrow mb-4">
                 Your most read
               </h2>
 
@@ -109,7 +106,7 @@ export default function Analytics() {
                   action={{ label: "Write something", to: "/write" }}
                 />
               ) : (
-                <div className="overflow-x-auto rounded-lg border border-border">
+                <div className="overflow-x-auto rounded-md border border-border">
                   <table className="w-full min-w-[34rem] text-sm">
                     <thead className="border-b border-border bg-muted/40 text-left">
                       <tr>

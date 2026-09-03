@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Flag, Heart, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
+import { CornerDownRight, Flag, Heart, MoreHorizontal, Pencil, Pin, PinOff, Trash2 } from "lucide-react";
 import UserAvatar from "@/features/users/components/UserAvatar";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import ReportCommentDialog from "@/features/comments/components/ReportCommentDialog";
@@ -56,6 +56,9 @@ interface CommentItemProps {
   onDelete: (id: string) => Promise<unknown>;
   onLike?: (id: string, liked: boolean) => void;
   onPin?: (id: string, pinned: boolean) => void;
+  /** Posts a reply against this thread. Absent for signed-out readers. */
+  onReply?: (parentId: string, content: string) => Promise<unknown>;
+  replying?: boolean;
   busy?: boolean;
   depth?: number;
 }
@@ -70,6 +73,8 @@ export default function CommentItem({
   onDelete,
   onLike,
   onPin,
+  onReply,
+  replying = false,
   busy = false,
   depth = 0,
 }: CommentItemProps) {
@@ -78,6 +83,8 @@ export default function CommentItem({
   const [draft, setDraft] = useState(comment.content);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyDraft, setReplyDraft] = useState("");
 
   const isOwn =
     Boolean(user) &&
@@ -86,6 +93,18 @@ export default function CommentItem({
       user!.name === comment.author.name);
 
   const edited = comment.updatedAt && comment.updatedAt !== comment.createdAt;
+
+  /**
+   * A reply always attaches to the top of its thread, matching how the API
+   * returns them — replies nested inside their parent, one level deep.
+   */
+  const sendReply = async () => {
+    const trimmed = replyDraft.trim();
+    if (!trimmed || !onReply) return;
+    await onReply(comment.parentId ?? comment.id, trimmed);
+    setReplyDraft("");
+    setReplyOpen(false);
+  };
 
   const save = async () => {
     const trimmed = draft.trim();
@@ -99,7 +118,7 @@ export default function CommentItem({
   };
 
   return (
-    <article className={depth > 0 ? "ml-6 border-l border-border pl-4 sm:ml-11" : undefined}>
+    <article className={depth > 0 ? "ml-6 mt-6 border-l border-border pl-5 sm:ml-11" : "py-7"}>
       <div className="flex gap-3">
         <UserAvatar user={comment.author} size="sm" className="mt-0.5 shrink-0" />
 
@@ -247,25 +266,72 @@ export default function CommentItem({
                 {renderMentions(comment.content)}
               </p>
 
-              {onLike && (
-                <button
-                  type="button"
-                  onClick={() => user && onLike(comment.id, !comment.isLiked)}
-                  disabled={!user}
-                  aria-pressed={comment.isLiked}
-                  aria-label={comment.isLiked ? "Unlike this comment" : "Like this comment"}
-                  className={cn(
-                    "mt-2 inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs transition-colors",
-                    user ? "hover:bg-accent" : "cursor-default",
-                    comment.isLiked ? "text-primary" : "text-muted-foreground",
-                  )}
-                >
-                  <Heart
-                    className={cn("h-3.5 w-3.5", comment.isLiked && "fill-current")}
-                    aria-hidden="true"
+              <div className="mt-2 -ml-1.5 flex items-center gap-1">
+                {onLike && (
+                  <button
+                    type="button"
+                    onClick={() => user && onLike(comment.id, !comment.isLiked)}
+                    disabled={!user}
+                    aria-pressed={comment.isLiked}
+                    aria-label={comment.isLiked ? "Unlike this comment" : "Like this comment"}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs transition-colors duration-200",
+                      user ? "hover:bg-accent" : "cursor-default",
+                      comment.isLiked ? "text-primary" : "text-muted-foreground",
+                    )}
+                  >
+                    <Heart
+                      className={cn("h-3.5 w-3.5", comment.isLiked && "fill-current")}
+                      aria-hidden="true"
+                    />
+                    {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
+                  </button>
+                )}
+
+                {onReply && user && (
+                  <button
+                    type="button"
+                    onClick={() => setReplyOpen((open) => !open)}
+                    aria-expanded={replyOpen}
+                    className="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-xs text-muted-foreground transition-colors duration-200 hover:bg-accent hover:text-foreground"
+                  >
+                    <CornerDownRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    Reply
+                  </button>
+                )}
+              </div>
+
+              {replyOpen && onReply && (
+                <div className="mt-4 border-l border-border pl-4">
+                  <label htmlFor={`reply-${comment.id}`} className="sr-only">
+                    Reply to {comment.author.name}
+                  </label>
+                  <Textarea
+                    id={`reply-${comment.id}`}
+                    value={replyDraft}
+                    onChange={(event) => setReplyDraft(event.target.value.slice(0, 1000))}
+                    rows={3}
+                    autoFocus
+                    placeholder={`Reply to ${comment.author.name}…`}
+                    className="resize-y bg-transparent"
                   />
-                  {comment.likeCount > 0 && <span>{comment.likeCount}</span>}
-                </button>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Button size="sm" onClick={sendReply} disabled={replying || !replyDraft.trim()}>
+                      {replying ? "Posting…" : "Post reply"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={replying}
+                      onClick={() => {
+                        setReplyOpen(false);
+                        setReplyDraft("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
               )}
             </>
           )}
@@ -279,6 +345,8 @@ export default function CommentItem({
                   onUpdate={onUpdate}
                   onDelete={onDelete}
                   onLike={onLike}
+                  onReply={onReply}
+                  replying={replying}
                   busy={busy}
                   depth={depth + 1}
                 />

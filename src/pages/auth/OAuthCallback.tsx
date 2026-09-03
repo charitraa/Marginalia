@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import Layout from "@/components/layout/Layout";
+import AuthLayout from "@/features/auth/components/AuthLayout";
 import Seo from "@/components/common/Seo";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -66,25 +66,27 @@ export default function OAuthCallback() {
   }, [navigate, params, provider, refresh]);
 
   return (
-    <Layout>
+    <>
       <Seo title="Signing you in" noIndex />
 
-      <div className="container-page flex min-h-[50vh] items-center justify-center py-16">
+      <AuthLayout
+        title={error ? "Sign-in didn't finish" : "Signing you in"}
+        statement="Almost there."
+      >
         {error ? (
-          <div className="max-w-md space-y-4 text-center">
-            <h1 className="font-serif text-2xl font-semibold">Sign-in didn&apos;t finish</h1>
-            <p className="text-sm text-muted-foreground">{error}</p>
+          <div className="space-y-5">
+            <p className="font-sans text-sm leading-relaxed text-muted-foreground">{error}</p>
             <Button asChild>
               <Link to="/login">Back to sign in</Link>
             </Button>
           </div>
         ) : (
-          <div className="space-y-4 text-center">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" aria-hidden="true" />
-            <p className="text-sm text-muted-foreground">Finishing your sign-in…</p>
+          <div className="flex items-center gap-3">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
+            <p className="font-sans text-sm text-muted-foreground">Finishing your sign-in…</p>
           </div>
         )}
-      </div>
-    </Layout>
+      </AuthLayout>
+    </>
   );
 }

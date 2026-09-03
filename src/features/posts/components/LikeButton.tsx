@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, Lightbulb, Smile, ThumbsUp } from "lucide-react";
+import { ChevronDown, Heart, Lightbulb, Smile, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -105,9 +105,9 @@ export default function LikeButton({
           <button
             type="button"
             aria-label="Choose a reaction"
-            className="rounded px-1 text-xs text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            className="-ml-1 inline-flex h-8 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors duration-200 hover:text-foreground"
           >
-            ⌄
+            <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-1" align="start">

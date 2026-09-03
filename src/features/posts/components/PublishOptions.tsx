@@ -189,7 +189,7 @@ export default function PublishOptions({
 
           {/* A preview beats explaining what the fields do. */}
           <div className="rounded-md border border-border p-3">
-            <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
+            <p className="eyebrow mb-1.5">
               Preview
             </p>
             <p className="line-clamp-1 text-sm text-[#1a0dab] dark:text-[#8ab4f8]">

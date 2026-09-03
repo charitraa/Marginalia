@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Rss, Sparkles } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -32,13 +33,13 @@ export default function Feed() {
     <Layout>
       <Seo title="Your feed" noIndex />
 
-      <div className="container-page py-10">
-        <header className="mb-6">
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Your feed</h1>
-          <p className="mt-2 text-muted-foreground">
-            Writers, categories and tags you follow — plus a few suggestions.
-          </p>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Reading"
+          title="Your feed"
+          description="Writers, categories and tags you follow — plus a few suggestions."
+        />
 
         <Tabs
           value={tab}
@@ -48,7 +49,7 @@ export default function Feed() {
           }}
           className="mb-8"
         >
-          <TabsList>
+          <TabsList className="w-full justify-start">
             <TabsTrigger value="following" className="gap-2">
               <Rss className="h-4 w-4" aria-hidden="true" />
               Following
@@ -81,7 +82,7 @@ export default function Feed() {
           />
         ) : (
           <>
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}

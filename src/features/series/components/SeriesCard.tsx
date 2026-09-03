@@ -15,7 +15,7 @@ export default function SeriesCard({ series }: { series: Series }) {
     : 0;
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-border transition-colors hover:border-foreground/25">
+    <article className="surface-card-interactive group overflow-hidden">
       <Link to={`/series/${series.slug}`} className="block">
         {series.coverImage ? (
           <img
@@ -31,16 +31,16 @@ export default function SeriesCard({ series }: { series: Series }) {
         )}
 
         <div className="p-4">
-          <h3 className="font-serif text-lg font-semibold leading-snug group-hover:underline">
+          <h3 className="font-serif text-xl font-semibold leading-snug transition-colors duration-200 group-hover:text-primary">
             {series.title}
           </h3>
           {series.description && (
-            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+            <p className="mt-2 line-clamp-2 font-sans text-sm leading-relaxed text-muted-foreground">
               {series.description}
             </p>
           )}
 
-          <p className="mt-3 text-xs text-muted-foreground">
+          <p className="mt-3 font-sans text-xs text-muted-foreground">
             {series.postCount} {series.postCount === 1 ? "part" : "parts"}
             {" · "}
             {series.author.name}

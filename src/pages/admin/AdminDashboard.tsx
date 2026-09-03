@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen,
   ClipboardCheck, Eye, FileText, Flag, Heart, Mail, MessageSquare, Send, Users,
 } from "lucide-react";
@@ -21,11 +22,11 @@ export default function AdminDashboard() {
     <Layout>
       <Seo title="Admin" noIndex />
 
-      <div className="container-page py-10">
+      <div className="container-page pb-20 pt-12 sm:pt-16">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Admin</h1>
-            <p className="mt-2 text-muted-foreground">How the site is doing right now.</p>
+            <h1 className="font-serif text-4xl font-semibold sm:text-5xl">Admin</h1>
+            <p className="mt-4 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">How the site is doing right now.</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -72,18 +73,18 @@ export default function AdminDashboard() {
         {isError ? (
           <ErrorState error={error} title="We couldn't load the dashboard." onRetry={() => refetch()} />
         ) : isLoading || !data ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-busy="true">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4" aria-busy="true">
             {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="h-24 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-24 w-full" />
             ))}
           </div>
         ) : (
           <>
             <section aria-labelledby="people" className="mb-10">
-              <h2 id="people" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <h2 id="people" className="eyebrow mb-4">
                 People
               </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4">
                 <StatCard
                   label="Total users" value={data.totalUsers}
                   icon={<Users className="h-4 w-4" />}
@@ -106,10 +107,10 @@ export default function AdminDashboard() {
             </section>
 
             <section aria-labelledby="content" className="mb-10">
-              <h2 id="content" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <h2 id="content" className="eyebrow mb-4">
                 Content
               </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4">
                 <StatCard
                   label="Posts" value={data.totalPosts}
                   icon={<FileText className="h-4 w-4" />}
@@ -126,7 +127,7 @@ export default function AdminDashboard() {
             </section>
 
             <section aria-labelledby="roles">
-              <h2 id="roles" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <h2 id="roles" className="eyebrow mb-4">
                 Roles
               </h2>
               <ul className="flex flex-wrap gap-2">
@@ -145,7 +146,7 @@ export default function AdminDashboard() {
             </section>
 
             <section aria-labelledby="developer" className="mt-10 border-t border-border pt-6">
-              <h2 id="developer" className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              <h2 id="developer" className="eyebrow mb-4">
                 Developer
               </h2>
               <p className="mb-3 text-sm text-muted-foreground">

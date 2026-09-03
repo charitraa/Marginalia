@@ -2,13 +2,12 @@ import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import PageHeader from "@/components/common/PageHeader";
-import BlogCard from "@/features/posts/components/BlogCard";
+import NumberedStory from "@/features/posts/components/NumberedStory";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
-import { PostGridSkeleton } from "@/components/common/Skeletons";
+import { RankedListSkeleton } from "@/components/common/Skeletons";
 import { Button } from "@/components/ui/button";
 import { useTrendingPosts } from "@/features/posts/hooks/usePosts";
-import { cn } from "@/lib/utils";
 
 /**
  * Trending is ranked entirely by the API, from real likes, comments and views
@@ -56,7 +55,7 @@ export default function Trending() {
 
         <div className="mt-10">
           {isLoading ? (
-            <PostGridSkeleton count={6} />
+            <RankedListSkeleton count={3} />
           ) : error ? (
             <ErrorState error={error} title="We couldn't load trending stories." onRetry={() => refetch()} />
           ) : posts.length === 0 ? (
@@ -66,21 +65,33 @@ export default function Trending() {
               action={{ label: "Browse all stories", to: "/explore" }}
             />
           ) : (
-            <ol className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post, index) => (
-                <li key={post.id} className="relative">
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "absolute -left-1 -top-3 z-10 text-5xl font-bold leading-none",
-                      "text-foreground/10",
-                    )}
-                  >
-                    {index + 1}
-                  </span>
-                  <BlogCard post={post} />
+            /* The top three carry the ranking; the rest continue it as a list,
+               so the page reads as one ordered thing rather than a grid with
+               numbers stuck on it. */
+            <ol>
+              {posts.slice(0, 3).map((post, index) => (
+                <li key={post.id} className="mb-12">
+                  <NumberedStory
+                    post={post}
+                    rank={index + 1}
+                    variant="lead"
+                    /* The masthead already drew a rule; the first story does
+                       not need a second one directly under it. */
+                    className={index === 0 ? "border-t-0 pt-0" : undefined}
+                  />
                 </li>
               ))}
+              {posts.length > 3 && (
+                <li>
+                  <ol className="grid gap-x-14 sm:grid-cols-2">
+                    {posts.slice(3).map((post, index) => (
+                      <li key={post.id}>
+                        <NumberedStory post={post} rank={index + 4} />
+                      </li>
+                    ))}
+                  </ol>
+                </li>
+              )}
             </ol>
           )}
         </div>

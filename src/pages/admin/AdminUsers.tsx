@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Ban, Search, ShieldCheck, Undo2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -51,13 +53,13 @@ export default function AdminUsers() {
     <Layout>
       <Seo title="Users · Admin" noIndex />
 
-      <div className="container-page py-10">
-        <div className="mb-6">
-          <h1 className="font-serif text-3xl font-semibold">Users</h1>
-          <p className="mt-2 text-muted-foreground">
-            {data?.count ? `${data.count} accounts` : "Manage roles and suspensions."}
-          </p>
-        </div>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Admin"
+          title="Users"
+          description={data?.count ? `${data.count} accounts.` : "Manage roles and suspensions."}
+        />
 
         <div className="mb-6 flex flex-wrap gap-3">
           <div className="relative min-w-56 flex-1">
@@ -101,13 +103,13 @@ export default function AdminUsers() {
         ) : isLoading ? (
           <div className="space-y-2" aria-busy="true">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-16 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-16 w-full" />
             ))}
           </div>
         ) : rows.length === 0 ? (
           <EmptyState title="No accounts match" description="Try a different search or role." />
         ) : (
-          <div className="overflow-x-auto rounded-lg border border-border">
+          <div className="overflow-x-auto rounded-md border border-border">
             <table className="w-full min-w-[46rem] text-sm">
               <thead className="border-b border-border bg-muted/40 text-left">
                 <tr>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { History, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
@@ -76,7 +77,7 @@ export default function RevisionHistory({
           {isLoading ? (
             <div className="space-y-2" aria-busy="true">
               {Array.from({ length: 4 }).map((_, index) => (
-                <div key={index} className="h-12 animate-pulse rounded bg-muted" />
+                <Skeleton key={index} className="h-12 w-full" />
               ))}
             </div>
           ) : revisions.length === 0 ? (

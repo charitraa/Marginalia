@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
@@ -46,45 +47,73 @@ function StatCard({
   // A stat the API cannot calculate is omitted rather than shown as zero.
   if (value == null) return null;
   return (
-    <div className="surface-card p-5">
-      <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
-      <p className="mt-4 text-3xl font-semibold tabular-nums">{formatCount(value)}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+    <div className="border-t border-border pt-4">
+      <p className="flex items-center gap-1.5 font-sans text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+        <Icon className="h-3 w-3" aria-hidden="true" />
+        {label}
+      </p>
+      <p className="mt-2.5 font-serif text-4xl font-semibold tabular-nums">{formatCount(value)}</p>
     </div>
   );
 }
 
 function PostRow({ post, onDelete }: { post: Post; onDelete: (post: Post) => void }) {
   return (
-    <article className="surface-card flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
+    <article className="group flex flex-col gap-5 border-b border-border py-6 sm:flex-row sm:items-start">
+      <Link
+        to={postPath(post)}
+        tabIndex={-1}
+        aria-hidden="true"
+        className="media-frame hidden aspect-[4/3] w-28 shrink-0 sm:block"
+      >
+        {post.coverImage ? (
+          <img src={post.coverImage} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-muted">
+            <span className="font-serif text-xl text-muted-foreground/40">
+              {post.title.slice(0, 1).toUpperCase()}
+            </span>
+          </div>
+        )}
+      </Link>
+
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
           <span
             className={cn(
-              "rounded-full px-2.5 py-0.5 text-xs font-medium",
-              post.status === "published"
-                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                : "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+              "inline-flex items-center gap-1.5 font-sans text-2xs font-medium uppercase tracking-[0.14em]",
+              post.status === "published" ? "text-primary" : "text-muted-foreground",
             )}
           >
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full",
+                post.status === "published" ? "bg-primary" : "bg-muted-foreground/50",
+              )}
+              aria-hidden="true"
+            />
             {post.status === "published" ? "Published" : "Draft"}
           </span>
           {post.category && (
-            <span className="text-xs text-muted-foreground">{post.category.name}</span>
+            <span className="font-sans text-2xs uppercase tracking-[0.14em] text-muted-foreground">
+              {post.category.name}
+            </span>
           )}
         </div>
 
-        <h3 className="mt-2 text-lg font-semibold leading-snug">
-          <Link to={postPath(post)} className="text-foreground hover:text-primary">
+        <h3 className="mt-2.5 font-serif text-xl font-semibold">
+          <Link to={postPath(post)} className="transition-colors duration-200 hover:text-primary">
             {post.title}
           </Link>
         </h3>
 
         {post.excerpt && (
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{post.excerpt}</p>
+          <p className="mt-2 line-clamp-2 max-w-measure font-sans text-sm leading-relaxed text-muted-foreground">
+            {post.excerpt}
+          </p>
         )}
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-sans text-xs tabular-nums text-muted-foreground">
           {post.viewCount != null && (
             <span className="inline-flex items-center gap-1">
               <Eye className="h-3.5 w-3.5" aria-hidden="true" />
@@ -128,8 +157,16 @@ function PostRow({ post, onDelete }: { post: Post; onDelete: (post: Post) => voi
   );
 }
 
+/** Local time of day — nothing is fetched for this. */
+function greetingFor(hour: number) {
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
+  const greeting = greetingFor(new Date().getHours());
   const [params, setParams] = useSearchParams();
   const tab = params.get("tab") ?? "all";
   const page = Number(params.get("page") ?? 1) || 1;
@@ -153,24 +190,28 @@ export default function Dashboard() {
     <Layout>
       <Seo title="Dashboard" canonicalPath="/dashboard" noIndex />
 
-      <div className="container-page py-12 sm:py-16">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-4xl">Your dashboard</h1>
-            <p className="mt-3 text-lg text-muted-foreground">
-              {user ? `Welcome back, ${user.name}.` : "Manage your stories and track how they're doing."}
-            </p>
-          </div>
-          <Button asChild className="gap-2">
-            <Link to="/write">
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              Write a story
-            </Link>
-          </Button>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          eyebrow="Marginalia / Studio"
+          title={
+            <>
+              {greeting}
+              {user ? `, ${user.name.split(" ")[0]}` : ""}.
+            </>
+          }
+          description="Your writing space."
+          actions={
+            <Button asChild className="gap-2">
+              <Link to="/write">
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                Write a story
+              </Link>
+            </Button>
+          }
+        />
 
         {/* Overview */}
-        <section aria-label="Overview" className="mt-10">
+        <section aria-label="Overview" className="mt-12">
           {stats.isLoading ? (
             <StatsSkeleton count={4} />
           ) : stats.error ? (
@@ -180,7 +221,7 @@ export default function Dashboard() {
               onRetry={() => stats.refetch()}
             />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-x-8 gap-y-8 grid-cols-2 lg:grid-cols-4">
               <StatCard icon={FileText} label="Total posts" value={stats.data?.totalPosts ?? null} />
               <StatCard icon={BarChart3} label="Published" value={stats.data?.publishedPosts ?? null} />
               <StatCard icon={Pencil} label="Drafts" value={stats.data?.draftPosts ?? null} />
@@ -199,7 +240,7 @@ export default function Dashboard() {
         {/* Posts */}
         <section aria-label="Your posts" className="mt-14">
           <div className="border-b border-border">
-            <div className="flex gap-6" role="tablist">
+            <div className="flex gap-7" role="tablist">
               {TABS.map((entry) => (
                 <button
                   key={entry.id}
@@ -207,7 +248,7 @@ export default function Dashboard() {
                   aria-selected={activeTab.id === entry.id}
                   onClick={() => setTab(entry.id)}
                   className={cn(
-                    "-mb-px border-b-2 pb-3 text-sm font-medium transition-colors",
+                    "-mb-px border-b-2 pb-3 font-sans text-sm transition-colors duration-200",
                     activeTab.id === entry.id
                       ? "border-primary text-foreground"
                       : "border-transparent text-muted-foreground hover:text-foreground",
@@ -242,7 +283,7 @@ export default function Dashboard() {
               />
             ) : (
               <>
-                <div className="space-y-4">
+                <div className="border-t border-border">
                   {items.map((post) => (
                     <PostRow key={post.id} post={post} onDelete={setPendingDelete} />
                   ))}

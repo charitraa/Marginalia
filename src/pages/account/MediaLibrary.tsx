@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { Check, Copy, ImageIcon, Upload } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -46,14 +48,13 @@ export default function MediaLibrary() {
     <Layout>
       <Seo title="Media library" noIndex />
 
-      <div className="container-page py-10">
-        <header className="mb-8">
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Media library</h1>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            Images you&apos;ve uploaded from the editor. Copy a URL to reuse one in
-            another post instead of uploading it again.
-          </p>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Studio"
+          title="Media library"
+          description="Images you've uploaded from the editor. Copy a URL to reuse one in another post instead of uploading it again."
+        />
 
         {isError ? (
           <ErrorState error={error} title="We couldn't load your images."
@@ -61,7 +62,7 @@ export default function MediaLibrary() {
         ) : isLoading ? (
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4" aria-busy="true">
             {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="aspect-square animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="aspect-square w-full" />
             ))}
           </div>
         ) : images.length === 0 ? (
@@ -75,7 +76,7 @@ export default function MediaLibrary() {
           <>
             <ul className="grid gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {images.map((image) => (
-                <li key={image.id} className="group overflow-hidden rounded-lg border border-border">
+                <li key={image.id} className="group overflow-hidden rounded-md border border-border">
                   <div className="aspect-square bg-muted">
                     <img
                       src={image.url}

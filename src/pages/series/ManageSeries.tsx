@@ -91,14 +91,14 @@ export default function ManageSeries() {
     <Layout>
       <Seo title={`Managing: ${series.title}`} noIndex />
 
-      <div className="container-page max-w-3xl py-10">
+      <div className="container-page max-w-3xl pb-20 pt-12 sm:pt-16">
         <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="mb-1 flex items-center gap-2 text-sm text-muted-foreground">
               <Layers className="h-4 w-4" aria-hidden="true" />
               Managing series
             </p>
-            <h1 className="font-serif text-3xl font-semibold">{series.title}</h1>
+            <h1 className="font-serif text-4xl font-semibold">{series.title}</h1>
           </div>
           <Button variant="outline" asChild>
             <Link to={`/series/${series.slug}`}>View series</Link>
@@ -107,7 +107,7 @@ export default function ManageSeries() {
 
         {/* Details */}
         <section className="surface-card mb-8 space-y-4 p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <h2 className="eyebrow">
             Details
           </h2>
 
@@ -181,7 +181,7 @@ export default function ManageSeries() {
 
         {/* Parts */}
         <section className="surface-card space-y-4 p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <h2 className="eyebrow">
             Parts
           </h2>
 

@@ -75,22 +75,27 @@ export default function AuthorProfile() {
         canonicalPath={`/author/${profile.username}`}
       />
 
-      <header className="border-b border-border bg-muted/25">
-        <div className="container-page py-12 sm:py-16">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+      <header className="border-b border-foreground/15">
+        <div className="container-page pb-20 pt-12 sm:pt-16">
+          <p className="eyebrow mb-8">Marginalia / Writer</p>
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-10">
             <UserAvatar user={profile} size="xl" className="shrink-0" />
 
             <div className="min-w-0 flex-1">
-              <h1 className="text-3xl sm:text-4xl">{profile.name}</h1>
-              <p className="mt-1 text-muted-foreground">@{profile.username}</p>
+              <h1 className="font-serif text-4xl font-semibold sm:text-5xl">{profile.name}</h1>
+              <p className="mt-2 font-sans text-sm text-muted-foreground">@{profile.username}</p>
               {profile.headline && (
-                <p className="mt-2 font-medium text-primary">{profile.headline}</p>
+                <p className="mt-4 max-w-measure font-serif text-xl leading-snug text-foreground/85">
+                  {profile.headline}
+                </p>
               )}
               {profile.bio && (
-                <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">{profile.bio}</p>
+                <p className="mt-4 max-w-measure font-sans leading-relaxed text-muted-foreground">
+                  {profile.bio}
+                </p>
               )}
 
-              <dl className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+              <dl className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 font-sans text-sm tabular-nums">
                 {profile.postCount != null && (
                   <div className="inline-flex items-center gap-1.5">
                     <FileText className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
@@ -202,10 +207,18 @@ export default function AuthorProfile() {
         </div>
       </header>
 
-      <section className="container-page py-12 sm:py-16">
-        <h2 className="mb-8 border-b border-border pb-4 text-2xl">
-          {isSelf ? "Your published stories" : "Published stories"}
-        </h2>
+      <section className="container-page pb-20 pt-12 sm:pt-16">
+        <div className="section-head mb-10">
+          <h2 className="section-title">
+            {isSelf ? "Your stories" : `Stories by ${profile.name}`}
+          </h2>
+          {profile.postCount != null && (
+            <span className="font-sans text-sm tabular-nums text-muted-foreground">
+              {formatCount(profile.postCount)}{" "}
+              {profile.postCount === 1 ? "story" : "stories"}
+            </span>
+          )}
+        </div>
 
         {posts.isLoading ? (
           <PostGridSkeleton count={3} />
@@ -227,7 +240,7 @@ export default function AuthorProfile() {
           />
         ) : (
           <>
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}

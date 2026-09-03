@@ -10,31 +10,37 @@ const NotFound = () => {
   return (
     <Layout>
       <Seo title="Page not found" noIndex />
-      <div className="min-h-screen flex items-center justify-center py-12 md:py-20">
-        <div className="text-center max-w-md px-4">
-          <div className="mb-8">
-            <p className="text-6xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-              404
+
+      <div className="container-page flex min-h-[70vh] items-center py-20">
+        {/* The page is literally set in the margin — the one place the brand's
+            own idiom can carry a joke without explaining it. A single accent
+            rule does the work; the rail's own hairline would only double it. */}
+        <div className="w-full">
+          <p className="eyebrow mb-6">Error 404</p>
+
+          <div className="min-w-0 border-l-2 border-primary pl-8">
+            <h1 className="max-w-[16ch] font-serif text-4xl font-semibold sm:text-5xl">
+              This page wandered off into the margins.
+            </h1>
+            <p className="mt-6 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+              Nothing lives at this address. It may have been moved, unpublished, or the
+              link may simply have a typo in it.
             </p>
-          </div>
 
-          <h1 className="text-4xl font-semibold mb-4">Page Not Found</h1>
-
-          <p className="text-lg text-muted-foreground mb-8">
-            Sorry, we couldn't find the page you're looking for. It might have been moved or deleted.
-          </p>
-
-          <div className="space-y-3">
-            <Link to="/" className="block">
-              <Button className="w-full bg-primary hover:bg-primary/90 flex items-center justify-center gap-2">
-                Back to Home <ArrowRight className="h-4 w-4" />
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Button asChild className="group gap-2">
+                <Link to="/">
+                  Back home
+                  <ArrowRight
+                    className="h-4 w-4 transition-transform duration-200 ease-editorial group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </Link>
               </Button>
-            </Link>
-            <Link to="/explore" className="block">
-              <Button variant="outline" className="w-full">
-                Explore Articles
+              <Button variant="outline" asChild>
+                <Link to="/explore">Explore stories</Link>
               </Button>
-            </Link>
+            </div>
           </div>
         </div>
       </div>

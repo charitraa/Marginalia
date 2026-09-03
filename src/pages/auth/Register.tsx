@@ -1,26 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Check, Loader2, X } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import Layout from "@/components/layout/Layout";
+import AuthLayout from "@/features/auth/components/AuthLayout";
 import Seo from "@/components/common/Seo";
-import Logo from "@/components/common/Logo";
 import Captcha, { resetCaptcha } from "@/features/captcha/components/Captcha";
 import SocialAuthButtons from "@/features/auth/components/SocialAuthButtons";
+import PasswordRules, { passwordMeetsRules } from "@/features/auth/components/PasswordRules";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { errorMessage, fieldErrors } from "@/lib/errors";
 import { SITE_NAME } from "@/config/constants";
-import { cn } from "@/lib/utils";
-
-/** Mirrors the server's password validators so failures surface before submit. */
-const RULES = [
-  { id: "length", label: "At least 8 characters", test: (value: string) => value.length >= 8 },
-  { id: "letter", label: "Contains a letter", test: (value: string) => /[a-zA-Z]/.test(value) },
-  { id: "number", label: "Contains a number", test: (value: string) => /\d/.test(value) },
-];
 
 export default function Register() {
   const navigate = useNavigate();
@@ -42,7 +34,7 @@ export default function Register() {
   const update = (key: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement>) =>
     setForm((current) => ({ ...current, [key]: event.target.value }));
 
-  const passwordOk = RULES.every((rule) => rule.test(form.password));
+  const passwordOk = passwordMeetsRules(form.password);
   const matches = form.password === form.confirmPassword;
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -119,20 +111,22 @@ export default function Register() {
   );
 
   return (
-    <Layout>
+    <>
       <Seo title="Create an account" canonicalPath="/register" noIndex />
 
-      <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-        <div className="w-full max-w-md">
-          <div className="mb-10 text-center">
-            <Link to="/" className="inline-block text-lg" aria-label={`${SITE_NAME} home`}>
-              <Logo />
+      <AuthLayout
+        title="Create your account"
+        description={`Join ${SITE_NAME} to save what you read and publish what you write.`}
+        statement="A margin is where the reader answers back."
+        footer={
+          <>
+            Already have an account?{" "}
+            <Link to="/login" className="text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:decoration-primary">
+              Sign in
             </Link>
-            <h1 className="mt-8 font-serif text-4xl font-semibold">Create account</h1>
-            <p className="mt-3 font-sans text-muted-foreground">
-              Join {SITE_NAME} to start sharing your stories.
-            </p>
-          </div>
+          </>
+        }
+      >
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {formError && (
@@ -184,27 +178,7 @@ export default function Register() {
                 aria-describedby="password-rules"
                 className="mt-2"
               />
-              <ul id="password-rules" className="mt-2 space-y-1">
-                {RULES.map((rule) => {
-                  const ok = rule.test(form.password);
-                  return (
-                    <li
-                      key={rule.id}
-                      className={cn(
-                        "flex items-center gap-1.5 text-xs",
-                        ok ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground",
-                      )}
-                    >
-                      {ok ? (
-                        <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                      ) : (
-                        <X className="h-3.5 w-3.5" aria-hidden="true" />
-                      )}
-                      {rule.label}
-                    </li>
-                  );
-                })}
-              </ul>
+              <PasswordRules id="password-rules" value={form.password} />
               {errors.password && (
                 <p className="mt-1.5 text-sm text-destructive">{errors.password}</p>
               )}
@@ -260,15 +234,7 @@ export default function Register() {
           </form>
 
           <SocialAuthButtons label="or sign up with" />
-
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="font-medium text-primary hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </div>
-    </Layout>
+      </AuthLayout>
+    </>
   );
 }

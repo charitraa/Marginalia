@@ -60,13 +60,13 @@ export default function SeriesDetail() {
         canonicalPath={`/series/${series.slug}`}
       />
 
-      <div className="container-page max-w-3xl py-10">
+      <div className="container-page max-w-3xl pb-20 pt-12 sm:pt-16">
         <header className="mb-8">
           <p className="mb-2 flex items-center gap-2 text-sm text-muted-foreground">
             <Layers className="h-4 w-4" aria-hidden="true" />
             Series
           </p>
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">{series.title}</h1>
+          <h1 className="font-serif text-4xl font-semibold sm:text-5xl">{series.title}</h1>
           {series.description && (
             <p className="mt-3 text-lg text-muted-foreground">{series.description}</p>
           )}
@@ -87,7 +87,7 @@ export default function SeriesDetail() {
           )}
 
           {isAuthenticated && series.postCount > 0 && (
-            <div className="mt-6 rounded-lg border border-border p-4">
+            <div className="mt-6 rounded-md border border-border p-4">
               <div className="mb-2 flex items-center justify-between text-sm">
                 <span className="font-medium">Your progress</span>
                 <span className="tabular-nums text-muted-foreground">
@@ -126,7 +126,7 @@ export default function SeriesDetail() {
                 <li
                   key={entry.id}
                   className={cn(
-                    "flex items-start gap-3 rounded-lg border border-border p-4 transition-colors",
+                    "flex items-start gap-3 rounded-md border border-border p-4 transition-colors",
                     finished && "bg-muted/40",
                   )}
                 >

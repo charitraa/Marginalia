@@ -55,7 +55,7 @@ export default function SocialAuthButtons({ label = "or" }: { label?: string }) 
     <div className="space-y-4">
       <div className="flex items-center gap-3" aria-hidden="true">
         <span className="h-px flex-1 bg-border" />
-        <span className="text-xs uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="eyebrow">{label}</span>
         <span className="h-px flex-1 bg-border" />
       </div>
 

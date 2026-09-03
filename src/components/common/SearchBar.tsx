@@ -50,7 +50,9 @@ export default function SearchBar({
         autoFocus={autoFocus}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
-        className="h-11 rounded-full border-border bg-muted/60 pl-9 pr-9 focus-visible:bg-background"
+        /* Same corner as every other input; the tinted ground is what marks
+           it as search, not a pill shape borrowed from another design. */
+        className="h-11 border-border bg-muted/50 pl-9 pr-9 focus-visible:bg-background"
       />
       {busy ? (
         <Loader2

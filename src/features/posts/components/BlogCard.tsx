@@ -141,6 +141,10 @@ export default function BlogCard({ post, variant = "grid", className }: BlogCard
         </p>
       )}
 
+      {/* Takes up whatever height the neighbouring cards' longer titles create,
+          so the bylines line up along the bottom of a row. */}
+      <div className="grow" aria-hidden="true" />
+
       <div className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border pt-4">
         {byline}
         <PostMeta post={post} variant="plain" />

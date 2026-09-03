@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import BlogCard from "@/features/posts/components/BlogCard";
 import FeaturedPost from "@/features/posts/components/FeaturedPost";
-import PostMeta from "@/features/posts/components/PostMeta";
+import NumberedStory from "@/features/posts/components/NumberedStory";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import { PostGridSkeleton } from "@/components/common/Skeletons";
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
-import { categoryPath, postPath } from "@/lib/routes";
+import { categoryPath } from "@/lib/routes";
 import { SITE_DESCRIPTION, SITE_NAME } from "@/config/constants";
 
 /** A section opener: hairline, title, and an optional way out to the full list. */
@@ -161,31 +161,10 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <ol className="grid gap-x-14 gap-y-0 sm:grid-cols-2">
+              <ol className="grid gap-x-14 sm:grid-cols-2">
                 {trending.map((post, index) => (
-                  <li key={post.id} className="group border-t border-border py-6">
-                    <div className="flex gap-6">
-                      <span
-                        className="shrink-0 font-serif text-3xl font-semibold tabular-nums text-foreground/20 transition-colors duration-200 group-hover:text-primary/50"
-                        aria-hidden="true"
-                      >
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-serif text-xl font-semibold">
-                          <Link
-                            to={postPath(post)}
-                            className="transition-colors duration-200 hover:text-primary"
-                          >
-                            {post.title}
-                          </Link>
-                        </h3>
-                        <p className="mt-1.5 font-sans text-xs text-muted-foreground">
-                          {post.author.name}
-                        </p>
-                        <PostMeta post={post} className="mt-2.5" />
-                      </div>
-                    </div>
+                  <li key={post.id}>
+                    <NumberedStory post={post} rank={index + 1} />
                   </li>
                 ))}
               </ol>

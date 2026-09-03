@@ -54,6 +54,29 @@ export function PostListSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
+export function RankedListSkeleton({ count = 3 }: { count?: number }) {
+  return (
+    <div role="status" aria-label="Loading stories">
+      {Array.from({ length: count }).map((_, index) => (
+        <div
+          key={index}
+          className="mb-12 grid gap-8 border-t border-foreground/15 pt-8 lg:grid-cols-[auto_minmax(0,1fr)_minmax(0,20rem)] lg:gap-10"
+          aria-hidden="true"
+        >
+          <Skeleton className="h-12 w-12 shrink-0" />
+          <div className="space-y-3">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-4 w-4/5" />
+            <Skeleton className="h-4 w-40" />
+          </div>
+          <Skeleton className="hidden aspect-[4/3] w-full rounded-md lg:block" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function ArticleSkeleton() {
   return (
     <div className="space-y-6" role="status" aria-label="Loading story">
@@ -111,9 +134,13 @@ export function ProfileSkeleton() {
 
 export function StatsSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4" role="status" aria-label="Loading stats">
+    <div
+      className="grid grid-cols-2 gap-x-8 gap-y-8 lg:grid-cols-4"
+      role="status"
+      aria-label="Loading stats"
+    >
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="surface-card space-y-3 p-5">
+        <div key={index} className="space-y-3 border-t border-border pt-4">
           <Skeleton className="h-4 w-20" />
           <Skeleton className="h-8 w-12" />
         </div>

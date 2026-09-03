@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Loader2, XCircle } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
 import { Button } from "@/components/ui/button";
@@ -52,38 +52,71 @@ export default function NewsletterAction({ action }: { action: "confirm" | "unsu
     <Layout>
       <Seo title={heading} noIndex />
 
-      <div className="container-page flex min-h-[50vh] items-center justify-center py-16">
-        <div className="max-w-md space-y-4 text-center">
-          {state === "working" && (
-            <>
-              <Loader2 className="mx-auto h-10 w-10 animate-spin text-primary" aria-hidden="true" />
-              <p className="text-sm text-muted-foreground">{heading}…</p>
-            </>
-          )}
+      {/* Set like the other single-purpose screens: the margin carries the
+          label, the statement carries the outcome. No status-circle icons. */}
+      <div className="container-page flex min-h-[60vh] items-center py-20">
+        <div className="w-full">
+          <p className="eyebrow mb-6">Marginalia / Newsletter</p>
 
-          {state === "done" && (
-            <>
-              <CheckCircle2 className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
-              <h1 className="font-serif text-2xl font-semibold">
-                {action === "confirm" ? "You're subscribed" : "You're unsubscribed"}
-              </h1>
-              <p className="text-sm text-muted-foreground">{message}</p>
-              <Button asChild>
-                <Link to="/explore">Browse stories</Link>
-              </Button>
-            </>
-          )}
+          <div className="min-w-0">
+            {state === "working" && (
+              <div role="status" className="flex items-center gap-3">
+                <Loader2
+                  className="h-5 w-5 animate-spin text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <p className="font-sans text-lg text-muted-foreground">{heading}…</p>
+              </div>
+            )}
 
-          {state === "failed" && (
-            <>
-              <XCircle className="mx-auto h-12 w-12 text-destructive" aria-hidden="true" />
-              <h1 className="font-serif text-2xl font-semibold">That link didn&apos;t work</h1>
-              <p className="text-sm text-muted-foreground">{message}</p>
-              <Button variant="outline" asChild>
-                <Link to="/">Back to the blog</Link>
-              </Button>
-            </>
-          )}
+            {state === "done" && (
+              <div className="border-l-2 border-primary pl-8">
+                <h1 className="max-w-[16ch] font-serif text-4xl font-semibold sm:text-5xl">
+                  {action === "confirm"
+                    ? "You're on the list."
+                    : "You're unsubscribed."}
+                </h1>
+                <p className="mt-6 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+                  {message}
+                </p>
+                <div className="mt-10 flex flex-wrap gap-3">
+                  <Button asChild className="group gap-2">
+                    <Link to="/explore">
+                      Browse stories
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform duration-200 ease-editorial group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </Button>
+                  {action === "unsubscribe" && (
+                    <Button variant="outline" asChild>
+                      <Link to="/">Back home</Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {state === "failed" && (
+              <div className="border-l-2 border-destructive pl-8">
+                <h1 className="max-w-[18ch] font-serif text-4xl font-semibold sm:text-5xl">
+                  That link didn&apos;t work.
+                </h1>
+                <p className="mt-6 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+                  {message}
+                </p>
+                <div className="mt-10 flex flex-wrap gap-3">
+                  <Button asChild>
+                    <Link to="/">Back home</Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link to="/contact">Get in touch</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </Layout>

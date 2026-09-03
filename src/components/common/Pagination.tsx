@@ -36,7 +36,13 @@ export default function Pagination({
   if (pageCount <= 1) return null;
 
   return (
-    <nav aria-label="Pagination" className={cn("flex items-center justify-center gap-1", className)}>
+    <nav
+      aria-label="Pagination"
+      className={cn(
+        "mt-14 flex items-center justify-center gap-1 border-t border-border pt-8",
+        className,
+      )}
+    >
       <Button
         variant="outline"
         size="sm"

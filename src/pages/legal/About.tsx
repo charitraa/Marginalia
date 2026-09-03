@@ -1,91 +1,206 @@
-import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, Zap, Target } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ArrowRight, ArrowUpRight, PenLine } from "lucide-react";
+import Layout from "@/components/layout/Layout";
+import Seo from "@/components/common/Seo";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useCategories } from "@/features/posts/hooks/usePosts";
+import { categoryPath } from "@/lib/routes";
+import { MAINTAINER_URL, SITE_NAME, SITE_TAGLINE, SOURCE_URL } from "@/config/constants";
+
+/**
+ * The three commitments the publication actually makes. Written as principles
+ * rather than features — the features are visible on every other page.
+ */
+const PRINCIPLES = [
+  {
+    title: "The reading comes first",
+    body: "One column, a comfortable measure, type chosen for long stretches. Nothing pops up mid-paragraph, nothing follows you down the page, and the only thing competing for attention is the next sentence.",
+  },
+  {
+    title: "Written slowly",
+    body: "There is no algorithm rewarding volume here, and no feed to feed. A piece is published when it is finished, and it stays findable long after the week it was written in.",
+  },
+  {
+    title: "Yours to keep",
+    body: "Your writing stays your writing. Drafts are private until you say otherwise, published work carries your name, and you can take it down as easily as you put it up.",
+  },
+];
 
 export default function About() {
+  const { isAuthenticated } = useAuth();
+  const { data: categories, isLoading } = useCategories();
+
   return (
     <Layout>
-      <div className="py-12 md:py-20">
-        <div className="container mx-auto px-4">
-          {/* Hero */}
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <h1 className="text-5xl font-semibold mb-6">About Marginalia</h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              The premier platform for software developers and cybersecurity professionals to share knowledge, discuss trends, and build a secure digital future.
-            </p>
-          </div>
+      <Seo
+        title={`About ${SITE_NAME}`}
+        description={`${SITE_NAME} is an independent publication for thoughtful writing about software, design and the thinking behind them.`}
+        canonicalPath="/about"
+      />
 
-          {/* Mission Section */}
-          <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
-            <div>
-              <h2 className="text-3xl font-semibold mb-4">Our Mission</h2>
-              <p className="text-lg text-muted-foreground mb-4 leading-relaxed">
-                We believe that secure, well-built software is essential in today's digital world. Marginalia is built on the principle that knowledge about software development and cybersecurity should be accessible to everyone—from beginners to experts.
+      {/* The definition, then the statement. The word is doing the work here. */}
+      <section className="container-page pb-20 pt-16 sm:pt-24">
+        <div className="rail">
+          <p className="rail-label">About</p>
+          <div>
+            <p className="font-sans text-sm italic leading-relaxed text-muted-foreground">
+              mar·gi·na·li·a <span className="not-italic">·</span> noun
+              <span className="not-italic"> — </span>notes written in the margin of a page by
+              someone who was reading it closely.
+            </p>
+
+            <h1 className="mt-8 max-w-[17ch] font-serif text-display-sm font-semibold">
+              A publication for the thought beside the thought.
+            </h1>
+
+            <div className="mt-10 max-w-measure space-y-6 font-sans text-lg leading-relaxed text-muted-foreground">
+              <p>
+                The best part of a secondhand book is rarely the book. It is the previous
+                reader — the underline, the question mark, the argument in the margin with an
+                author who cannot answer back.
               </p>
-              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                Our mission is to create a space where software engineers, security professionals, and DevOps specialists can publish quality content, share experiences, and learn from one another in a vibrant, collaborative community.
+              <p>
+                {SITE_NAME} is built for that kind of writing: essays, tutorials, notes and
+                arguments from people working through something in public. Long enough to be
+                worth the time, honest enough to be worth trusting.
               </p>
             </div>
-            <div className="bg-gradient-to-br from-primary/10 to-blue-600/10 rounded-lg p-12 border border-primary/20 h-96 flex items-center justify-center">
-              <Zap className="h-32 w-32 text-primary opacity-20" />
-            </div>
-          </div>
-
-          {/* Values */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-semibold mb-12 text-center">Our Core Values</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: Target,
-                  title: "Security First",
-                  description: "We prioritize security best practices in everything we do, advocating for secure coding and DevSecOps practices.",
-                },
-                {
-                  icon: Users,
-                  title: "Knowledge Sharing",
-                  description: "We foster a collaborative community where developers and security professionals learn from each other's experiences.",
-                },
-                {
-                  icon: Zap,
-                  title: "Technical Excellence",
-                  description: "We uphold high standards for technical content, promoting best practices and cutting-edge methodologies.",
-                },
-              ].map((value, index) => {
-                const Icon = value.icon;
-                return (
-                  <div key={index} className="bg-card rounded-lg border border-border p-8">
-                    <Icon className="h-12 w-12 text-primary mb-4" />
-                    <h3 className="text-xl font-semibold mb-3">{value.title}</h3>
-                    <p className="text-muted-foreground">{value.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Team */}
-          <div className="mb-16 py-12 border-t border-b border-border">
-            <h2 className="text-3xl font-semibold mb-8 text-center">Built by Security-Minded Engineers</h2>
-            <p className="text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-12">
-              Marginalia is developed and maintained by a passionate team of software engineers, security researchers, and DevOps specialists committed to creating the best platform for knowledge sharing in the tech community.
-            </p>
-          </div>
-
-          {/* CTA */}
-          <div className="text-center">
-            <h2 className="text-3xl font-semibold mb-4">Join Our Developer Community</h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Start sharing your expertise and learn from thousands of developers and security professionals worldwide.
-            </p>
-            <Link to="/register">
-              <Button className="bg-primary hover:bg-primary/90 flex items-center gap-2 mx-auto">
-                Get Started <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
           </div>
         </div>
+      </section>
+
+      <div className="container-page pb-24">
+        {/* Principles, numbered in the margin like annotations. */}
+        <section>
+          <div className="section-head mb-10">
+            <h2 className="section-title">What this place is for</h2>
+          </div>
+          <ol className="grid gap-x-14 gap-y-0 md:grid-cols-3">
+            {PRINCIPLES.map((principle, index) => (
+              <li key={principle.title} className="border-t border-border py-7 md:border-t-0 md:pt-0">
+                <span
+                  aria-hidden="true"
+                  className="font-sans text-2xs font-medium tabular-nums tracking-[0.14em] text-primary"
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <h3 className="mt-3 font-serif text-2xl font-semibold">{principle.title}</h3>
+                <p className="mt-3 font-sans text-base leading-relaxed text-muted-foreground">
+                  {principle.body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Real topics from the API — the publication describing itself by what
+            has actually been written, rather than by a claim. */}
+        {(isLoading || (categories?.length ?? 0) > 0) && (
+          <section className="mt-24">
+            <div className="section-head mb-10">
+              <h2 className="section-title">What gets written about</h2>
+              <Link
+                to="/explore"
+                className="group/link inline-flex items-center gap-1.5 font-sans text-sm text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Explore everything
+                <ArrowRight
+                  className="h-3.5 w-3.5 transition-transform duration-200 ease-editorial group-hover/link:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Link>
+            </div>
+
+            {isLoading ? (
+              <div className="flex flex-wrap gap-x-8 gap-y-4">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Skeleton key={index} className="h-7 w-32" />
+                ))}
+              </div>
+            ) : (
+              <ul className="flex flex-wrap items-baseline gap-x-8 gap-y-4">
+                {categories!.map((category) => (
+                  <li key={category.slug}>
+                    <Link
+                      to={categoryPath(category.slug)}
+                      className="font-serif text-2xl font-semibold text-foreground/80 transition-colors duration-200 hover:text-primary sm:text-3xl"
+                    >
+                      {category.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        {/* Provenance. Small, factual, and honest about what this is. */}
+        <section className="mt-24">
+          <div className="rail border-t border-foreground/15 pt-8">
+            <p className="rail-label">Colophon</p>
+            <div className="max-w-measure space-y-5 font-sans text-base leading-relaxed text-muted-foreground">
+              <p>
+                {SITE_NAME} is an independent project, not a company. It is designed, built and
+                maintained by{" "}
+                <a
+                  href={MAINTAINER_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-foreground underline decoration-primary/50 underline-offset-[3px] transition-colors hover:decoration-primary"
+                >
+                  Charitra Shrestha
+                </a>
+                .
+              </p>
+              <p>
+                Set in Fraunces for the writing and Inter for everything around it. Built with
+                React and Django; the source is public.
+              </p>
+              <p>
+                <a
+                  href={SOURCE_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group inline-flex items-center gap-1.5 text-foreground underline decoration-primary/50 underline-offset-[3px] transition-colors hover:decoration-primary"
+                >
+                  Read the source on GitHub
+                  <ArrowUpRight
+                    className="h-3.5 w-3.5 transition-transform duration-200 ease-editorial group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </a>
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Closing invitation, set as a pulled quote in the margin idiom. */}
+        <section className="mt-24 border-t border-foreground/15 pt-14">
+          <div className="max-w-2xl border-l-2 border-primary pl-8">
+            <p className="font-serif text-3xl font-semibold leading-[1.15] sm:text-4xl">
+              If you have been meaning to write it down, write it here.
+            </p>
+            <p className="mt-6 font-sans text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {SITE_TAGLINE}
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="gap-2">
+                <Link to={isAuthenticated ? "/write" : "/register"}>
+                  <PenLine className="h-4 w-4" aria-hidden="true" />
+                  Start writing
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="gap-2">
+                <Link to="/explore">
+                  Read something first
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
       </div>
     </Layout>
   );

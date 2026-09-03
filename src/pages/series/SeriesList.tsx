@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Layers, Plus } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -51,22 +53,22 @@ export default function SeriesList() {
         canonicalPath="/series"
       />
 
-      <div className="container-page py-10">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Series</h1>
-            <p className="mt-2 max-w-2xl text-muted-foreground">
-              Multi-part guides meant to be read in order. Your place is remembered as you go.
-            </p>
-          </div>
-
-          {isAuthenticated && user?.canPublish && (
-            <Button className="gap-2" onClick={() => setCreating(true)}>
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              New series
-            </Button>
-          )}
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Series"
+          title="Series"
+          description="Multi-part guides meant to be read in order. Your place is remembered as you go."
+          actions={
+            isAuthenticated &&
+            user?.canPublish && (
+              <Button className="gap-2" onClick={() => setCreating(true)}>
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                New series
+              </Button>
+            )
+          }
+        />
 
         <div className="mb-8 max-w-md">
           <SearchBar
@@ -84,7 +86,7 @@ export default function SeriesList() {
         ) : isLoading ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-64 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-64 w-full" />
             ))}
           </div>
         ) : series.length === 0 ? (

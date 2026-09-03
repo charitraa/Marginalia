@@ -31,7 +31,7 @@ export default function BackToTop() {
       onClick={toTop}
       aria-label="Back to top"
       className={cn(
-        "fixed bottom-6 right-6 z-40 rounded-full shadow-md transition-opacity",
+        "fixed bottom-6 right-6 z-40 rounded-full border-border bg-background/90 backdrop-blur transition-opacity duration-200",
         visible ? "opacity-100" : "pointer-events-none opacity-0",
       )}
     >

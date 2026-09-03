@@ -76,6 +76,45 @@ function CategoryMenu() {
   );
 }
 
+/** One labelled group inside the mobile drawer. */
+function MobileGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-8 first:mt-0">
+      <p className="eyebrow">{label}</p>
+      <ul className="mt-1">{children}</ul>
+    </div>
+  );
+}
+
+/** A row in the drawer. Set in the editorial face — this is navigation for a
+ *  publication, not a settings list. */
+function MobileLink({
+  to,
+  end,
+  children,
+}: {
+  to: string;
+  end?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <li>
+      <NavLink
+        to={to}
+        end={end}
+        className={({ isActive }) =>
+          cn(
+            "flex items-center justify-between border-b border-border/70 py-3.5 font-serif text-lg transition-colors duration-200",
+            isActive ? "text-primary" : "text-foreground hover:text-primary",
+          )
+        }
+      >
+        {children}
+      </NavLink>
+    </li>
+  );
+}
+
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -134,6 +173,8 @@ export default function Header() {
           ? "border-b border-border bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
           : "border-b border-transparent bg-background",
       )}
+      /* The drawer opens directly under the bar, whichever height it is at. */
+      style={{ ["--header-offset" as string]: condensed ? "3.5rem" : "4rem" }}
     >
       <a
         href="#main"
@@ -177,7 +218,10 @@ export default function Header() {
             </Link>
           </Button>
 
-          <ThemeToggle />
+          {/* Below `sm` the bar keeps only search, notifications and the menu;
+              theme and the account live inside the drawer, where there is room
+              for them to be labelled. */}
+          <ThemeToggle className="hidden sm:inline-flex" />
 
           {isAuthenticated && user ? (
             <>
@@ -199,7 +243,7 @@ export default function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="ml-1.5 rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="ml-1.5 hidden rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:block"
                     aria-label="Account menu"
                   >
                     <UserAvatar user={user} size="sm" />
@@ -320,47 +364,100 @@ export default function Header() {
         </div>
       </div>
 
+      {/**
+        * Mobile navigation.
+        *
+        * Not the desktop bar reflowed: the whole of the reader's account lives
+        * behind one control here, grouped by what they came to do — read, keep,
+        * write, manage — with the publication's sections first. It scrolls
+        * inside itself and locks the page behind it.
+        */}
       {menuOpen && (
         <div
           id="mobile-nav"
-          className="animate-slide-down border-t border-border bg-background md:hidden"
+          className="animate-slide-down fixed inset-x-0 bottom-0 top-[var(--header-offset,3.5rem)] z-40 overflow-y-auto overscroll-contain border-t border-border bg-background md:hidden"
         >
-          <nav aria-label="Mobile" className="container-page flex flex-col py-2">
-            {[...NAV_LINKS, { to: "/about", label: "About", end: false }].map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                end={link.end}
-                className={({ isActive }) =>
-                  cn(
-                    "border-b border-border/70 py-3.5 font-serif text-lg transition-colors",
-                    isActive ? "text-foreground" : "text-muted-foreground",
-                  )
-                }
-              >
-                {link.label}
-              </NavLink>
-            ))}
-            <NavLink
-              to="/search"
-              className="border-b border-border/70 py-3.5 font-serif text-lg text-muted-foreground transition-colors"
-            >
-              Search
-            </NavLink>
+          <nav aria-label="Mobile" className="container-page pb-16 pt-6">
+            <MobileGroup label="Read">
+              {[...NAV_LINKS, { to: "/search", label: "Search", end: false }].map((link) => (
+                <MobileLink key={link.to} to={link.to} end={link.end}>
+                  {link.label}
+                </MobileLink>
+              ))}
+            </MobileGroup>
 
-            {!isAuthenticated && (
-              <div className="mt-5 flex gap-3 pb-2">
-                <Button variant="outline" asChild className="flex-1">
-                  <Link to="/login">Sign in</Link>
-                </Button>
-                <Button asChild className="flex-1">
-                  <Link to="/register">Get started</Link>
-                </Button>
-              </div>
+            {isAuthenticated && user ? (
+              <>
+                <MobileGroup label="Yours">
+                  <MobileLink to="/feed">Your feed</MobileLink>
+                  <MobileLink to="/bookmarks">Reading list</MobileLink>
+                  <MobileLink to="/history">Reading history</MobileLink>
+                  <MobileLink to="/notifications">Notifications</MobileLink>
+                  <MobileLink to="/my-comments">Your comments</MobileLink>
+                </MobileGroup>
+
+                <MobileGroup label="Studio">
+                  <MobileLink to="/write">Write a story</MobileLink>
+                  <MobileLink to="/dashboard">Dashboard</MobileLink>
+                  <MobileLink to="/analytics">Analytics</MobileLink>
+                  <MobileLink to="/media">Media library</MobileLink>
+                  <MobileLink to="/trash">Trash</MobileLink>
+                </MobileGroup>
+
+                <MobileGroup label="Account">
+                  <MobileLink to={authorPath(user)}>Your profile</MobileLink>
+                  <MobileLink to="/settings">Settings</MobileLink>
+                  {user.canModerate && <MobileLink to="/admin">Admin</MobileLink>}
+                </MobileGroup>
+
+                <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+                  <p className="eyebrow">Appearance</p>
+                  <ThemeToggle />
+                </div>
+
+                <div className="mt-6 border-t border-border pt-6">
+                  <p className="font-sans text-sm text-muted-foreground">
+                    Signed in as <span className="text-foreground">{user.name}</span>
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="mt-4 w-full gap-2"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    <LogOut className="h-4 w-4" aria-hidden="true" />
+                    Log out
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <MobileGroup label="About">
+                  <MobileLink to="/about">About Marginalia</MobileLink>
+                  <MobileLink to="/contact">Contact</MobileLink>
+                </MobileGroup>
+
+                <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+                  <p className="eyebrow">Appearance</p>
+                  <ThemeToggle />
+                </div>
+
+                <div className="mt-6 flex gap-3 border-t border-border pt-6">
+                  <Button variant="outline" asChild className="flex-1">
+                    <Link to="/login">Sign in</Link>
+                  </Button>
+                  <Button asChild className="flex-1">
+                    <Link to="/register">Get started</Link>
+                  </Button>
+                </div>
+              </>
             )}
           </nav>
         </div>
       )}
+
     </header>
   );
 }

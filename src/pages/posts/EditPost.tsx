@@ -3,6 +3,7 @@ import { History } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import PostEditor, { clearStoredDraft } from "@/features/posts/components/PostEditor";
 import DraftShareLink from "@/features/posts/components/DraftShareLink";
 import ReviewBanner from "@/features/posts/components/ReviewBanner";
@@ -62,14 +63,16 @@ export default function EditPost() {
   if (!canEdit) {
     return (
       <Layout>
-        <div className="container-page py-20 text-center">
-          <h1 className="text-3xl">You can't edit this story</h1>
-          <p className="mt-3 text-muted-foreground">
-            Only its author can make changes to it.
-          </p>
-          <Button className="mt-8" asChild>
-            <Link to={postPath(post)}>Read it instead</Link>
-          </Button>
+        <div className="container-page py-20">
+          <div className="border-l-2 border-primary pl-8">
+            <h1 className="font-serif text-4xl font-semibold">You can&apos;t edit this story.</h1>
+            <p className="mt-4 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+              Only its author can make changes to it.
+            </p>
+            <Button className="mt-8" asChild>
+              <Link to={postPath(post)}>Read it instead</Link>
+            </Button>
+          </div>
         </div>
       </Layout>
     );
@@ -79,23 +82,28 @@ export default function EditPost() {
     <Layout>
       <Seo title={`Editing: ${post.title}`} canonicalPath={`/post/${post.slug}/edit`} noIndex />
 
-      <div className="container-page py-12 sm:py-16">
-        <header className="mb-10 max-w-2xl">
-          <h1 className="text-4xl">Edit story</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            {post.status === "draft"
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Studio"
+          title="Edit story"
+          description={
+            post.status === "draft"
               ? "This story is still a draft. Publish it when it's ready."
-              : "This story is live. Changes appear as soon as you save."}
-          </p>
-        </header>
-
-        <div className="mb-6 flex justify-end">
-          <Button variant="outline" size="sm" className="gap-2"
-                  onClick={() => setHistoryOpen(true)}>
-            <History className="h-4 w-4" aria-hidden="true" />
-            Version history
-          </Button>
-        </div>
+              : "This story is live. Changes appear as soon as you save."
+          }
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+              onClick={() => setHistoryOpen(true)}
+            >
+              <History className="h-4 w-4" aria-hidden="true" />
+              Version history
+            </Button>
+          }
+        />
 
         <ReviewBanner post={post} />
 

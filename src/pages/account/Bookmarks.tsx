@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Bookmark } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -26,15 +27,17 @@ export default function Bookmarks() {
     <Layout>
       <Seo title="Your reading list" noIndex />
 
-      <div className="container-page py-10">
-        <div className="mb-8">
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Reading list</h1>
-          <p className="mt-2 text-muted-foreground">
-            {data?.count
-              ? `${data.count} ${data.count === 1 ? "story" : "stories"} saved for later`
-              : "Stories you save for later live here."}
-          </p>
-        </div>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Reading"
+          title="Reading list"
+          description={
+            data?.count
+              ? `${data.count} ${data.count === 1 ? "story" : "stories"} saved for later.`
+              : "Stories you save for later live here."
+          }
+        />
 
         {isLoading ? (
           <PostGridSkeleton count={6} />
@@ -53,7 +56,7 @@ export default function Bookmarks() {
           />
         ) : (
           <>
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {posts.map((post) => (
                 <BlogCard key={post.id} post={post} />
               ))}

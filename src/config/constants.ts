@@ -22,6 +22,11 @@ export const THEME_STORAGE_KEY = "marginalia.theme";
 export const OAUTH_STATE_KEY = "marginalia.oauth-state";
 
 export const SITE_NAME = "Marginalia";
+/** Where readers reach a human. Used by the contact and legal pages. */
+export const CONTACT_EMAIL = "stharabi9862187405@gmail.com";
+/** The person behind the publication, and where the code lives. */
+export const MAINTAINER_URL = "https://www.charitrashrestha.com.np";
+export const SOURCE_URL = "https://github.com/charitraa/Marginalia";
 export const SITE_TAGLINE = "Notes in the margins.";
 export const SITE_DESCRIPTION =
   "Thoughtful stories, ideas, tutorials and experiences from the Marginalia community.";

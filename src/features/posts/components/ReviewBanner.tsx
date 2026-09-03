@@ -27,7 +27,7 @@ export default function ReviewBanner({ post }: { post: Post }) {
 
   if (post.reviewNote) {
     return (
-      <div className="mb-6 rounded-lg border border-border bg-muted/50 p-4">
+      <div className="mb-6 rounded-md border border-border bg-muted/50 p-4">
         <p className="flex items-center gap-2 text-sm font-medium">
           <MessageSquareWarning className="h-4 w-4" aria-hidden="true" />
           An editor asked for changes
@@ -55,7 +55,7 @@ export default function ReviewBanner({ post }: { post: Post }) {
 
   if (post.status === "in_review") {
     return (
-      <div className="mb-6 rounded-lg border border-border p-4">
+      <div className="mb-6 rounded-md border border-border p-4">
         <p className="text-sm font-medium">Waiting for an editor</p>
         <p className="mt-1 text-sm text-muted-foreground">
           You&apos;ll be notified when they publish it or ask for changes. Nothing
@@ -67,7 +67,7 @@ export default function ReviewBanner({ post }: { post: Post }) {
 
   if (post.status === "draft" && !user?.canPublish) {
     return (
-      <div className="mb-6 rounded-lg border border-border p-4">
+      <div className="mb-6 rounded-md border border-border p-4">
         <p className="text-sm font-medium">Ready to publish?</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Your account saves drafts; an editor publishes them. Send this over when

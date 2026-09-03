@@ -336,6 +336,39 @@
     @apply -mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0;
   }
 
+  /**
+   * Policy and long-form static documents.
+   *
+   * Set in the interface face rather than Fraunces: these are read for
+   * reference, not for pleasure, and the sans keeps clauses and addresses
+   * unambiguous. The measure and leading still come from the article.
+   */
+  .legal-prose {
+    @apply font-sans text-base leading-[1.75] text-foreground/85;
+  }
+
+  .legal-prose a {
+    @apply text-foreground underline decoration-primary/50 underline-offset-[3px] transition-colors duration-150 hover:decoration-primary;
+  }
+
+  .legal-prose strong {
+    @apply font-medium text-foreground;
+  }
+
+  .legal-prose ul {
+    @apply space-y-2.5 pl-5;
+  }
+
+  .legal-prose li {
+    @apply relative pl-4;
+  }
+
+  /* A margin tick instead of a bullet — the mark's own annotation idiom. */
+  .legal-prose li::before {
+    content: "";
+    @apply absolute left-0 top-[0.7em] h-px w-2.5 bg-primary/60;
+  }
+
   /* Clamp helpers used by cards. */
   .line-clamp-2 {
     display: -webkit-box;

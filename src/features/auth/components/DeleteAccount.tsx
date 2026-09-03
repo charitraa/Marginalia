@@ -57,12 +57,12 @@ export default function DeleteAccount() {
   const ready = nameMatches && (!needsPassword || password.length > 0);
 
   return (
-    <section className="rounded-lg border border-destructive/30 p-5">
-      <h2 className="flex items-center gap-2 text-sm font-semibold text-destructive">
-        <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+    <section className="border-l-2 border-destructive py-1 pl-6">
+      <h2 className="flex items-center gap-2 font-serif text-2xl font-semibold text-destructive">
+        <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
         Delete account
       </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <p className="mt-2 max-w-measure font-sans text-sm leading-relaxed text-muted-foreground">
         Permanently deletes your account along with everything you have written.
         This cannot be undone.
       </p>

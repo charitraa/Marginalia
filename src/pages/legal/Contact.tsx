@@ -1,151 +1,185 @@
 import { useState } from "react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import Seo from "@/components/common/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MessageSquare, Phone, MapPin } from "lucide-react";
+import { CONTACT_EMAIL, SITE_NAME, SOURCE_URL } from "@/config/constants";
+
+const CHANNELS = [
+  {
+    label: "Anything at all",
+    value: CONTACT_EMAIL,
+    href: `mailto:${CONTACT_EMAIL}`,
+    note: "Questions, corrections, an idea for a piece, or a bug you hit. Read by a person.",
+  },
+  {
+    label: "Security",
+    value: CONTACT_EMAIL,
+    href: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Security report")}`,
+    note: "Found a vulnerability? Report it privately first, with steps to reproduce, and give us time to fix it before disclosing.",
+  },
+  {
+    label: "The code",
+    value: "github.com/charitraa/Marginalia",
+    href: SOURCE_URL,
+    external: true,
+    note: "Bugs and feature requests are welcome as issues, where everyone can follow them.",
+  },
+];
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const set =
+    (key: keyof typeof form) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((current) => ({ ...current, [key]: event.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      alert("Message sent! We'll get back to you soon.");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    }, 1000);
+  /**
+   * There is no contact endpoint on the API, so this composes a real message in
+   * the reader's own mail client rather than pretending to send one. The reader
+   * keeps a copy in their sent folder, which is the better outcome anyway.
+   */
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const body = [
+      form.message,
+      "",
+      "—",
+      form.name && `From: ${form.name}`,
+      form.email && `Reply to: ${form.email}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+      form.subject || `${SITE_NAME} enquiry`,
+    )}&body=${encodeURIComponent(body)}`;
   };
 
   return (
     <Layout>
-      <div className="py-12 md:py-20">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h1 className="text-5xl font-semibold mb-4">Contact</h1>
-            <p className="text-xl text-muted-foreground">
-              Have questions about our platform, want to contribute, or found a security issue? Get in touch with our team and we'll respond promptly.
+      <Seo
+        title="Contact"
+        description={`Get in touch with ${SITE_NAME}.`}
+        canonicalPath="/contact"
+      />
+
+      <section className="container-page pb-16 pt-16 sm:pt-24">
+        <div className="rail">
+          <p className="rail-label">Contact</p>
+          <div>
+            <h1 className="max-w-[16ch] font-serif text-display-sm font-semibold">
+              Say something in the margin.
+            </h1>
+            <p className="mt-7 max-w-measure font-sans text-lg leading-relaxed text-muted-foreground">
+              Corrections, questions, a piece you think belongs here, or something that broke —
+              it all reaches the same inbox, and it is a small enough publication that you will
+              get an answer.
             </p>
           </div>
+        </div>
+      </section>
 
-          <div className="grid md:grid-cols-3 gap-12 mb-16">
-            {/* Contact Info */}
-            <div className="space-y-8">
-              {[
-                {
-                  icon: Mail,
-                  title: "General Inquiries",
-                  content: "hello@devsechub.io",
-                },
-                {
-                  icon: MessageSquare,
-                  title: "Community Chat",
-                  content: "Join our Discord community",
-                },
-                {
-                  icon: Mail,
-                  title: "Security Issues",
-                  content: "security@devsechub.io",
-                },
-              ].map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <div key={index}>
-                    <div className="flex items-center gap-3 mb-2">
-                      <Icon className="h-6 w-6 text-primary" />
-                      <h3 className="font-semibold">{item.title}</h3>
-                    </div>
-                    <p className="text-muted-foreground ml-9">{item.content}</p>
-                  </div>
-                );
-              })}
-            </div>
+      <div className="container-page pb-24">
+        <div className="grid gap-14 border-t border-foreground/15 pt-12 lg:grid-cols-[1fr_1.35fr] lg:gap-20">
+          {/* Where to write, plainly listed. */}
+          <div>
+            <h2 className="eyebrow">Direct</h2>
+            <ul className="mt-6">
+              {CHANNELS.map((channel) => (
+                <li key={channel.label} className="border-t border-border py-6 first:border-t-0 first:pt-0">
+                  <p className="font-sans text-2xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    {channel.label}
+                  </p>
+                  <a
+                    href={channel.href}
+                    {...(channel.external ? { target: "_blank", rel: "noreferrer" } : {})}
+                    className="group mt-2 inline-flex items-center gap-1.5 font-serif text-lg font-semibold text-foreground transition-colors duration-200 hover:text-primary"
+                  >
+                    <span className="break-all">{channel.value}</span>
+                    {channel.external && (
+                      <ArrowUpRight
+                        className="h-4 w-4 shrink-0 transition-transform duration-200 ease-editorial group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </a>
+                  <p className="mt-2 font-sans text-sm leading-relaxed text-muted-foreground">
+                    {channel.note}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            {/* Contact Form */}
-            <div className="md:col-span-2">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="mt-2"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
-
+          {/* The form is a composer, not a submission — and it says so. */}
+          <div>
+            <h2 className="eyebrow">Draft a message</h2>
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="name">Your name</Label>
                   <Input
-                    id="subject"
-                    name="subject"
-                    type="text"
-                    placeholder="e.g., Feature Request, Bug Report, Partnership"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
+                    id="name"
+                    value={form.name}
+                    onChange={set("name")}
+                    autoComplete="name"
                     className="mt-2"
                   />
                 </div>
-
                 <div>
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    placeholder="Your message here..."
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={6}
-                    required
-                    className="mt-2 resize-none"
+                  <Label htmlFor="email">Your email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    onChange={set("email")}
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="mt-2"
                   />
                 </div>
+              </div>
 
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-primary hover:bg-primary/90"
-                >
-                  {isSubmitting ? "Sending..." : "Send Message"}
+              <div>
+                <Label htmlFor="subject">Subject</Label>
+                <Input
+                  id="subject"
+                  value={form.subject}
+                  onChange={set("subject")}
+                  placeholder="What is this about?"
+                  className="mt-2"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  value={form.message}
+                  onChange={set("message")}
+                  rows={8}
+                  required
+                  placeholder="Write as much or as little as you like."
+                  className="mt-2 resize-y"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
+                <p className="max-w-[24rem] font-sans text-xs leading-relaxed text-muted-foreground">
+                  This opens the message in your own mail app, addressed to {CONTACT_EMAIL} — so
+                  you keep a copy of what you sent.
+                </p>
+                <Button type="submit" className="gap-2" disabled={!form.message.trim()}>
+                  <Mail className="h-4 w-4" aria-hidden="true" />
+                  Open in your mail app
                 </Button>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>

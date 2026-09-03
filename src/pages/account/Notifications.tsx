@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Bell, CheckCheck, X } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import Pagination from "@/components/common/Pagination";
 import UserAvatar from "@/features/users/components/UserAvatar";
@@ -34,27 +36,26 @@ export default function Notifications() {
     <Layout>
       <Seo title="Notifications" noIndex />
 
-      <div className="container-page max-w-3xl py-10">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-semibold">Notifications</h1>
-            <p className="text-sm text-muted-foreground">
-              {unread > 0 ? `${unread} unread` : "You're all caught up"}
-            </p>
-          </div>
-
-          {unread > 0 && (
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={() => markRead.mutate(undefined)}
-              disabled={markRead.isPending}
-            >
-              <CheckCheck className="h-4 w-4" aria-hidden="true" />
-              Mark all read
-            </Button>
-          )}
-        </div>
+      <div className="container-page max-w-3xl pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Account"
+          title="Notifications"
+          description={unread > 0 ? `${unread} unread.` : "You're all caught up."}
+          actions={
+            unread > 0 && (
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => markRead.mutate(undefined)}
+                disabled={markRead.isPending}
+              >
+                <CheckCheck className="h-4 w-4" aria-hidden="true" />
+                Mark all read
+              </Button>
+            )
+          }
+        />
 
         <Tabs
           value={unreadOnly ? "unread" : "all"}
@@ -64,7 +65,7 @@ export default function Notifications() {
           }}
           className="mb-6"
         >
-          <TabsList>
+          <TabsList className="w-full justify-start">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="unread">Unread</TabsTrigger>
           </TabsList>
@@ -73,7 +74,7 @@ export default function Notifications() {
         {isLoading ? (
           <div className="space-y-2" aria-busy="true">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="h-20 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-20 w-full" />
             ))}
           </div>
         ) : items.length === 0 ? (
@@ -83,11 +84,16 @@ export default function Notifications() {
             description="Likes, comments and new followers will show up here."
           />
         ) : (
-          <ul className="divide-y divide-border rounded-lg border border-border">
+          <ul className="border-t border-border">
             {items.map((item) => (
               <li
                 key={item.id}
-                className={cn("flex items-start gap-3 p-4", !item.isRead && "bg-accent/40")}
+                /* Unread is marked by a rule in the margin rather than a tint —
+                   the same annotation idiom the rest of the site uses. */
+                className={cn(
+                  "flex items-start gap-3 border-b border-border py-4 pr-1 transition-colors",
+                  item.isRead ? "pl-4" : "border-l-2 border-l-primary bg-accent/25 pl-3.5",
+                )}
               >
                 <UserAvatar user={item.actor} size="sm" />
 
@@ -121,7 +127,6 @@ export default function Notifications() {
 
         {data && pageCount(data) > 1 && (
           <Pagination
-            className="mt-8"
             page={page}
             pageCount={pageCount(data)}
             onPageChange={setPage}

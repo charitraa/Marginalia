@@ -108,11 +108,9 @@ export default function Search() {
                   </span>
                 )}
               </p>
-              <div className="divide-y divide-border">
+              <div className="border-t border-border">
                 {posts.map((post) => (
-                  <div key={post.id} className="py-6 first:pt-0">
-                    <BlogCard post={post} variant="row" />
-                  </div>
+                  <BlogCard key={post.id} post={post} variant="row" />
                 ))}
               </div>
               <Pagination

@@ -2,16 +2,14 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import Layout from "@/components/layout/Layout";
+import AuthLayout from "@/features/auth/components/AuthLayout";
 import Seo from "@/components/common/Seo";
-import Logo from "@/components/common/Logo";
 import SocialAuthButtons from "@/features/auth/components/SocialAuthButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { errorMessage, fieldErrors } from "@/lib/errors";
-import { SITE_NAME } from "@/config/constants";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -59,20 +57,21 @@ export default function Login() {
   };
 
   return (
-    <Layout>
+    <>
       <Seo title="Sign in" canonicalPath="/login" noIndex />
 
-      <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-        <div className="w-full max-w-md">
-          <div className="mb-10 text-center">
-            <Link to="/" className="inline-block text-lg" aria-label={`${SITE_NAME} home`}>
-              <Logo />
+      <AuthLayout
+        title="Welcome back"
+        description="Sign in to keep reading, saving and writing."
+        footer={
+          <>
+            Don&apos;t have an account?{" "}
+            <Link to="/register" className="text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:decoration-primary">
+              Create one
             </Link>
-            <h1 className="mt-8 font-serif text-4xl font-semibold">Welcome back</h1>
-            <p className="mt-3 font-sans text-muted-foreground">
-              Sign in to keep reading and writing.
-            </p>
-          </div>
+          </>
+        }
+      >
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {formError && (
@@ -149,15 +148,7 @@ export default function Login() {
           </form>
 
           <SocialAuthButtons label="or continue with" />
-
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <Link to="/register" className="font-medium text-primary hover:underline">
-              Create one
-            </Link>
-          </p>
-        </div>
-      </div>
-    </Layout>
+      </AuthLayout>
+    </>
   );
 }

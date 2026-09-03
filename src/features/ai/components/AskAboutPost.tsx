@@ -25,7 +25,7 @@ export default function AskAboutPost({ slug }: { slug: string }) {
 
   return (
     <section
-      className="mt-12 rounded-lg border border-border p-5"
+      className="mt-12 rounded-md border border-border p-5"
       aria-labelledby="ask-about-post"
     >
       <h2 id="ask-about-post" className="flex items-center gap-2 text-sm font-semibold">

@@ -44,9 +44,11 @@ export default function Logo({
   markClassName?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-baseline gap-2", className)}>
+    <span className={cn("inline-flex shrink-0 items-baseline gap-2", className)}>
       <LogoMark className={cn("self-center", markClassName)} />
-      <span className="font-serif font-bold tracking-tight">{SITE_NAME}</span>
+      {/* The global wrap rule would otherwise hyphenate the masthead itself
+          when the header gets tight at 320px. */}
+      <span className="whitespace-nowrap font-serif font-bold tracking-tight">{SITE_NAME}</span>
     </span>
   );
 }

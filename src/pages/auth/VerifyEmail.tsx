@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Loader2, MailCheck } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import Layout from "@/components/layout/Layout";
+import AuthLayout from "@/features/auth/components/AuthLayout";
 import Seo from "@/components/common/Seo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,18 +68,22 @@ export default function VerifyEmail() {
   };
 
   return (
-    <Layout>
+    <>
       <Seo title="Verify your email" canonicalPath="/verify" noIndex />
 
-      <div className="container-page flex min-h-[70vh] items-center justify-center py-12">
-        <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-            <MailCheck className="mx-auto mb-4 h-10 w-10 text-primary" aria-hidden="true" />
-            <h1 className="text-3xl sm:text-4xl">Check your email</h1>
-            <p className="mt-2 text-muted-foreground">
-              We sent a 6-digit code{email ? ` to ${email}` : ""}. Enter it below to finish signing in.
-            </p>
-          </div>
+      <AuthLayout
+        title="Check your email"
+        description={`We sent a 6-digit code${email ? ` to ${email}` : ""}. Enter it below to finish signing in.`}
+        statement="One more step before the first page."
+        footer={
+          <>
+            Wrong address?{" "}
+            <Link to="/register" className="text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:decoration-primary">
+              Start over
+            </Link>
+          </>
+        }
+      >
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {formError && (
@@ -140,14 +144,7 @@ export default function VerifyEmail() {
             </Button>
           </div>
 
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            Wrong address?{" "}
-            <Link to="/register" className="font-medium text-primary hover:underline">
-              Start over
-            </Link>
-          </p>
-        </div>
-      </div>
-    </Layout>
+      </AuthLayout>
+    </>
   );
 }

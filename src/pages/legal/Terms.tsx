@@ -1,79 +1,175 @@
-import Layout from "@/components/layout/Layout";
+import { Link } from "react-router-dom";
+import LegalDocument from "@/pages/legal/LegalDocument";
+import { CONTACT_EMAIL, SITE_NAME } from "@/config/constants";
+
+const UPDATED = "January 2025";
 
 export default function Terms() {
   return (
-    <Layout>
-      <div className="py-12 md:py-20">
-        <div className="container mx-auto px-4 max-w-3xl prose dark:prose-invert">
-          <h1>Terms of Service</h1>
-          <p className="lead">Last updated: January 2025</p>
-
-          <h2>1. Agreement to Terms</h2>
-          <p>
-            By accessing and using the ArticleHub website and mobile application, you accept and agree to be
-            bound by the terms and provision of this agreement.
-          </p>
-
-          <h2>2. Use License</h2>
-          <p>
-            Permission is granted to temporarily download one copy of the materials (information or software)
-            on ArticleHub for personal, non-commercial transitory viewing only. This is the grant of a license,
-            not a transfer of title, and under this license you may not:
-          </p>
-          <ul>
-            <li>Modify or copy the materials</li>
-            <li>Use the materials for any commercial purpose or for any public display</li>
-            <li>Attempt to decompile or reverse engineer any software contained on ArticleHub</li>
-            <li>Remove any copyright or other proprietary notations from the materials</li>
-            <li>Transfer the materials to another person or "mirror" the materials on any other server</li>
-          </ul>
-
-          <h2>3. Disclaimer</h2>
-          <p>
-            The materials on ArticleHub are provided on an 'as is' basis. ArticleHub makes no warranties,
-            expressed or implied, and hereby disclaims and negates all other warranties including, without
-            limitation, implied warranties or conditions of merchantability, fitness for a particular purpose,
-            or non-infringement of intellectual property or other violation of rights.
-          </p>
-
-          <h2>4. Limitations</h2>
-          <p>
-            In no event shall ArticleHub or its suppliers be liable for any damages (including, without
-            limitation, damages for loss of data or profit, or due to business interruption) arising out of
-            the use or inability to use the materials on ArticleHub.
-          </p>
-
-          <h2>5. Accuracy of Materials</h2>
-          <p>
-            The materials appearing on ArticleHub could include technical, typographical, or photographic
-            errors. ArticleHub does not warrant that any of the materials on the website are accurate,
-            complete, or current.
-          </p>
-
-          <h2>6. Links</h2>
-          <p>
-            ArticleHub has not reviewed all of the sites linked to its website and is not responsible for
-            the contents of any such linked site. The inclusion of any link does not imply endorsement by
-            ArticleHub of the site. Use of any such linked website is at the user's own risk.
-          </p>
-
-          <h2>7. Modifications</h2>
-          <p>
-            ArticleHub may revise these terms of service for the website at any time without notice. By
-            using this website, you are agreeing to be bound by the then current version of these terms
-            of service.
-          </p>
-
-          <h2>8. Governing Law</h2>
-          <p>
-            These terms and conditions are governed by and construed in accordance with the laws of the
-            United States, and you irrevocably submit to the exclusive jurisdiction of the courts in that location.
-          </p>
-
-          <h2>Contact Us</h2>
-          <p>If you have any questions about these Terms of Service, please contact us at legal@articlehub.com</p>
-        </div>
-      </div>
-    </Layout>
+    <LegalDocument
+      eyebrow={`${SITE_NAME} / Legal`}
+      title="Terms of Service"
+      summary={`The agreement between you and ${SITE_NAME}: what you may do here, what we may do, and where each side's responsibility ends.`}
+      updated={UPDATED}
+      canonicalPath="/terms"
+      sections={[
+        {
+          id: "agreement",
+          title: "The agreement",
+          body: (
+            <p>
+              By using {SITE_NAME} you accept these terms. If you do not accept them, please do
+              not use the service. Where they conflict with the{" "}
+              <Link to="/privacy">Privacy Policy</Link> on a question of personal data, the
+              Privacy Policy governs.
+            </p>
+          ),
+        },
+        {
+          id: "accounts",
+          title: "Your account",
+          body: (
+            <>
+              <p>
+                You need an account to write, comment, follow or bookmark. You are responsible
+                for what happens under it, so keep your password to yourself and tell us if you
+                think it has been compromised.
+              </p>
+              <p>
+                One person, one account. Accounts created to impersonate someone else, or to
+                evade a suspension, will be removed.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "your-content",
+          title: "What you write stays yours",
+          body: (
+            <>
+              <p>
+                You keep every right you already had in what you publish here. Nothing in these
+                terms transfers ownership of your writing to us.
+              </p>
+              <p>
+                By publishing on {SITE_NAME} you grant us a non-exclusive, worldwide,
+                royalty-free licence to host, store, reproduce and display that work for the
+                purpose of running the service — showing it on its page, in feeds and in search
+                results, and quoting an excerpt of it in the newsletter. The licence exists so
+                the site can display your work; it ends for new uses when you delete the work,
+                allowing for copies in backups and caches that expire in the ordinary course.
+              </p>
+              <p>
+                You confirm that you have the right to publish what you post, including any
+                images in it.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "conduct",
+          title: "What is not allowed",
+          body: (
+            <>
+              <p>Do not use {SITE_NAME} to:</p>
+              <ul>
+                <li>Publish work that is not yours to publish.</li>
+                <li>Harass, threaten or target another person.</li>
+                <li>Post malware, phishing pages, or content designed to deceive.</li>
+                <li>
+                  Publish material that is unlawful where it is read, or that sexualises
+                  children.
+                </li>
+                <li>Spam — bulk posting, comment farming, or undisclosed paid promotion.</li>
+                <li>
+                  Attack the service itself: scraping at a volume that degrades it, probing for
+                  vulnerabilities without permission, or circumventing access controls.
+                </li>
+              </ul>
+              <p>
+                Comments can be reported for review. Reports are read by a human, and reporting
+                something does not remove it on its own.
+              </p>
+            </>
+          ),
+        },
+        {
+          id: "moderation",
+          title: "Moderation",
+          body: (
+            <p>
+              We may remove content or suspend an account that breaks these terms. Where it is
+              practical and lawful to do so, we will say why. Serious or repeated breaches can
+              end an account without warning.
+            </p>
+          ),
+        },
+        {
+          id: "our-content",
+          title: "The service itself",
+          body: (
+            <p>
+              The {SITE_NAME} name, design and software belong to us or to our licensors. You
+              may read, link to and quote the site normally; you may not copy the service
+              wholesale or present it as your own.
+            </p>
+          ),
+        },
+        {
+          id: "availability",
+          title: "Availability",
+          body: (
+            <p>
+              {SITE_NAME} is provided as it is, without warranty of any kind. We do not promise
+              that it will be uninterrupted, error-free, or that any particular feature will
+              stay available. Features may change or be withdrawn.
+            </p>
+          ),
+        },
+        {
+          id: "liability",
+          title: "Liability",
+          body: (
+            <p>
+              To the fullest extent the law allows, we are not liable for indirect or
+              consequential loss, for lost profits, or for loss of data arising from your use of
+              the service. Nothing here limits liability that cannot lawfully be limited.
+            </p>
+          ),
+        },
+        {
+          id: "ending",
+          title: "Ending this agreement",
+          body: (
+            <p>
+              You can close your account at any time from the Security tab in{" "}
+              <Link to="/settings">Settings</Link>. We can end an account for a breach of these
+              terms. The sections on your content licence, liability and governing law survive
+              the end of the agreement.
+            </p>
+          ),
+        },
+        {
+          id: "changes",
+          title: "Changes to these terms",
+          body: (
+            <p>
+              These terms may be revised. The date at the top changes when they are, and
+              continuing to use {SITE_NAME} after a revision means you accept it. If a change is
+              material, it will be announced on the site.
+            </p>
+          ),
+        },
+      ]}
+      footnote={
+        <>
+          Questions about these terms? Write to{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline decoration-primary/50 underline-offset-[3px]">
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </>
+      }
+    />
   );
 }

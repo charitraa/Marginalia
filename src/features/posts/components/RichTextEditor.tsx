@@ -148,12 +148,14 @@ export default function RichTextEditor({
   );
 
   return (
-    <div className={cn("surface-card overflow-hidden", className)}>
+    /* No overflow clipping here: it would trap the sticky toolbar below. */
+    <div className={cn("surface-card", className)}>
       <div
         role="toolbar"
         aria-label="Formatting"
         aria-controls={id}
-        className="flex flex-wrap items-center gap-0.5 border-b border-border bg-muted/40 p-1.5"
+        /* Follows the writer down a long draft, tucked under the site header. */
+        className="sticky top-14 z-20 flex flex-wrap items-center gap-0.5 rounded-t-md border-b border-border bg-card/95 p-1.5 backdrop-blur supports-[backdrop-filter]:bg-card/80"
       >
         {INLINE_ACTIONS.map(renderAction)}
         <Separator orientation="vertical" className="mx-1 h-5" />

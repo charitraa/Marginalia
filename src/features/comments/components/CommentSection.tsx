@@ -54,12 +54,19 @@ export default function CommentSection({ postId }: { postId: string }) {
 
   return (
     <section aria-labelledby="comments-heading" className="scroll-mt-24" id="comments">
-      <h2 id="comments-heading" className="text-2xl">
-        {total > 0 ? `${total} ${total === 1 ? "comment" : "comments"}` : "Comments"}
-      </h2>
+      <div className="section-head">
+        <h2 id="comments-heading" className="section-title">
+          Discussion
+        </h2>
+        {total > 0 && (
+          <span className="font-sans text-sm tabular-nums text-muted-foreground">
+            {total} {total === 1 ? "comment" : "comments"}
+          </span>
+        )}
+      </div>
 
       {isAuthenticated ? (
-        <form onSubmit={submit} className="mt-6">
+        <form onSubmit={submit} className="mt-8">
           <div className="flex gap-3">
             {user && <UserAvatar user={user} size="sm" className="mt-1 shrink-0" />}
             <div className="min-w-0 flex-1">
@@ -70,9 +77,9 @@ export default function CommentSection({ postId }: { postId: string }) {
                 id="new-comment"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value.slice(0, MAX_LENGTH))}
-                placeholder="Write a thoughtful comment…"
+                placeholder="Add to the conversation…"
                 rows={3}
-                className="resize-y"
+                className="resize-y bg-transparent"
               />
               <div className="mt-2 flex items-center justify-between gap-3">
                 <span className="text-xs text-muted-foreground">
@@ -86,8 +93,11 @@ export default function CommentSection({ postId }: { postId: string }) {
           </div>
         </form>
       ) : (
-        <div className="mt-6 rounded-lg border border-border bg-muted/40 px-5 py-4 text-sm">
-          <Link to="/login" className="font-medium text-primary hover:underline">
+        <div className="mt-8 border-y border-border py-5 font-sans text-sm">
+          <Link
+            to="/login"
+            className="text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:decoration-primary"
+          >
             Sign in
           </Link>{" "}
           <span className="text-muted-foreground">to join the conversation.</span>
@@ -117,7 +127,7 @@ export default function CommentSection({ postId }: { postId: string }) {
             description="Be the first to share your thoughts."
           />
         ) : (
-          <div className="space-y-8">
+          <div>
             {comments.length > 1 && (
               <div className="flex items-center justify-end gap-2">
                 <ArrowDownWideNarrow
@@ -136,17 +146,25 @@ export default function CommentSection({ postId }: { postId: string }) {
                 </Select>
               </div>
             )}
+            <div className="mt-2 divide-y divide-border border-t border-border">
             {comments.map((comment) => (
               <CommentItem
                 key={comment.id}
                 comment={comment}
                 busy={update.isPending || remove.isPending}
+                replying={create.isPending}
                 onUpdate={(id, content) => update.mutateAsync({ id, content })}
                 onDelete={(id) => remove.mutateAsync(id)}
                 onLike={(id, liked) => like.mutate({ id, liked })}
                 onPin={(id, pinned) => pin.mutate({ id, pinned })}
+                onReply={
+                  isAuthenticated
+                    ? (parentId, content) => create.mutateAsync({ content, parentId })
+                    : undefined
+                }
               />
             ))}
+            </div>
           </div>
         )}
       </div>

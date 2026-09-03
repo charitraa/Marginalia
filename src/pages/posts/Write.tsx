@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import PostEditor, { clearStoredDraft } from "@/features/posts/components/PostEditor";
 import { usePostMutations } from "@/features/posts/hooks/usePosts";
 import { postPath } from "@/lib/routes";
@@ -21,13 +22,13 @@ export default function Write() {
     <Layout>
       <Seo title="Write a story" canonicalPath="/write" noIndex />
 
-      <div className="container-page py-12 sm:py-16">
-        <header className="mb-10 max-w-2xl">
-          <h1 className="text-4xl">Create your story</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            Write it now, publish when you're ready. Drafts stay private to you.
-          </p>
-        </header>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Studio"
+          title="Write"
+          description="Write it now, publish when you're ready. Drafts stay private to you."
+        />
 
         <PostEditor
           submitting={create.isPending}

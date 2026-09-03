@@ -20,11 +20,17 @@ export default function TopicFollowButton({
   slug,
   name,
   size = "sm",
+  variant = "labelled",
 }: {
   kind: TopicKind;
   slug: string;
   name: string;
   size?: "sm" | "default";
+  /**
+   * "icon" is for places that repeat the control — a row of tags, where eight
+   * buttons reading "Follow" would drown the tags they belong to.
+   */
+  variant?: "labelled" | "icon";
 }) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -60,6 +66,32 @@ export default function TopicFollowButton({
     }
     toggle.mutate(!isFollowing);
   };
+
+  if (variant === "icon") {
+    const label = isFollowing ? `Unfollow ${name}` : `Follow ${name}`;
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={toggle.isPending}
+        aria-pressed={isFollowing}
+        aria-label={label}
+        title={label}
+        className={cn(
+          "inline-flex h-6 w-6 items-center justify-center rounded-full border transition-colors duration-200",
+          isFollowing
+            ? "border-primary bg-primary/10 text-primary"
+            : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+        )}
+      >
+        {isFollowing ? (
+          <Check className="h-3 w-3" aria-hidden="true" />
+        ) : (
+          <Plus className="h-3 w-3" aria-hidden="true" />
+        )}
+      </button>
+    );
+  }
 
   return (
     <Button

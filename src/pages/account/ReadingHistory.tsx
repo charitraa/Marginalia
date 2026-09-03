@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { History, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -49,26 +51,25 @@ export default function ReadingHistory() {
     <Layout>
       <Seo title="Reading history" noIndex />
 
-      <div className="container-page py-10">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Reading history</h1>
-            <p className="mt-2 text-muted-foreground">
-              Only you can see this. Clearing it does not affect view counts.
-            </p>
-          </div>
-
-          {entries.length > 0 && (
-            <Button
-              variant="outline"
-              className="gap-2 text-destructive hover:text-destructive"
-              onClick={() => setConfirmClear(true)}
-            >
-              <Trash2 className="h-4 w-4" aria-hidden="true" />
-              Clear history
-            </Button>
-          )}
-        </div>
+      <div className="container-page pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Reading"
+          title="Reading history"
+          description="Only you can see this. Clearing it does not affect view counts."
+          actions={
+            entries.length > 0 && (
+              <Button
+                variant="outline"
+                className="gap-2 text-destructive hover:text-destructive"
+                onClick={() => setConfirmClear(true)}
+              >
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
+                Clear history
+              </Button>
+            )
+          }
+        />
 
         <Tabs
           value={unfinishedOnly ? "continue" : "all"}
@@ -78,7 +79,7 @@ export default function ReadingHistory() {
           }}
           className="mb-8"
         >
-          <TabsList>
+          <TabsList className="w-full justify-start">
             <TabsTrigger value="all">Everything</TabsTrigger>
             <TabsTrigger value="continue">Continue reading</TabsTrigger>
           </TabsList>
@@ -87,9 +88,9 @@ export default function ReadingHistory() {
         {isError ? (
           <ErrorState error={error} title="We couldn't load your history." onRetry={() => refetch()} />
         ) : isLoading ? (
-          <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
+          <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3" aria-busy="true">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-64 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-64 w-full" />
             ))}
           </div>
         ) : entries.length === 0 ? (
@@ -105,7 +106,7 @@ export default function ReadingHistory() {
           />
         ) : (
           <>
-            <div className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {entries.map((entry) => (
                 <div key={entry.id}>
                   <BlogCard post={entry.post} />

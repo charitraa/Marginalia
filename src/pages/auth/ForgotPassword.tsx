@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Loader2, MailCheck } from "lucide-react";
-import Layout from "@/components/layout/Layout";
+import AuthLayout from "@/features/auth/components/AuthLayout";
 import Seo from "@/components/common/Seo";
 import Captcha, { resetCaptcha } from "@/features/captcha/components/Captcha";
 import { Button } from "@/components/ui/button";
@@ -49,16 +49,30 @@ export default function ForgotPassword() {
   };
 
   return (
-    <Layout>
+    <>
       <Seo title="Reset your password" noIndex />
 
-      <div className="container-page flex justify-center py-16">
-        <div className="w-full max-w-md">
+      <AuthLayout
+        title={sent ? "Check your inbox" : "Reset your password"}
+        description={
+          sent
+            ? undefined
+            : "Enter the email you signed up with and we'll send a reset link."
+        }
+        statement="Some things are worth coming back to."
+        footer={
+          <>
+            Remembered it?{" "}
+            <Link to="/login" className="text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:decoration-primary">
+              Sign in
+            </Link>
+          </>
+        }
+      >
           {sent ? (
             <div className="space-y-6 text-center">
               <MailCheck className="mx-auto h-12 w-12 text-primary" aria-hidden="true" />
               <div className="space-y-2">
-                <h1 className="font-serif text-2xl font-semibold">Check your inbox</h1>
                 <p className="text-sm text-muted-foreground">{message}</p>
                 <p className="text-sm text-muted-foreground">
                   The link works once and expires shortly, so open it soon.
@@ -73,13 +87,6 @@ export default function ForgotPassword() {
             </div>
           ) : (
             <>
-              <div className="mb-8 space-y-2">
-                <h1 className="font-serif text-3xl font-semibold">Forgot your password?</h1>
-                <p className="text-sm text-muted-foreground">
-                  Enter your email and we&apos;ll send a link to choose a new one.
-                </p>
-              </div>
-
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 {formError && (
                   <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -108,16 +115,9 @@ export default function ForgotPassword() {
                 </Button>
               </form>
 
-              <p className="mt-6 text-center text-sm text-muted-foreground">
-                Remembered it?{" "}
-                <Link to="/login" className="font-medium text-foreground hover:underline">
-                  Sign in
-                </Link>
-              </p>
             </>
           )}
-        </div>
-      </div>
-    </Layout>
+      </AuthLayout>
+    </>
   );
 }

@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { MessageSquare } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -33,15 +35,17 @@ export default function MyComments() {
     <Layout>
       <Seo title="Your comments" noIndex />
 
-      <div className="container-page max-w-3xl py-10">
-        <header className="mb-8">
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Your comments</h1>
-          <p className="mt-2 text-muted-foreground">
-            {data?.count
-              ? `${data.count} ${data.count === 1 ? "comment" : "comments"} across the site`
-              : "Everything you've said, newest first."}
-          </p>
-        </header>
+      <div className="container-page max-w-3xl pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Account"
+          title="Your comments"
+          description={
+            data?.count
+              ? `${data.count} ${data.count === 1 ? "comment" : "comments"} across the site.`
+              : "Everything you've said, newest first."
+          }
+        />
 
         {isError ? (
           <ErrorState error={error} title="We couldn't load your comments."
@@ -49,7 +53,7 @@ export default function MyComments() {
         ) : isLoading ? (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="h-24 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-24 w-full" />
             ))}
           </div>
         ) : comments.length === 0 ? (
@@ -63,7 +67,7 @@ export default function MyComments() {
           <>
             <ul className="space-y-3">
               {comments.map((comment) => (
-                <li key={comment.id} className="rounded-lg border border-border p-4">
+                <li key={comment.id} className="rounded-md border border-border p-4">
                   <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span>{formatRelative(comment.createdAt)}</span>
                     {comment.isEdited && <span>· edited</span>}

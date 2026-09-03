@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { Check, ClipboardCheck, Undo2 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -42,13 +44,13 @@ export default function ReviewQueue() {
     <Layout>
       <Seo title="Review queue · Admin" noIndex />
 
-      <div className="container-page max-w-3xl py-10">
-        <header className="mb-8">
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Review queue</h1>
-          <p className="mt-2 text-muted-foreground">
-            Submissions from writers who can draft but not publish. Oldest first.
-          </p>
-        </header>
+      <div className="container-page max-w-3xl pb-20">
+        <PageHeader
+          className="mb-10"
+          eyebrow="Marginalia / Admin"
+          title="Review queue"
+          description="Submissions from writers who can draft but not publish. Oldest first."
+        />
 
         {isError ? (
           <ErrorState error={error} title="We couldn't load the queue."
@@ -56,7 +58,7 @@ export default function ReviewQueue() {
         ) : isLoading ? (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="h-28 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-28 w-full" />
             ))}
           </div>
         ) : posts.length === 0 ? (
@@ -68,7 +70,7 @@ export default function ReviewQueue() {
         ) : (
           <ul className="space-y-4">
             {posts.map((post) => (
-              <li key={post.id} className="rounded-lg border border-border p-5">
+              <li key={post.id} className="rounded-md border border-border p-5">
                 <div className="mb-3 flex items-start gap-3">
                   <UserAvatar user={post.author} size="sm" />
                   <div className="min-w-0 flex-1">

@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Archive, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import Layout from "@/components/layout/Layout";
 import Seo from "@/components/common/Seo";
+import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/common/EmptyState";
 import ErrorState from "@/components/common/ErrorState";
 import Pagination from "@/components/common/Pagination";
@@ -47,20 +49,20 @@ export default function Trash() {
     <Layout>
       <Seo title="Trash" noIndex />
 
-      <div className="container-page max-w-3xl py-10">
-        <header className="mb-8">
-          <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Trash</h1>
-          <p className="mt-2 text-muted-foreground">
-            Deleted posts keep their comments and likes. Restore one to put it back as a draft.
-          </p>
-        </header>
+      <div className="container-page max-w-3xl pb-20">
+        <PageHeader
+          className="mb-12"
+          eyebrow="Marginalia / Studio"
+          title="Trash"
+          description="Deleted posts keep their comments and likes. Restore one to put it back as a draft."
+        />
 
         {isError ? (
           <ErrorState error={error} title="We couldn't load your trash." onRetry={() => refetch()} />
         ) : isLoading ? (
           <div className="space-y-3" aria-busy="true">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="h-20 animate-pulse rounded-lg bg-muted" />
+              <Skeleton key={index} className="h-20 w-full" />
             ))}
           </div>
         ) : posts.length === 0 ? (
@@ -76,7 +78,7 @@ export default function Trash() {
               {posts.map((post) => (
                 <li
                   key={post.id}
-                  className="flex flex-wrap items-center gap-3 rounded-lg border border-border p-4"
+                  className="flex flex-wrap items-center gap-3 rounded-md border border-border p-4"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{post.title}</p>
