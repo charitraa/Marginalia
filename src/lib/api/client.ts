@@ -41,7 +41,33 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-/** Called when a refresh fails, so the app can drop to a signed-out state. */
+/**
+ * True when a request never got an answer it can trust: the browser is offline,
+ * DNS or CORS failed, the request timed out, or the server is briefly down or
+ * still waking from a cold start.
+ *
+ * This is the difference between "we do not know who you are" and "we could not
+ * ask". Only the first is a reason to sign somebody out; treating the second as
+ * a signed-out state is what strands a reader on the login page after a blip in
+ * their connection, with a perfectly good refresh cookie still in the browser.
+ */
+export function isTransportFailure(error: unknown): boolean {
+  const status = (error as AxiosError)?.response?.status;
+  // No response at all: offline, timeout, DNS, CORS, aborted.
+  if (status === undefined) return true;
+  // The server answered, but not with an opinion about this session.
+  return status >= 500 || status === 408 || status === 429;
+}
+
+export type RefreshOutcome =
+  /** A new access token was issued. */
+  | { status: "refreshed"; token: string }
+  /** The server refused the refresh token: this session is genuinely over. */
+  | { status: "signed-out" }
+  /** We could not reach the server. The session may well still be valid. */
+  | { status: "unreachable" };
+
+/** Called when the server refuses a refresh, so the app can drop to signed out. */
 let onSessionExpired: (() => void) | null = null;
 
 export function setSessionExpiredHandler(handler: (() => void) | null) {
@@ -58,21 +84,27 @@ const NO_REFRESH = ["/api/auth/login/", "/api/auth/refresh/", "/api/auth/registe
  * A single in-flight refresh shared by every request that gets a 401, so a page
  * with six parallel queries refreshes once instead of six times.
  */
-let refreshInFlight: Promise<string | null> | null = null;
+let refreshInFlight: Promise<RefreshOutcome> | null = null;
 
-async function refreshAccessToken(): Promise<string | null> {
+export async function refreshAccessToken(): Promise<RefreshOutcome> {
   if (!refreshInFlight) {
     refreshInFlight = axios
       // A bare axios call, so this request cannot recurse through this interceptor.
       .post(`${BASE_URL || ""}/api/auth/refresh/`, {}, { withCredentials: true })
-      .then((response) => {
+      .then((response): RefreshOutcome => {
         const token = response.data?.access ?? null;
+        if (!token) {
+          setAccessToken(null);
+          return { status: "signed-out" };
+        }
         setAccessToken(token);
-        return token;
+        return { status: "refreshed", token };
       })
-      .catch(() => {
+      .catch((error): RefreshOutcome => {
+        // The in-memory token is known-stale either way; the session flag is
+        // what must survive, and only the caller decides that.
         setAccessToken(null);
-        return null;
+        return isTransportFailure(error) ? { status: "unreachable" } : { status: "signed-out" };
       })
       .finally(() => {
         refreshInFlight = null;
@@ -95,9 +127,11 @@ axiosInstance.interceptors.response.use(
 
     if (refreshable) {
       config._retried = true;
-      const token = await refreshAccessToken();
-      if (token) return axiosInstance(config);
-      onSessionExpired?.();
+      const outcome = await refreshAccessToken();
+      if (outcome.status === "refreshed") return axiosInstance(config);
+      // A refresh we could not deliver says nothing about the session, so the
+      // request fails and the caller retries later. Only a refusal signs out.
+      if (outcome.status === "signed-out") onSessionExpired?.();
     }
 
     return Promise.reject(error);

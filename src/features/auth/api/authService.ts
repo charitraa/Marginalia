@@ -1,4 +1,4 @@
-import { axiosInstance, setAccessToken } from "@/lib/api/client";
+import { axiosInstance, refreshAccessToken, setAccessToken } from "@/lib/api/client";
 import { normalizeCurrentUser } from "@/features/users/api/normalizers";
 import { normalizeSocialProvider } from "./normalizers";
 import { OAUTH_STATE_KEY, PENDING_VERIFICATION_KEY, SESSION_FLAG_KEY } from "@/config/constants";
@@ -137,20 +137,25 @@ export async function getCurrentUser(): Promise<CurrentUser> {
   return normalizeCurrentUser(data);
 }
 
+export type SessionRestore =
+  /** A fresh access token is in memory; the session continues. */
+  | "restored"
+  /** The server refused the refresh cookie. The session is over. */
+  | "signed-out"
+  /** The server could not be reached. Nothing is known; try again later. */
+  | "unreachable";
+
 /**
- * Restores a session on boot using the httpOnly refresh cookie. Returns the new
- * access token, or null when there is no valid session to restore.
+ * Restores a session on boot using the httpOnly refresh cookie.
+ *
+ * The three outcomes are deliberately distinct. Collapsing "unreachable" into
+ * "signed-out" is how an offline page load used to delete the session flag: the
+ * refresh cookie was still valid, but nothing was left to tell the app to use it.
  */
-export async function restoreSession(): Promise<string | null> {
-  try {
-    const { data } = await axiosInstance.post("/api/auth/refresh/", {});
-    const token = data?.access ?? null;
-    setAccessToken(token);
-    return token;
-  } catch {
-    setAccessToken(null);
-    return null;
-  }
+export async function restoreSession(): Promise<SessionRestore> {
+  const outcome = await refreshAccessToken();
+  if (outcome.status === "refreshed") return "restored";
+  return outcome.status === "unreachable" ? "unreachable" : "signed-out";
 }
 
 /**

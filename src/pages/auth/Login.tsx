@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import AuthLayout from "@/features/auth/components/AuthLayout";
@@ -14,7 +14,7 @@ import { errorMessage, fieldErrors } from "@/lib/errors";
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -55,6 +55,10 @@ export default function Login() {
       setSubmitting(false);
     }
   };
+
+  // A session that restored while this page was open (after a reconnection,
+  // say) means there is nothing to sign in to.
+  if (isAuthenticated) return <Navigate to={redirectTo} replace />;
 
   return (
     <>

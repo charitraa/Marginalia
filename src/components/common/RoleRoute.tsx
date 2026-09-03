@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import SessionReconnecting from "@/components/common/SessionReconnecting";
 import type { CurrentUser } from "@/features/users/types";
 
 /** Capability flags the guard can require. */
@@ -22,7 +23,7 @@ export default function RoleRoute({
   children: ReactNode;
   require: Capability;
 }) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading, isOffline, retrySession } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -32,6 +33,11 @@ export default function RoleRoute({
         <span className="sr-only">Checking your permissions…</span>
       </div>
     );
+  }
+
+  // A session we could not verify is not a session we know to be over.
+  if (!isAuthenticated && isOffline) {
+    return <SessionReconnecting onRetry={retrySession} />;
   }
 
   if (!isAuthenticated) {

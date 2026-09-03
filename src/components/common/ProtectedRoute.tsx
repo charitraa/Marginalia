@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import SessionReconnecting from "@/components/common/SessionReconnecting";
 import { Loader2 } from "lucide-react";
 
 /**
@@ -8,7 +9,7 @@ import { Loader2 } from "lucide-react";
  * the API remains the authority on what a request is allowed to do.
  */
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, isOffline, retrySession } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -18,6 +19,11 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
         <span className="sr-only">Checking your session…</span>
       </div>
     );
+  }
+
+  // A session we could not verify is not a session we know to be over.
+  if (!isAuthenticated && isOffline) {
+    return <SessionReconnecting onRetry={retrySession} />;
   }
 
   if (!isAuthenticated) {
