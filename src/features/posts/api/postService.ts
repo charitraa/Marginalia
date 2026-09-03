@@ -90,7 +90,11 @@ function toPayload(input: PostInput, options: { includeCover?: boolean } = {}) {
 
   if (input.coverImage instanceof File && options.includeCover !== false) {
     const form = new FormData();
-    Object.entries(base).forEach(([key, value]) => form.append(key, String(value)));
+    // FormData stringifies whatever it is given, so a null would reach the
+    // server as the literal "null" and fail validation; send it empty instead.
+    Object.entries(base).forEach(([key, value]) =>
+      form.append(key, value == null ? "" : String(value)),
+    );
     input.tags.forEach((tag) => form.append("tags", tag));
     form.append("cover_image", input.coverImage);
     return form;
