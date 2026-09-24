@@ -5,7 +5,7 @@
  * Django by the dev proxy in vite.config.ts. Set VITE_API_BASE_URL for deployed
  * builds (for example https://api.marginalia.blog).
  */
-export const BASE_URL = "https://blog-server-akdq.onrender.com";
+export const BASE_URL = "https://marginalia.pythonanywhere.com";
 
 /** react-query cache keys, kept from the original services layer. */
 export const LOGIN_CACHE_KEY = "login";
@@ -36,7 +36,7 @@ export const SITE_TAGLINE = "Notes in the margins.";
  * canonicalises itself competes with production in the index. Left empty in
  * development, where the browser's own origin is the right answer.
  */
-export const SITE_URL = (import.meta.env.VITE_SITE_URL ?? "").replace(/\/+$/, "");
+export const SITE_URL = "https://marginalia.charitrashrestha.com.np";
 
 /** Social preview image for pages that have none of their own. */
 export const SITE_OG_IMAGE = "/icon-512.png";
