@@ -14,7 +14,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useCategories, usePostList } from "@/features/posts/hooks/usePosts";
 import { categoryPath } from "@/lib/routes";
-import { SITE_DESCRIPTION, SITE_NAME, siteOrigin } from "@/config/constants";
+import {
+  MAINTAINER_GITHUB_URL,
+  MAINTAINER_NAME,
+  MAINTAINER_URL,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  siteOrigin,
+} from "@/config/constants";
 
 /** A section opener: hairline, title, and an optional way out to the full list. */
 function SectionHeading({
@@ -69,6 +76,11 @@ export default function Home() {
           description: SITE_DESCRIPTION,
           url: siteOrigin(),
           searchPath: "/search?q=",
+          developer: {
+            name: MAINTAINER_NAME,
+            url: MAINTAINER_URL,
+            sameAs: [MAINTAINER_GITHUB_URL],
+          },
         })}
       />
 

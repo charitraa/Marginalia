@@ -63,6 +63,7 @@ export function websiteSchema(options: {
   description: string;
   url: string;
   searchPath?: string;
+  developer?: { name: string; url: string; sameAs?: string[] };
 }) {
   return {
     "@context": "https://schema.org",
@@ -71,6 +72,17 @@ export function websiteSchema(options: {
     description: options.description,
     url: options.url,
     publisher: { "@type": "Organization", name: options.siteName, url: options.url },
+    // Names the person behind the site, so a search for them can resolve here.
+    ...(options.developer
+      ? {
+          creator: {
+            "@type": "Person",
+            name: options.developer.name,
+            url: options.developer.url,
+            ...(options.developer.sameAs?.length ? { sameAs: options.developer.sameAs } : {}),
+          },
+        }
+      : {}),
     ...(options.searchPath
       ? {
           potentialAction: {

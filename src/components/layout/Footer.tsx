@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import NewsletterForm from "@/features/newsletter/components/NewsletterForm";
 import Logo from "@/components/common/Logo";
-import { SITE_NAME } from "@/config/constants";
+import { MAINTAINER_NAME, MAINTAINER_URL, SITE_NAME } from "@/config/constants";
 
 const SECTIONS = [
   {
@@ -74,9 +74,22 @@ export default function Footer() {
           </div>
         </div>
 
-        <p className="mt-16 border-t border-border pt-7 font-sans text-xs text-muted-foreground">
-          © {new Date().getFullYear()} {SITE_NAME}
-        </p>
+        <div className="mt-16 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border pt-7 font-sans text-xs text-muted-foreground">
+          <p>
+            © {new Date().getFullYear()} {SITE_NAME}
+          </p>
+          <p>
+            Developed by{" "}
+            <a
+              href={MAINTAINER_URL}
+              target="_blank"
+              rel="author noreferrer"
+              className="text-foreground underline decoration-primary/50 underline-offset-[3px] transition-colors hover:decoration-primary"
+            >
+              {MAINTAINER_NAME}
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );

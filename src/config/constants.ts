@@ -25,7 +25,9 @@ export const SITE_NAME = "Marginalia";
 /** Where readers reach a human. Used by the contact and legal pages. */
 export const CONTACT_EMAIL = "stharabi9862187405@gmail.com";
 /** The person behind the publication, and where the code lives. */
+export const MAINTAINER_NAME = "Charitra Shrestha";
 export const MAINTAINER_URL = "https://www.charitrashrestha.com.np";
+export const MAINTAINER_GITHUB_URL = "https://github.com/charitraa";
 export const SOURCE_URL = "https://github.com/charitraa/Marginalia";
 export const SITE_TAGLINE = "Notes in the margins.";
 /**
